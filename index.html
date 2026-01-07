@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國樂團團練簽到系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/umd/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f3f4f6; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .tab-active { border-bottom: 2px solid #4f46e5; color: #4f46e5; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Toggle Switch Style */
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #4f46e5; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        /* Modal Style */
+        .modal-overlay { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        /* Sync Spin Animation */
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- 全局登出按鈕 -->
+    <div id="global-logout" class="hidden fixed top-6 right-6 z-50">
+        <button onclick="logout()" class="flex items-center gap-2 bg-white/80 hover:bg-red-50 text-red-500 px-4 py-2 rounded-full shadow-md border border-red-100 transition-all active:scale-95">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span class="text-sm font-bold">登出</span>
+        </button>
+    </div>
+
+    <div id="app" class="w-full max-w-md">
+        <!-- Login Card -->
+        <div id="login-view" class="glass-card p-8 rounded-3xl shadow-xl border border-gray-100 fade-in">
+            <div class="text-center mb-8">
+                <!-- 替換為上傳的 Logo -->
+                <div class="mb-4">
+                    <img src="Baiyang.png" alt="樂團 Logo" class="w-20 h-20 object-contain mx-auto rounded-2xl shadow-sm border border-gray-50">
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">國樂團簽到系統</h1>
+                <p class="text-gray-500 text-sm mt-2">請使用帳號登入以進行簽到</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">帳號</label>
+                    <input type="text" id="username" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="您的登入帳號">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
+                    <input type="password" id="password" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="••••••••">
+                </div>
+                <button onclick="handleLogin()" id="login-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-indigo-200">登入</button>
+                <button onclick="switchView('register-view')" class="w-full text-indigo-600 text-sm font-medium hover:underline">尚無帳號？點此註冊</button>
+            </div>
+        </div>
+
+        <!-- Register Card -->
+        <div id="register-view" class="hidden glass-card p-8 rounded-3xl shadow-xl border border-gray-100 fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">新成員註冊</h2>
+            <div class="space-y-4">
+                <input type="text" id="reg-name" placeholder="真實姓名" class="w-full px-4 py-3 rounded-xl border border-gray-200">
+                <select id="reg-section" class="w-full px-4 py-3 rounded-xl border border-gray-200">
+                    <option value="">選擇組別 (樂器)</option>
+                    <option value="笛簫">笛簫組</option>
+                    <option value="笙">笙組</option>
+                    <option value="嗩吶">嗩吶組</option>
+                    <option value="胡琴">胡琴組</option>
+                    <option value="彈撥">彈撥組</option>
+                    <option value="低音">低音組</option>
+                    <option value="打擊">打擊組</option>
+                </select>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 ml-1 uppercase">設定登入帳號</label>
+                    <input type="text" id="reg-username" placeholder="帳號" class="w-full px-4 py-3 rounded-xl border border-gray-200">
+                </div>
+                <input type="password" id="reg-password" placeholder="設定密碼" class="w-full px-4 py-3 rounded-xl border border-gray-200">
+                <button onclick="handleRegister()" id="reg-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition shadow-lg">提交註冊</button>
+                <button onclick="switchView('login-view')" class="w-full text-gray-500 text-sm">返回登入</button>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="dashboard-view" class="hidden fade-in">
+            <!-- 管理員控制面板 -->
+            <div id="admin-control-card" class="hidden glass-card p-5 rounded-3xl shadow-lg mb-4 border-2 border-indigo-200 bg-indigo-50/30">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                            <i data-lucide="settings-2" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-indigo-900">簽到控制台</h3>
+                                <button onclick="refreshConfig()" class="bg-white p-1.5 rounded-full shadow-sm hover:shadow-md border border-indigo-100 text-indigo-600 transition-all active:scale-90">
+                                    <i data-lucide="refresh-cw" id="config-sync-icon" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <p id="admin-status-text" class="text-[10px] text-indigo-600 font-medium">目前狀態：關閉中</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-gray-500">開放簽到</span>
+                        <label class="switch">
+                            <input type="checkbox" id="checkin-toggle" onchange="handleToggleStatus()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl shadow-xl mb-4 border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800" id="user-display">你好，樂友</h2>
+                        <span id="role-badge" class="inline-block px-2 py-0.5 rounded text-[10px] font-bold mt-1 uppercase">角色</span>
+                    </div>
+                    <button onclick="syncAllData()" class="bg-indigo-50 text-indigo-600 p-3 rounded-full hover:bg-indigo-100 shadow-sm border border-indigo-200 transition-all active:scale-90">
+                        <i data-lucide="rotate-cw" id="main-sync-icon" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div id="checkin-section" class="text-center py-6">
+                    <button onclick="handleCheckin()" id="checkin-btn" class="w-28 h-28 bg-gray-400 rounded-full text-white font-bold text-lg shadow-2xl transition-all cursor-not-allowed" disabled>
+                        尚未開放
+                    </button>
+                    <p id="checkin-hint" class="text-red-500 mt-4 text-xs font-medium">目前管理員尚未開放簽到</p>
+                </div>
+            </div>
+
+            <div class="flex border-b border-gray-200 mb-4 px-2">
+                <button id="tab-personal" onclick="switchDashboardTab('personal')" class="flex-1 py-2 text-sm font-medium tab-active transition-all">個人紀錄</button>
+                <button id="tab-management" onclick="switchDashboardTab('management')" class="flex-1 py-2 text-sm font-medium text-gray-500 hidden transition-all">團隊狀況</button>
+            </div>
+
+            <!-- 個人面板 -->
+            <div id="personal-panel" class="glass-card p-6 rounded-3xl shadow-xl border border-gray-100">
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center text-sm"><i data-lucide="calendar" class="w-4 h-4 mr-2"></i> 我的歷史簽到</h3>
+                <div id="personal-history" class="space-y-2 max-h-60 overflow-y-auto pr-2">
+                    <p class="text-gray-400 text-xs italic text-center py-4">載入紀錄中...</p>
+                </div>
+            </div>
+
+            <!-- 管理面板 -->
+            <div id="management-panel" class="hidden glass-card p-6 rounded-3xl shadow-xl border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="mgmt-title" class="font-bold text-gray-800 flex items-center text-sm">
+                        <i data-lucide="users" class="w-4 h-4 mr-2"></i> 團員出席
+                    </h3>
+                    <div class="flex items-center gap-2">
+                        <input type="date" id="mgmt-date-picker" onchange="loadStats()" class="text-xs border rounded-lg px-2 py-1 outline-none border-gray-200 focus:ring-1 focus:ring-indigo-400 bg-white">
+                        <button onclick="loadStats()" class="p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-full border border-indigo-200 transition-all active:scale-90">
+                            <i data-lucide="rotate-cw" id="stats-sync-icon" class="w-4 h-4 font-bold"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="stats-container" class="space-y-2 max-h-60 overflow-y-auto pr-2">
+                    <p class="text-gray-400 text-xs italic text-center py-4">載入資料中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 團員詳細紀錄彈窗 (Modal) -->
+    <div id="member-detail-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 modal-overlay">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden fade-in">
+            <div class="bg-indigo-600 p-6 text-white relative">
+                <button onclick="closeMemberModal()" class="absolute top-4 right-4 text-white/70 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i data-lucide="user-circle" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h4 id="modal-member-name" class="text-lg font-bold">團員姓名</h4>
+                        <p id="modal-member-section" class="text-xs text-indigo-100">樂器組別</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">歷史簽到紀錄</p>
+                    <span id="modal-member-count" class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-bold">0 次</span>
+                </div>
+                <div id="modal-member-history" class="space-y-2 max-h-64 overflow-y-auto pr-2">
+                    <!-- 載入歷史紀錄 -->
+                </div>
+                <button onclick="closeMemberModal()" class="w-full mt-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition active:scale-95">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 hidden bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-medium z-50"></div>
+
+    <script>
+        let currentUser = null;
+        let systemConfig = { checkin_status: 'Closed' };
+        let isCheckingIn = false; 
+        let isGAS = typeof google !== 'undefined' && google.script && google.script.run;
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzGfEmDLOOWnodU7bIM5n5-KlQ9rlCOlJgov9Eat_9iBph2OsSDB2ZikfEVip4-7yfL/exec"; 
+
+        window.onload = function() {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            document.getElementById('mgmt-date-picker').valueAsDate = new Date();
+        };
+
+        function switchView(viewId) {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('register-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('global-logout').classList.add('hidden');
+            document.getElementById(viewId).classList.remove('hidden');
+            if (viewId === 'dashboard-view') document.getElementById('global-logout').classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function switchDashboardTab(tab) {
+            const pTab = document.getElementById('tab-personal');
+            const mTab = document.getElementById('tab-management');
+            const pPanel = document.getElementById('personal-panel');
+            const mPanel = document.getElementById('management-panel');
+            if (tab === 'personal') {
+                pTab.classList.add('tab-active'); pTab.classList.remove('text-gray-500');
+                mTab.classList.remove('tab-active'); mTab.classList.add('text-gray-500');
+                pPanel.classList.remove('hidden'); mPanel.classList.add('hidden');
+            } else {
+                mTab.classList.add('tab-active'); mTab.classList.remove('text-gray-500');
+                pTab.classList.remove('tab-active'); pTab.classList.add('text-gray-500');
+                mPanel.classList.remove('hidden'); pPanel.classList.add('hidden');
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl text-sm font-medium z-50 ${isError ? 'bg-red-600' : 'bg-gray-800'}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        async function callBackend(funcName, data, callback) {
+            if (isGAS) {
+                google.script.run.withSuccessHandler(callback)[funcName](data);
+            } else {
+                try {
+                    const res = await fetch(GAS_WEB_APP_URL + "?action=" + funcName, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: funcName, data: data })
+                    }).then(r => r.json());
+                    callback(res);
+                } catch (err) { showToast("通訊失敗", true); }
+            }
+        }
+        
+        function handleLogin() {
+            const btn = document.getElementById('login-btn');
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            if (!username || !password) return showToast("請輸入帳號與密碼", true);
+            btn.disabled = true; btn.innerText = '驗證中...';
+            callBackend('loginUser', {email: username, password: password}, (res) => {
+                btn.disabled = false; btn.innerText = '登入';
+                if(res && res.success) {
+                    currentUser = res.user;
+                    systemConfig = res.systemConfig;
+                    initDashboard(res.hasCheckedInToday);
+                } else { showToast(res ? res.message : "登入失敗", true); }
+            });
+        }
+
+        function handleRegister() {
+            const btn = document.getElementById('reg-btn');
+            const data = {
+                name: document.getElementById('reg-name').value.trim(),
+                section: document.getElementById('reg-section').value,
+                email: document.getElementById('reg-username').value.trim(), 
+                password: document.getElementById('reg-password').value
+            };
+
+            if(!data.name || !data.email || !data.section || !data.password) {
+                return showToast("請填寫完整資訊", true);
+            }
+
+            btn.disabled = true; btn.innerText = '註冊中...';
+            callBackend('registerUser', data, (res) => {
+                btn.disabled = false; btn.innerText = '提交註冊';
+                if(res && res.success) { 
+                    showToast("註冊成功"); 
+                    switchView('login-view'); 
+                } else {
+                    showToast(res ? res.message : "註冊失敗", true);
+                }
+            });
+        }
+
+        function initDashboard(alreadyCheckedIn = false) {
+            document.getElementById('user-display').innerText = `你好，${currentUser.Name}`;
+            const badge = document.getElementById('role-badge');
+            badge.innerText = currentUser.Role;
+            
+            if(currentUser.Role === 'Admin') {
+                badge.className = "inline-block px-2 py-0.5 rounded text-[10px] font-bold mt-1 bg-purple-100 text-purple-700";
+                document.getElementById('admin-control-card').classList.remove('hidden');
+                document.getElementById('checkin-toggle').checked = (systemConfig.checkin_status === 'Open');
+                updateAdminStatusText();
+                document.getElementById('tab-management').classList.remove('hidden');
+            } else if(currentUser.Role === 'Leader') {
+                badge.className = "inline-block px-2 py-0.5 rounded text-[10px] font-bold mt-1 bg-blue-100 text-blue-700";
+                document.getElementById('tab-management').classList.remove('hidden');
+            }
+
+            updateCheckinButtonUI(alreadyCheckedIn);
+            loadPersonalHistory();
+            if (currentUser.Role !== 'Member') loadStats();
+            switchView('dashboard-view');
+        }
+
+        function syncAllData() {
+            const icon = document.getElementById('main-sync-icon');
+            icon.classList.add('spin');
+            refreshConfig(() => {
+                loadPersonalHistory();
+                if (currentUser.Role !== 'Member') loadStats();
+                setTimeout(() => {
+                    icon.classList.remove('spin');
+                    showToast("資料同步完成");
+                }, 800);
+            });
+        }
+
+        function refreshConfig(callback) {
+            const icon = document.getElementById('config-sync-icon');
+            if(icon) icon.classList.add('spin');
+            callBackend('getSystemConfig', {}, (res) => {
+                if(res.success) {
+                    systemConfig = res.config;
+                    if(currentUser.Role === 'Admin') {
+                        document.getElementById('checkin-toggle').checked = (systemConfig.checkin_status === 'Open');
+                        updateAdminStatusText();
+                    }
+                    updateCheckinButtonUI(document.getElementById('checkin-btn').innerText === '已簽到');
+                }
+                if(icon) icon.classList.remove('spin');
+                if(callback) callback();
+            });
+        }
+
+        function updateAdminStatusText() {
+            const text = document.getElementById('admin-status-text');
+            const isOpen = document.getElementById('checkin-toggle').checked;
+            text.innerText = isOpen ? "目前狀態：簽到開放中" : "目前狀態：簽到已關閉";
+            text.className = isOpen ? "text-[10px] text-green-600 font-bold" : "text-[10px] text-red-500 font-bold";
+        }
+
+        function handleToggleStatus() {
+            const isOpen = document.getElementById('checkin-toggle').checked;
+            const newStatus = isOpen ? 'Open' : 'Closed';
+            callBackend('toggleCheckinStatus', { newStatus: newStatus }, (res) => {
+                if(res.success) {
+                    systemConfig.checkin_status = newStatus;
+                    updateAdminStatusText();
+                    showToast(`簽到功能已${isOpen ? '開啟' : '關閉'}`);
+                    updateCheckinButtonUI(document.getElementById('checkin-btn').innerText === '已簽到');
+                }
+            });
+        }
+
+        function updateCheckinButtonUI(alreadyCheckedIn) {
+            const btn = document.getElementById('checkin-btn');
+            const hint = document.getElementById('checkin-hint');
+            if (alreadyCheckedIn) {
+                btn.className = "w-28 h-28 bg-green-500 rounded-full text-white font-bold text-lg shadow-2xl transition-all";
+                btn.innerText = '已簽到'; btn.disabled = true;
+                hint.innerText = '今日已完成團練簽到，辛苦了！';
+                hint.className = "text-green-600 mt-4 text-xs font-medium";
+            } else if (systemConfig.checkin_status === 'Open') {
+                btn.className = "w-28 h-28 bg-indigo-600 rounded-full text-white font-bold text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all";
+                btn.innerText = '簽到'; btn.disabled = false;
+                hint.innerText = '點擊按鈕完成今日團練簽到';
+                hint.className = "text-gray-500 mt-4 text-xs";
+            } else {
+                btn.className = "w-28 h-28 bg-gray-400 rounded-full text-white font-bold text-lg shadow-2xl transition-all cursor-not-allowed";
+                btn.innerText = '尚未開放'; btn.disabled = true;
+                hint.innerText = '目前管理員尚未開放簽到';
+                hint.className = "text-red-500 mt-4 text-xs font-medium";
+            }
+        }
+
+        function handleCheckin() {
+            if (isCheckingIn) return;
+            isCheckingIn = true;
+            const btn = document.getElementById('checkin-btn');
+            const oldText = btn.innerText;
+            btn.innerText = '處理中';
+            callBackend('recordCheckin', {name: currentUser.Name, section: currentUser.Section, email: currentUser.Email}, (res) => {
+                isCheckingIn = false;
+                if(res.success) {
+                    showToast("簽到成功！");
+                    updateCheckinButtonUI(true);
+                    loadPersonalHistory();
+                    if (currentUser.Role !== 'Member') loadStats();
+                } else {
+                    showToast(res.message, true);
+                    btn.innerText = oldText;
+                }
+            });
+        }
+
+        function loadPersonalHistory() {
+            callBackend('getAttendance', { type: 'personal', email: currentUser.Email }, (res) => {
+                const data = res.data || [];
+                const container = document.getElementById('personal-history');
+                if(!data.length) { container.innerHTML = `<p class="text-gray-400 text-xs italic text-center py-4">尚未有簽到紀錄</p>`; return; }
+                container.innerHTML = data.map(item => `
+                    <div class="flex items-center justify-between p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
+                        <span class="text-xs font-medium text-indigo-700">${item.date}</span>
+                        <span class="text-[10px] text-indigo-400 bg-white px-2 py-1 rounded-md shadow-sm">${item.time}</span>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function loadStats() {
+            const icon = document.getElementById('stats-sync-icon');
+            if(icon) icon.classList.add('spin');
+            const selectedDate = document.getElementById('mgmt-date-picker').value;
+            const container = document.getElementById('stats-container');
+            callBackend('getAttendance', { 
+                type: 'management', 
+                role: currentUser.Role, 
+                section: currentUser.Section,
+                targetDate: selectedDate 
+            }, (res) => {
+                const data = res.data || [];
+                if(!data.length) { 
+                    container.innerHTML = `<p class="text-gray-400 text-xs italic text-center py-4">此日期無簽到資料</p>`; 
+                } else {
+                    container.innerHTML = data.map(item => `
+                        <div onclick="openMemberModal('${item.name}', '${item.section}', '${item.email}')" 
+                             class="flex items-center justify-between p-3 bg-gray-50/80 rounded-xl border border-gray-100 transition-all hover:bg-white hover:shadow-md cursor-pointer group active:scale-[0.98]">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">${item.name}</span>
+                                <span class="text-[10px] text-gray-400">(${item.section})</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-400">
+                                <span class="text-[10px] font-mono">${item.time}</span>
+                                <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                if(icon) setTimeout(() => icon.classList.remove('spin'), 500);
+            });
+        }
+
+        function openMemberModal(name, section, email) {
+            document.getElementById('modal-member-name').innerText = name;
+            document.getElementById('modal-member-section').innerText = section;
+            const container = document.getElementById('modal-member-history');
+            const countBadge = document.getElementById('modal-member-count');
+            container.innerHTML = `<p class="text-gray-400 text-xs italic text-center py-8">載入歷史紀錄中...</p>`;
+            document.getElementById('member-detail-modal').classList.remove('hidden');
+            callBackend('getAttendance', { type: 'personal', email: email }, (res) => {
+                const data = res.data || [];
+                countBadge.innerText = `${data.length} 次`;
+                if(!data.length) { 
+                    container.innerHTML = `<p class="text-gray-400 text-xs italic text-center py-8">無簽到紀錄</p>`; 
+                    return; 
+                }
+                container.innerHTML = data.map(item => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <div class="flex items-center gap-2 text-gray-600">
+                            <i data-lucide="check-circle-2" class="w-3 h-3 text-green-500"></i>
+                            <span class="text-xs font-medium">${item.date}</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-indigo-500 bg-white px-2 py-0.5 rounded shadow-sm border border-gray-100">${item.time}</span>
+                    </div>
+                `).join('');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        }
+
+        function closeMemberModal() {
+            document.getElementById('member-detail-modal').classList.add('hidden');
+        }
+
+        function logout() {
+            currentUser = null;
+            isCheckingIn = false;
+            switchView('login-view');
+            showToast("已成功登出");
+        }
+    </script>
+</body>
+</html>
