@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>國樂團簽到系統 - 組長/管理員增強版</title>
+    <title>國樂團簽到系統 - 歷史監控增強版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/umd/lucide.min.js"></script>
     <style>
@@ -39,42 +39,27 @@
                     <i data-lucide="music" class="w-10 h-10 text-indigo-600"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-800">國樂團簽到系統</h1>
-                <p class="text-gray-400 text-xs mt-2">請登入以繼續使用</p>
             </div>
             <div class="space-y-4">
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-gray-500 ml-1">帳號</label>
-                    <input type="text" id="login-email" class="w-full px-4 py-3.5 rounded-2xl border bg-gray-50/50 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="請輸入您的帳號">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-gray-500 ml-1">密碼</label>
-                    <input type="password" id="login-password" class="w-full px-4 py-3.5 rounded-2xl border bg-gray-50/50 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="••••••••">
-                </div>
+                <input type="text" id="login-email" class="w-full px-4 py-3.5 rounded-2xl border bg-gray-50/50 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="請輸入您的帳號">
+                <input type="password" id="login-password" class="w-full px-4 py-3.5 rounded-2xl border bg-gray-50/50 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="密碼">
                 <button id="login-submit-btn" onclick="handleLogin()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-[0.98] transition-all">登入系統</button>
                 <div class="text-center mt-4">
-                    <button onclick="switchAuthMode('register')" class="text-indigo-600 text-sm font-bold hover:underline">還沒有帳號？立即註冊</button>
+                    <button onclick="switchAuthMode('register')" class="text-indigo-600 text-sm font-bold hover:underline">註冊新帳號</button>
                 </div>
             </div>
         </div>
 
         <!-- 註冊視圖 -->
         <div id="register-view" class="hidden glass-card p-8 rounded-3xl shadow-xl border border-gray-100 fade-in">
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">新團員註冊</h2>
-            </div>
+            <div class="text-center mb-6"><h2 class="text-2xl font-bold text-gray-800">新團員註冊</h2></div>
             <div class="space-y-4">
                 <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-xl border bg-gray-50/50" placeholder="姓名">
                 <select id="reg-section" onchange="updateInstrumentOptions()" class="w-full px-4 py-3 rounded-xl border bg-gray-50/50">
                     <option value="">選擇組別</option>
-                    <option value="吹管組">吹管組</option>
-                    <option value="拉弦組">拉弦組</option>
-                    <option value="彈撥組">彈撥組</option>
-                    <option value="揚打組">揚打組</option>
-                    <option value="低音組">低音組</option>
+                    <option value="吹管組">吹管組</option><option value="拉弦組">拉弦組</option><option value="彈撥組">彈撥組</option><option value="揚打組">揚打組</option><option value="低音組">低音組</option>
                 </select>
-                <select id="reg-instrument" class="w-full px-4 py-3 rounded-xl border bg-gray-50/50">
-                    <option value="">選擇樂器</option>
-                </select>
+                <select id="reg-instrument" class="w-full px-4 py-3 rounded-xl border bg-gray-50/50"><option value="">選擇樂器</option></select>
                 <input type="text" id="reg-email" class="w-full px-4 py-3 rounded-xl border bg-gray-50/50" placeholder="帳號">
                 <input type="password" id="reg-password" class="w-full px-4 py-3 rounded-xl border bg-gray-50/50" placeholder="密碼">
                 <button id="reg-submit-btn" onclick="handleRegister()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-all">完成註冊</button>
@@ -93,10 +78,7 @@
                     </div>
                 </div>
                 <div class="bg-indigo-600 p-5 rounded-2xl text-white shadow-lg flex items-center justify-between mb-6">
-                    <div>
-                        <p class="text-[10px] opacity-80 font-bold uppercase tracking-widest">個人累計時長</p>
-                        <h3 id="total-duration-display" class="text-2xl font-black">0 小時 0 分</h3>
-                    </div>
+                    <div><p class="text-[10px] opacity-80 font-bold tracking-widest">個人累計時長</p><h3 id="total-duration-display" class="text-2xl font-black">0 小時 0 分</h3></div>
                     <i data-lucide="timer" class="w-8 h-8 opacity-30"></i>
                 </div>
                 <div class="text-center py-6 bg-gray-50/80 rounded-3xl border border-gray-100 shadow-inner">
@@ -120,7 +102,7 @@
                 <div id="attendance-list" class="space-y-2"></div>
             </div>
 
-            <!-- 內容區塊: 監控 (組長或管理員) -->
+            <!-- 內容區塊: 監控 -->
             <div id="monitor-section" class="hidden space-y-4">
                 <div class="bg-white p-6 rounded-3xl shadow-md border border-gray-50">
                     <div class="flex justify-between items-center mb-4">
@@ -131,7 +113,7 @@
                         <div class="bg-green-50 p-4 rounded-2xl text-center"><p class="text-[10px] text-green-600 font-bold">已簽到</p><p class="text-2xl font-black text-green-700" id="stat-present">0</p></div>
                         <div class="bg-red-50 p-4 rounded-2xl text-center"><p class="text-[10px] text-red-600 font-bold">未簽到</p><p class="text-2xl font-black text-red-700" id="stat-absent">0</p></div>
                     </div>
-                    <div id="realtime-status-list" class="space-y-2 max-h-80 overflow-y-auto hide-scroll"></div>
+                    <div id="realtime-status-list" class="space-y-2 max-h-[400px] overflow-y-auto hide-scroll"></div>
                 </div>
             </div>
 
@@ -144,10 +126,26 @@
                             <i data-lucide="plus" class="w-3 h-3"></i>新增
                         </button>
                     </div>
-                    <div id="admin-event-list" class="space-y-3">
-                        <div class="text-center py-10 text-gray-400 text-xs">載入中...</div>
-                    </div>
+                    <div id="admin-event-list" class="space-y-3"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成員歷史彈窗 -->
+    <div id="member-history-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 modal-bg">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 fade-in flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h3 id="m-history-name" class="text-lg font-bold text-gray-800">成員歷史</h3>
+                    <p id="m-history-email" class="text-[10px] text-gray-400"></p>
+                </div>
+                <button onclick="closeMemberHistory()" class="p-2 bg-gray-100 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div id="m-history-list" class="flex-1 overflow-y-auto space-y-2 pr-1 hide-scroll"></div>
+            <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                <span class="text-xs text-gray-400 font-bold">總簽到次數</span>
+                <span id="m-history-count" class="text-indigo-600 font-black">0</span>
             </div>
         </div>
     </div>
@@ -157,23 +155,11 @@
         <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-8 fade-in">
             <h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-6">編輯活動</h3>
             <div class="space-y-4">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-gray-400">活動名稱</label>
-                    <input type="text" id="edit-name" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="例如：週五團練">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-gray-400">日期</label>
-                    <input type="date" id="edit-date" class="w-full px-4 py-3 rounded-xl border bg-gray-50">
-                </div>
+                <input type="text" id="edit-name" class="w-full px-4 py-3 rounded-xl border bg-gray-50 outline-none" placeholder="活動名稱">
+                <input type="date" id="edit-date" class="w-full px-4 py-3 rounded-xl border bg-gray-50">
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-gray-400">開始時間</label>
-                        <input type="time" id="edit-start" class="w-full px-4 py-3 rounded-xl border bg-gray-50">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-gray-400">結束時間</label>
-                        <input type="time" id="edit-end" class="w-full px-4 py-3 rounded-xl border bg-gray-50">
-                    </div>
+                    <input type="time" id="edit-start" class="w-full px-4 py-3 rounded-xl border bg-gray-50">
+                    <input type="time" id="edit-end" class="w-full px-4 py-3 rounded-xl border bg-gray-50">
                 </div>
             </div>
             <div class="flex gap-3 mt-8">
@@ -186,28 +172,18 @@
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 hidden bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl text-sm z-[200]"></div>
 
     <script>
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxXSAjQ4Fal0Ua0i2IlHnXViQWSIZJs5DuscDUs6YLffW71mpcDSG-mBJ137-HX6f7w/exec";
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzE0nIpFi0rMc0cwk1qqikjO2kzxwHVmjVFT-EXc_oYUxtZaxlvKdfKW42fUSKEpb3c/exec";
         let currentUser = null, currentEventData = null, allEvents = [], editingId = null;
 
-        const orchestraData = {
-            "吹管組": ["笛", "嗩", "笙", "(上)低音號"],
-            "拉弦組": ["高胡", "二胡", "中胡"],
-            "彈撥組": ["柳琴", "琵琶", "中阮", "大阮", "古箏"],
-            "揚打組": ["揚琴", "打擊"],
-            "低音組": ["大提琴", "低音提琴"]
-        };
+        const orchestraData = { "吹管組": ["笛", "嗩", "笙", "(上)低音號"], "拉弦組": ["高胡", "二胡", "中胡"], "彈撥組": ["柳琴", "琵琶", "中阮", "大阮", "古箏"], "揚打組": ["揚琴", "打擊"], "低音組": ["大提琴", "低音提琴"] };
 
         function updateInstrumentOptions() {
-            const sectionSelect = document.getElementById('reg-section');
-            const instrumentSelect = document.getElementById('reg-instrument');
-            const selectedSection = sectionSelect.value;
-            instrumentSelect.innerHTML = '<option value="">選擇樂器</option>';
-            if (selectedSection && orchestraData[selectedSection]) {
-                orchestraData[selectedSection].forEach(inst => {
-                    const opt = document.createElement('option');
-                    opt.value = inst;
-                    opt.innerText = inst;
-                    instrumentSelect.appendChild(opt);
+            const section = document.getElementById('reg-section').value;
+            const instSelect = document.getElementById('reg-instrument');
+            instSelect.innerHTML = '<option value="">選擇樂器</option>';
+            if (section && orchestraData[section]) {
+                orchestraData[section].forEach(inst => {
+                    const opt = document.createElement('option'); opt.value = inst; opt.innerText = inst; instSelect.appendChild(opt);
                 });
             }
         }
@@ -217,29 +193,22 @@
 
         async function callBackend(action, data) {
             try {
-                const response = await fetch(GAS_WEB_APP_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ action, data }) 
-                });
-                return await response.json();
-            } catch (e) {
-                console.error("Backend Error Details:", e);
-                return { success: false, message: "連線至後端失敗" };
+                const response = await fetch(GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action, data }) });
+                const result = await response.json();
+                if (!result) throw new Error("無回傳結果");
+                return result;
+            } catch (e) { 
+                console.error("Backend Error:", e);
+                return { success: false, message: "後端回傳錯誤，請檢查試算表分頁名稱是否正確" }; 
             }
         }
 
-        function switchAuthMode(mode) {
-            document.getElementById('login-view').classList.toggle('hidden', mode === 'register');
-            document.getElementById('register-view').classList.toggle('hidden', mode === 'login');
-        }
-
         async function handleLogin() {
-            const btn = document.getElementById('login-submit-btn');
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            
             if(!email || !password) return showToast("請輸入帳密", true);
             
+            const btn = document.getElementById('login-submit-btn');
             setBtnLoading(btn, true, "登入中...");
             const res = await callBackend('loginUser', { email, password });
             setBtnLoading(btn, false, "登入系統");
@@ -250,40 +219,30 @@
                 switchView('dashboard-view');
                 refreshSystemStatus();
                 loadAttendanceHistory();
-            } else showToast(res?.message || "帳密錯誤", true);
+            } else showToast(res?.message || "登入失敗", true);
         }
 
         async function handleRegister() {
-            const btn = document.getElementById('reg-submit-btn');
-            const data = {
-                name: document.getElementById('reg-name').value.trim(),
-                section: document.getElementById('reg-section').value,
-                instrument: document.getElementById('reg-instrument').value,
-                email: document.getElementById('reg-email').value.trim(),
-                password: document.getElementById('reg-password').value.trim()
-            };
-            
-            if (!data.name || !data.section || !data.instrument || !data.email || !data.password) {
-                return showToast("請填寫所有欄位", true);
+            const name = document.getElementById('reg-name').value;
+            const section = document.getElementById('reg-section').value;
+            const instrument = document.getElementById('reg-instrument').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+
+            if(!name || !section || !instrument || !email || !password) {
+                return showToast("請填寫完整資訊", true);
             }
-            
+
+            const btn = document.getElementById('reg-submit-btn');
             setBtnLoading(btn, true, "註冊中...");
-            const res = await callBackend('registerUser', data);
+            const res = await callBackend('registerUser', { name, section, instrument, email, password });
             setBtnLoading(btn, false, "完成註冊");
 
             if (res?.success) {
-                showToast("註冊成功！請登入");
+                showToast("註冊成功，請登入");
                 switchAuthMode('login');
-            } else showToast(res?.message || "註冊失敗", true);
-        }
-
-        function setBtnLoading(btn, isLoading, text) {
-            if (isLoading) {
-                btn.classList.add('btn-loading');
-                btn.innerText = text;
             } else {
-                btn.classList.remove('btn-loading');
-                btn.innerText = text;
+                showToast(res?.message || "註冊失敗", true);
             }
         }
 
@@ -292,20 +251,12 @@
             document.getElementById('info-badge').innerText = `${currentUser.Section} / ${currentUser.Instrument}`;
             document.getElementById('nav-user-info').innerText = currentUser.Name;
             
-            // 權限判斷：Admin, Officer, Leader 都可以看監控
             if (['Admin', 'Officer', 'Leader'].includes(currentUser.Role)) {
                 document.getElementById('btn-monitor').classList.remove('hidden');
+                document.getElementById('btn-monitor').innerText = currentUser.Role === 'Leader' ? "組內監控" : "簽到監控";
                 document.getElementById('monitor-title').innerText = currentUser.Role === 'Leader' ? `${currentUser.Section} 簽到狀態` : "全員簽到狀態";
-                
-                // 如果是 Leader，修改按鈕文字更親切
-                if (currentUser.Role === 'Leader') {
-                    document.getElementById('btn-monitor').innerText = "組內監控";
-                }
             }
-            
-            if (currentUser.Role === 'Admin') {
-                document.getElementById('btn-admin').classList.remove('hidden');
-            }
+            if (currentUser.Role === 'Admin') document.getElementById('btn-admin').classList.remove('hidden');
             safeCreateIcons();
         }
 
@@ -313,72 +264,92 @@
             const list = document.getElementById('realtime-status-list');
             list.innerHTML = '<div class="text-center py-5 text-gray-400 text-[10px]">載入中...</div>';
             
-            // 傳送角色與組別，讓後端過濾
-            const res = await callBackend('getRealtimeStatus', { 
-                role: currentUser.Role, 
-                section: currentUser.Section 
-            });
-            
+            const res = await callBackend('getRealtimeStatus', { role: currentUser.Role, section: currentUser.Section });
             if (res?.success) {
                 document.getElementById('stat-present').innerText = res.stats.present;
                 document.getElementById('stat-absent').innerText = res.stats.absent;
                 list.innerHTML = (res.data || []).map(u => {
-                    const displayName = String(u.Name || "未知");
-                    const initial = displayName.substring(0, 1);
+                    const safeName = String(u.Name || "未知");
+                    const initial = safeName.substring(0, 1);
                     return `
-                    <div class="flex justify-between items-center p-3 border-b border-gray-50 text-xs hover:bg-indigo-50 transition-all rounded-xl">
+                    <div class="flex justify-between items-center p-3 border-b border-gray-50 text-xs hover:bg-white transition-all rounded-xl">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-[10px]">${initial}</div>
                             <div>
-                                <span class="font-bold text-gray-700">${displayName}</span>
-                                <p class="text-[10px] text-gray-400">${u.Instrument || ''} ${currentUser.Role !== 'Leader' ? '('+u.Section+')' : ''}</p>
+                                <span class="font-bold text-gray-700">${safeName}</span>
+                                <p class="text-[10px] text-gray-400">${u.Instrument} ${currentUser.Role !== 'Leader' ? '('+u.Section+')' : ''}</p>
                             </div>
                         </div>
-                        <span class="${u.status === '已簽到' ? 'text-green-500 font-bold' : 'text-gray-300'}">${u.status}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="${u.status === '已簽到' ? 'text-green-500 font-bold' : 'text-gray-300'}">${u.status}</span>
+                            <button onclick="viewMemberHistory('${u.Email}', '${safeName}')" class="p-2 bg-gray-50 hover:bg-indigo-50 text-indigo-600 rounded-lg transition-colors">
+                                <i data-lucide="history" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>`;
                 }).join('');
+                safeCreateIcons();
             } else {
                 list.innerHTML = `<div class="text-center py-5 text-red-400 text-[10px]">${res.message}</div>`;
+            }
+        }
+
+        async function viewMemberHistory(email, name) {
+            const modal = document.getElementById('member-history-modal');
+            const list = document.getElementById('m-history-list');
+            document.getElementById('m-history-name').innerText = `${name} 的歷史紀錄`;
+            document.getElementById('m-history-email').innerText = email;
+            list.innerHTML = '<div class="text-center py-10 text-gray-400 text-xs">載入紀錄中...</div>';
+            modal.classList.remove('hidden');
+
+            const res = await callBackend('getMemberHistory', { adminEmail: currentUser.Email, targetEmail: email });
+            if (res?.success) {
+                document.getElementById('m-history-count').innerText = res.list.length;
+                if (res.list.length === 0) {
+                    list.innerHTML = '<div class="text-center py-10 text-gray-400 text-xs">尚無簽到紀錄</div>';
+                } else {
+                    list.innerHTML = res.list.map(h => {
+                        const displayDur = formatDurationDisplay(h.duration);
+                        return `
+                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <span class="font-bold text-gray-700 text-xs">${h.eventName}</span>
+                                <span class="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-md font-bold">${displayDur}</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1">${h.date}</p>
+                        </div>`;
+                    }).join('');
+                }
+            } else {
+                list.innerHTML = `<div class="text-center py-10 text-red-400 text-xs">${res.message}</div>`;
             }
             safeCreateIcons();
         }
 
-        async function submitCheckin() {
-            if (!currentUser || !currentEventData?.enabled) return;
-            if (currentEventData.hasCheckedIn) return showToast("您今日已簽到過囉！");
+        function closeMemberHistory() { document.getElementById('member-history-modal').classList.add('hidden'); }
 
+        async function submitCheckin() {
+            if (currentEventData.hasCheckedIn) return showToast("您今日已簽到過囉！");
             const btn = document.getElementById('checkin-btn');
             const originalHTML = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i data-lucide="loader-2" class="w-8 h-8 animate-spin"></i>';
             safeCreateIcons();
 
-            try {
-                const res = await callBackend('submitCheckin', { 
-                    email: currentUser.Email, 
-                    name: currentUser.Name,
-                    section: currentUser.Section,
-                    date: currentEventData.eventDate,
-                    type: currentEventData.eventType,
-                    eventName: currentEventData.eventName, 
-                    eventTimeRange: `${currentEventData.eventStart} ~ ${currentEventData.eventEnd}`, 
-                    duration: currentEventData.eventDuration || "0時0分"
-                });
-                
-                if (res?.success) {
-                    showToast("簽到成功！");
-                    currentEventData.hasCheckedIn = true;
-                    updateCheckinBtnStatus(true);
-                    setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1000);
-                } else {
-                    showToast(res?.message || "簽到失敗", true);
-                    btn.disabled = false;
-                    btn.innerHTML = originalHTML;
-                }
-            } catch (err) {
-                showToast("網路異常", true);
-                btn.disabled = false;
-                btn.innerHTML = originalHTML;
+            const res = await callBackend('submitCheckin', { 
+                email: currentUser.Email, name: currentUser.Name, section: currentUser.Section,
+                date: currentEventData.eventDate, type: currentEventData.eventType, eventName: currentEventData.eventName, 
+                eventTimeRange: `${currentEventData.eventStart} ~ ${currentEventData.eventEnd}`
+            });
+            
+            if (res?.success) {
+                showToast("簽到成功！");
+                currentEventData.hasCheckedIn = true;
+                updateCheckinBtnStatus(true);
+                setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1000);
+            } else {
+                showToast(res?.message || "簽到失敗", true);
+                btn.disabled = false; btn.innerHTML = originalHTML;
             }
             safeCreateIcons();
         }
@@ -387,35 +358,18 @@
             const btn = document.getElementById('checkin-btn');
             if (hasCheckedIn) {
                 btn.disabled = true;
-                btn.className = "w-28 h-28 bg-green-500 rounded-full text-white font-bold shadow-xl mx-auto border-4 border-white flex flex-col items-center justify-center transition-all duration-500 scale-105";
+                btn.className = "w-28 h-28 bg-green-500 rounded-full text-white font-bold shadow-xl mx-auto border-4 border-white flex flex-col items-center justify-center scale-105 transition-all";
                 btn.innerHTML = '<i data-lucide="check" class="w-10 h-10"></i><span class="text-[10px] mt-1">已簽到</span>';
             } else {
                 const isEnabled = currentEventData?.enabled;
                 btn.disabled = !isEnabled;
                 btn.innerHTML = '<span class="text-xl">簽到</span>';
-                btn.className = isEnabled 
-                    ? "w-28 h-28 bg-indigo-600 rounded-full text-white font-bold shadow-xl mx-auto border-4 border-white active:scale-95 transition-all flex flex-col items-center justify-center" 
-                    : "w-28 h-28 bg-gray-300 rounded-full text-white font-bold shadow-xl mx-auto border-4 border-white flex flex-col items-center justify-center";
+                btn.className = isEnabled ? "w-28 h-28 bg-indigo-600 rounded-full text-white font-bold shadow-xl mx-auto border-4 border-white active:scale-95 transition-all flex flex-col items-center justify-center" : "w-28 h-28 bg-gray-300 rounded-full text-white font-bold shadow-xl mx-auto border-4 border-white flex flex-col items-center justify-center";
             }
             safeCreateIcons();
         }
 
-        async function loadAttendanceHistory() {
-            if (!currentUser) return;
-            const res = await callBackend('getAttendanceHistory', { email: currentUser.Email });
-            if (res?.success) {
-                let totalMin = 0;
-                document.getElementById('attendance-list').innerHTML = (res.list || []).map(i => {
-                    const dur = formatDuration(i.duration);
-                    totalMin += parseDurationToMinutes(dur);
-                    return `<div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm text-xs border border-gray-50"><div><p class="font-bold text-gray-700">${i.status}</p><p class="text-gray-400 text-[10px] mt-1">${i.date}</p></div><span class="bg-indigo-50 px-3 py-1 rounded-xl text-indigo-600 font-bold">${dur}</span></div>`;
-                }).join('');
-                document.getElementById('total-duration-display').innerText = `${Math.floor(totalMin/60)} 小時 ${totalMin%60} 分`;
-            }
-        }
-
         async function refreshSystemStatus() {
-            if (!currentUser) return;
             const res = await callBackend('getSystemStatus', { email: currentUser.Email });
             if (res?.success) {
                 currentEventData = res;
@@ -425,18 +379,39 @@
             }
         }
 
-        function formatDuration(d) {
-            if (!d) return "0時0分";
-            const s = String(d);
-            if (s.includes("1899") || s.includes("T")) {
-                try { const date = new Date(s); return `${date.getHours()}時${date.getMinutes()}分`; } catch(e) { return "0時0分"; }
+        function formatDurationDisplay(dur) {
+            if (!dur) return "0時0分";
+            const s = String(dur);
+            if (s.includes('1899-12-') || s.includes('T')) {
+                try {
+                    const date = new Date(s);
+                    const h = date.getHours();
+                    const m = date.getMinutes();
+                    return `${h}時${m}分`;
+                } catch(e) { return "格式錯誤"; }
             }
             return s;
         }
 
-        function parseDurationToMinutes(d) {
-            const m = String(d).match(/(\d+)時(\d+)分/);
-            return m ? parseInt(m[1])*60 + parseInt(m[2]) : 0;
+        async function loadAttendanceHistory() {
+            const res = await callBackend('getAttendanceHistory', { email: currentUser.Email });
+            if (res?.success) {
+                let totalMin = 0;
+                document.getElementById('attendance-list').innerHTML = (res.list || []).map(i => {
+                    const dur = formatDurationDisplay(i.duration);
+                    const m = dur.match(/(\d+)時(\d+)分/);
+                    if(m) totalMin += parseInt(m[1])*60 + parseInt(m[2]);
+                    return `
+                    <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm text-xs border border-gray-100">
+                        <div>
+                            <p class="font-bold text-gray-700">${i.status}</p>
+                            <p class="text-gray-400 text-[10px] mt-1">${i.date}</p>
+                        </div>
+                        <span class="bg-indigo-50 px-3 py-1 rounded-xl text-indigo-600 font-bold">${dur}</span>
+                    </div>`;
+                }).join('');
+                document.getElementById('total-duration-display').innerText = `${Math.floor(totalMin/60)} 小時 ${totalMin%60} 分`;
+            }
         }
 
         function switchView(id) { 
@@ -450,10 +425,7 @@
                 const sec = document.getElementById(`${tab}-section`);
                 const btn = document.getElementById(`btn-${tab}`);
                 if(sec) sec.classList.toggle('hidden', tab !== t);
-                if(btn) {
-                    btn.classList.toggle('tab-active', tab === t);
-                    btn.classList.toggle('text-gray-500', tab !== t);
-                }
+                if(btn) { btn.classList.toggle('tab-active', tab === t); btn.classList.toggle('text-gray-500', tab !== t); }
             });
             if(t === 'monitor') loadRealtimeStatus();
             if(t === 'admin') loadEventList();
@@ -467,10 +439,7 @@
                 allEvents = res.data || [];
                 list.innerHTML = allEvents.map(ev => `
                 <div class="bg-gray-50 p-4 rounded-2xl flex justify-between items-center border border-gray-100">
-                    <div>
-                        <p class="font-bold text-gray-700">${ev.Name}</p>
-                        <p class="text-[10px] text-gray-400 mt-1">${ev.Date} | ${ev.StartTime} ~ ${ev.EndTime}</p>
-                    </div>
+                    <div><p class="font-bold text-gray-700">${ev.Name}</p><p class="text-[10px] text-gray-400 mt-1">${ev.Date} | ${ev.StartTime} ~ ${ev.EndTime}</p></div>
                     <div class="flex gap-2">
                         <button onclick="activateEventFromList('${ev.ID}')" class="p-2 bg-white text-orange-500 shadow-sm rounded-lg"><i data-lucide="zap" class="w-4 h-4"></i></button>
                         <button onclick="openEditModal('${ev.ID}')" class="p-2 bg-white rounded-lg shadow-sm text-indigo-600"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
@@ -483,50 +452,38 @@
         async function activateEventFromList(id) {
             const ev = allEvents.find(e => String(e.ID) === String(id));
             if (!ev) return;
-            showToast("正在啟動...");
+            showToast("啟動中...");
             const res = await callBackend('activateEvent', { id: ev.ID, name: ev.Name, type: ev.Type, date: ev.Date, start: ev.StartTime, end: ev.EndTime });
             if (res?.success) { showToast("已啟動"); refreshSystemStatus(); }
         }
 
         function openEditModal(id) {
-            editingId = id;
-            document.getElementById('edit-modal').classList.remove('hidden');
+            editingId = id; document.getElementById('edit-modal').classList.remove('hidden');
             if (id) {
                 const ev = allEvents.find(e => String(e.ID) === String(id));
-                if (ev) {
-                    document.getElementById('edit-name').value = ev.Name;
-                    document.getElementById('edit-date').value = ev.Date;
-                    document.getElementById('edit-start').value = ev.StartTime;
-                    document.getElementById('edit-end').value = ev.EndTime;
-                }
+                if (ev) { document.getElementById('edit-name').value = ev.Name; document.getElementById('edit-date').value = ev.Date; document.getElementById('edit-start').value = ev.StartTime; document.getElementById('edit-end').value = ev.EndTime; }
             } else {
-                document.getElementById('edit-name').value = "";
-                document.getElementById('edit-date').value = new Date().toISOString().split('T')[0];
-                document.getElementById('edit-start').value = "19:00";
-                document.getElementById('edit-end').value = "21:30";
+                document.getElementById('edit-name').value = ""; document.getElementById('edit-date').value = new Date().toISOString().split('T')[0]; document.getElementById('edit-start').value = "19:00"; document.getElementById('edit-end').value = "21:30";
             }
         }
 
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
 
         async function saveEvent() {
-            const btn = document.getElementById('save-event-btn');
             const data = { id: editingId, name: document.getElementById('edit-name').value, date: document.getElementById('edit-date').value, startTime: document.getElementById('edit-start').value, endTime: document.getElementById('edit-end').value };
-            setBtnLoading(btn, true, "儲存中...");
             const res = await callBackend('saveEvent', data);
-            setBtnLoading(btn, false, "儲存");
             if (res?.success) { closeEditModal(); loadEventList(); }
         }
 
         function showToast(m, e=false) {
-            const t = document.getElementById('toast');
-            t.innerText = m;
+            const t = document.getElementById('toast'); t.innerText = m;
             t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full ${e?'bg-red-600':'bg-gray-800'} text-white z-[200] shadow-2xl transition-all fade-in`;
-            t.classList.remove('hidden');
-            setTimeout(()=>t.classList.add('hidden'), 3000);
+            t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'), 3000);
         }
 
+        function setBtnLoading(btn, isLoading, text) { btn.innerText = text; btn.classList.toggle('btn-loading', isLoading); }
         function handleLogout() { location.reload(); }
+        function switchAuthMode(mode) { document.getElementById('login-view').classList.toggle('hidden', mode === 'register'); document.getElementById('register-view').classList.toggle('hidden', mode === 'login'); }
     </script>
 </body>
 </html>
