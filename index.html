@@ -357,6 +357,13 @@
                         <option value="Admin">最高管理員 (Admin)</option>
                     </select>
                 </div>
+                
+                <!-- 新增：顯示最後修改人資訊 -->
+                <div id="modifier-info-container" class="text-center bg-slate-50 p-3 rounded-2xl border border-slate-100 mt-2 hidden">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">最後修改紀錄</p>
+                    <p id="edit-member-modifier" class="text-[10px] font-bold text-slate-500"></p>
+                </div>
+
                 <input type="hidden" id="edit-member-email">
             </div>
             <div class="flex gap-4 mt-8">
@@ -419,7 +426,7 @@
     </div>
 
     <script>
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwS0EK9xx29RfOOIX2kxVkJAxMhc5_CIYKMUHnM04DL-RefCpq55KC2c3CHRPepsThH/exec";
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzTxJeBzTlp55xYW2Wkdoq_ysazTtRBKRCsnelO2n0MNGv6ZJgcRXM-6mMsD7pD46Z3/exec";
         let currentUser = null, currentEventData = null, allEvents = [], editingId = null;
 
         function getAbsenceLabelClass(count) {
@@ -498,7 +505,7 @@
             const res = await callBackend('registerUser', { name, section, instrument, email, password });
             setBtnLoading(btn, false, "確認註冊");
             if (res?.success) { showToast("註冊成功！"); switchAuthMode('login'); } 
-            else showToast(res?.message || "註冊失敗", true);
+            else showToast(res?.message || "註冊失敗環境", true);
         }
 
         function setupDashboard() {
@@ -551,23 +558,27 @@
                     const absCount = u.absenceCount || 0;
                     const absLabelClass = getAbsenceLabelClass(absCount);
                     const showEdit = ['Admin', 'Leader', 'Officer'].includes(currentUser.Role);
+                    
+                    // 傳入 Modifier 資訊給編輯 Modal
                     const editBtn = showEdit ? `
-                        <button onclick="openMemberEditModal('${u.Email}', '${u.Name}', '${u.Instrument}', '${u.Section}', '${u.Role || 'Member'}')" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all border border-indigo-100">
+                        <button onclick="openMemberEditModal('${u.Email}', '${u.Name}', '${u.Instrument}', '${u.Section}', '${u.Role || 'Member'}', '${u.Modifier || ''}')" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all border border-indigo-100">
                             <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                             <span class="text-[10px] font-black">編輯</span>
                         </button>` : '';
+
                     const historyBtn = `
                         <button onclick="viewMemberHistory('${u.Email}', '${u.Name}')" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-slate-100 text-slate-500 rounded-xl hover:bg-slate-800 hover:text-white transition-all border border-slate-200">
                             <i data-lucide="history" class="w-3.5 h-3.5"></i>
                             <span class="text-[10px] font-black">紀錄</span>
                         </button>`;
+
                     return `
                     <div class="flex flex-col p-5 bg-white/70 rounded-[28px] border border-white shadow-sm gap-4 transition-all hover:shadow-md">
                         <div class="flex items-center gap-4 w-full text-left">
                             <div class="w-12 h-12 rounded-[18px] bg-slate-800 text-white flex items-center justify-center font-black shadow-lg">${initial}</div>
                             <div class="flex-1 overflow-hidden">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-[900] text-slate-800 text-sm truncate">${u.Name}</span>
+                                    <span class="font-[900] text-slate-800 text-sm truncate tracking-tight">${u.Name}</span>
                                     <span class="text-[9px] px-2 py-0.5 rounded-full font-black ${absLabelClass}">缺 ${absCount}</span>
                                 </div>
                                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate mt-0.5">${u.Instrument} • ${u.Section}</p>
@@ -585,14 +596,33 @@
             } else list.innerHTML = `<div class="text-center py-10 text-rose-400 font-bold">${res.message}</div>`;
         }
 
-        function openMemberEditModal(email, name, currentInst, section, role) {
+        // 更新：增加 modifier 參數
+        function openMemberEditModal(email, name, currentInst, section, role, modifier) {
             const modal = document.getElementById('member-edit-modal');
             const instSelect = document.getElementById('edit-member-instrument');
             const roleSelect = document.getElementById('edit-member-role');
             const roleContainer = document.getElementById('role-edit-container');
+            const modifierContainer = document.getElementById('modifier-info-container');
+            const modifierText = document.getElementById('edit-member-modifier');
+
             document.getElementById('edit-member-email').value = email;
             document.getElementById('edit-member-name').value = name;
-            if (currentUser.Role === 'Admin') { roleContainer.classList.remove('hidden'); roleSelect.value = role; } else { roleContainer.classList.add('hidden'); }
+            
+            // 顯示修改人資訊
+            if (modifier) {
+                modifierContainer.classList.remove('hidden');
+                modifierText.innerText = modifier;
+            } else {
+                modifierContainer.classList.add('hidden');
+            }
+
+            if (currentUser.Role === 'Admin') {
+                roleContainer.classList.remove('hidden');
+                roleSelect.value = role;
+            } else {
+                roleContainer.classList.add('hidden');
+            }
+            
             instSelect.innerHTML = '';
             if (orchestraData[section]) {
                 orchestraData[section].forEach(inst => {
@@ -608,10 +638,16 @@
         function closeMemberEditModal() { document.getElementById('member-edit-modal').classList.add('hidden'); }
 
         async function saveMemberInfo() {
-            const data = { adminEmail: currentUser.Email, email: document.getElementById('edit-member-email').value, name: document.getElementById('edit-member-name').value.trim(), instrument: document.getElementById('edit-member-instrument').value, role: document.getElementById('edit-member-role').value };
+            const data = {
+                adminEmail: currentUser.Email,
+                email: document.getElementById('edit-member-email').value,
+                name: document.getElementById('edit-member-name').value.trim(),
+                instrument: document.getElementById('edit-member-instrument').value,
+                role: document.getElementById('edit-member-role').value
+            };
             if (!data.name) return showToast("姓名不可為空", true);
             const btn = document.getElementById('save-member-btn');
-            setBtnLoading(btn, true, "處理中...");
+            setBtnLoading(btn, true, "更新中...");
             const res = await callBackend('saveMember', data);
             setBtnLoading(btn, false, "儲存");
             if (res?.success) { showToast("資料已更新"); closeMemberEditModal(); loadRealtimeStatus(); } 
@@ -632,7 +668,7 @@
                 document.getElementById('m-history-count').innerText = res.list.length;
                 document.getElementById('m-history-absent').innerText = absCount;
                 absentBlock.className = `p-4 rounded-[22px] text-center transition-colors border shadow-sm ${getAbsenceBlockClass(absCount)}`;
-                list.innerHTML = res.list.length === 0 ? '<div class="text-center py-12 text-slate-400 font-bold">目前無紀錄</div>' : 
+                list.innerHTML = res.list.length === 0 ? '<div class="text-center py-12 text-slate-400 font-bold text-sm">目前無簽到紀錄</div>' : 
                     res.list.map(h => `
                         <div class="bg-slate-50/70 p-5 rounded-[22px] border border-slate-100 flex justify-between items-center text-left">
                             <div><span class="font-[900] text-slate-700 text-sm block tracking-tight">${h.eventName}</span><p class="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wider">${h.date}</p></div>
@@ -667,7 +703,7 @@
             } else {
                 const isEnabled = currentEventData?.enabled;
                 btn.disabled = !isEnabled;
-                btn.innerHTML = isEnabled ? '<i data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span class="text-lg tracking-tight">點擊簽到</span>' : '<i data-lucide="clock" class="w-10 h-10 mb-2 opacity-30"></i><span class="text-sm">未開放</span>';
+                btn.innerHTML = isEnabled ? '<i data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span class="text-lg tracking-tight text-center">點擊簽到</span>' : '<i data-lucide="clock" class="w-10 h-10 mb-2 opacity-30"></i><span class="text-sm">尚未開放</span>';
                 btn.className = isEnabled ? "relative z-10 w-36 h-36 btn-premium rounded-full text-white font-black shadow-2xl mx-auto border-[10px] border-white flex flex-col items-center justify-center" : "relative z-10 w-36 h-36 bg-slate-200 rounded-full text-slate-400 font-black shadow-inner mx-auto border-[10px] border-white flex flex-col items-center justify-center cursor-not-allowed";
                 if(isEnabled) { pulse.classList.add('pulse-effect'); timeInfo.classList.remove('opacity-0'); } else { pulse.classList.remove('pulse-effect'); timeInfo.classList.add('opacity-0'); }
             }
@@ -704,7 +740,7 @@
                     return `<div class="glass-panel p-5 rounded-[26px] flex justify-between items-center border-white/60 shadow-sm transition-all hover:scale-[1.02] hover:bg-white">
                         <div class="flex items-center gap-4 text-left">
                             <div class="w-12 h-12 rounded-[18px] bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100"><i data-lucide="music" class="w-5 h-5"></i></div>
-                            <div><p class="font-[900] text-slate-700 text-sm tracking-tight">${i.status}</p><p class="text-slate-400 text-[10px] font-bold mt-0.5 uppercase">${i.date}</p></div>
+                            <div><p class="font-[900] text-slate-700 text-sm tracking-tight">${i.status}</p><p class="text-slate-400 text-[10px] font-bold mt-0.5 uppercase tracking-tighter">${i.date}</p></div>
                         </div>
                         <span class="bg-indigo-500 text-white px-4 py-2 rounded-2xl font-black text-[11px] shadow-lg shadow-indigo-100">${dur}</span>
                     </div>`;
@@ -739,14 +775,14 @@
                 allEvents = res.data || [];
                 list.innerHTML = allEvents.map(ev => `
                 <div class="bg-white/70 p-6 rounded-[28px] border border-white shadow-sm gap-5 text-center">
-                    <p class="font-[900] text-slate-800 text-base tracking-tight mb-1">${ev.Name}</p>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4">${ev.Date} • ${ev.StartTime} - ${ev.EndTime}</p>
+                    <p class="font-[900] text-slate-800 text-base tracking-tight mb-1 text-center">${ev.Name}</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4 text-center">${ev.Date} • ${ev.StartTime} - ${ev.EndTime}</p>
                     <div class="flex gap-2.5 w-full">
                         <button onclick="activateEventFromList('${ev.ID}')" class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-orange-500 shadow-sm rounded-2xl hover:bg-orange-500 hover:text-white transition-all border border-orange-100">
-                            <i data-lucide="zap" class="w-4 h-4"></i><span class="text-xs font-black">廣播</span>
+                            <i data-lucide="zap" class="w-4 h-4"></i><span class="text-xs font-black text-center">廣播</span>
                         </button>
                         <button onclick="openEditModal('${ev.ID}')" class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-2xl shadow-sm text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all border border-indigo-100">
-                            <i data-lucide="edit-3" class="w-4 h-4"></i><span class="text-xs font-black">編輯</span>
+                            <i data-lucide="edit-3" class="w-4 h-4"></i><span class="text-xs font-black text-center">編輯</span>
                         </button>
                     </div>
                 </div>`).join('');
@@ -787,7 +823,7 @@
             const icon = document.getElementById('toast-icon');
             const msg = document.getElementById('toast-msg');
             msg.innerText = m;
-            t.className = `fixed top-12 left-1/2 -translate-x-1/2 px-6 py-4 rounded-[22px] flex items-center justify-center gap-3 glass-panel shadow-2xl z-[200] transition-all transform duration-500 translate-y-0 opacity-100 border-white ${e?'text-rose-500':'text-indigo-600'}`;
+            t.className = `fixed top-12 left-1/2 -translate-x-1/2 hidden flex items-center justify-center gap-3 glass-panel shadow-2xl z-[200] transition-all transform duration-500 translate-y-0 opacity-100 min-w-[220px] border-white ${e?'text-rose-500':'text-indigo-600'}`;
             icon.setAttribute('data-lucide', e ? 'alert-circle' : 'check-circle');
             t.classList.remove('hidden');
             safeCreateIcons();
