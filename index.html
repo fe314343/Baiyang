@@ -27,7 +27,6 @@
             align-items: center;
         }
 
-        /* 網格背景背景 */
         body::before {
             content: "";
             position: fixed;
@@ -57,7 +56,6 @@
             box-shadow: 0 4px 8px -2px rgba(99, 102, 241, 0.4);
         }
 
-        /* 簽到按鈕呼吸燈 */
         @keyframes ripple {
             0% { transform: scale(1); opacity: 0.4; }
             100% { transform: scale(1.4); opacity: 0; }
@@ -73,10 +71,7 @@
             animation: ripple 2s infinite ease-out;
         }
 
-        .tab-btn {
-            transition: all 0.4s ease;
-        }
-
+        .tab-btn { transition: all 0.4s ease; }
         .tab-btn.tab-active {
             background: white;
             color: var(--primary);
@@ -93,28 +88,27 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
         
         .app-icon-card {
-            width: 110px;
-            height: 110px;
+            width: 85px;
+            height: 85px;
             background: #ffffff;
-            border-radius: 36px;
-            box-shadow: 15px 15px 40px #d1d9e6, -10px -10px 30px #ffffff;
+            border-radius: 26px;
+            box-shadow: 10px 10px 25px #d1d9e6, -8px -8px 20px #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
+            margin: 0 auto 0.8rem;
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         .app-icon-card img {
-            width: 75%;
-            height: 75%;
+            width: 70%;
+            height: 70%;
             object-fit: contain;
             z-index: 2;
         }
 
-        /* 輸入框美化 */
         input, select {
             border: 1px solid rgba(0, 0, 0, 0.03) !important;
             transition: all 0.3s ease;
@@ -125,69 +119,73 @@
             background: #ffffff !important;
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08) !important;
         }
+
+        input:read-only {
+            background-color: #f1f5f9 !important;
+            color: #64748b !important;
+            cursor: not-allowed;
+            border: 1px dashed #cbd5e1 !important;
+        }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-10">
 
-    <!-- 頂部精緻導覽 -->
-    <nav id="nav-bar" class="hidden fixed top-0 w-full max-w-md z-50 p-4">
-        <div class="glass-panel rounded-[22px] p-2 flex justify-between items-center px-4 border-white/60">
-            <div class="flex items-center gap-3">
+    <!-- 頂部導覽列 -->
+    <nav id="nav-bar" class="hidden fixed top-0 w-full max-w-md z-50 p-4 text-center flex justify-center">
+        <div class="glass-panel rounded-[22px] p-2 flex justify-between items-center px-4 border-white/60 w-full shadow-lg">
+            <div class="flex items-center gap-3 text-center">
                 <div class="relative flex items-center justify-center">
                     <div id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                     <div class="absolute w-4 h-4 rounded-full border border-emerald-400 animate-ping opacity-20"></div>
                 </div>
-                <span id="nav-user-info" class="text-sm font-bold text-slate-700 tracking-tight"></span>
+                <span id="nav-user-info" class="text-sm font-bold text-slate-700 tracking-tight text-center">正在登入...</span>
             </div>
-            <button onclick="handleLogout()" class="bg-slate-50 text-slate-500 px-4 py-2 rounded-xl text-[11px] font-black hover:bg-rose-50 hover:text-rose-500 transition-all flex items-center gap-2 border border-slate-100 hover:border-rose-100">
+            <button onclick="handleLogout()" class="bg-slate-50 text-slate-500 px-4 py-2 rounded-xl text-[11px] font-black hover:bg-rose-50 hover:text-rose-500 transition-all flex items-center gap-2 border border-slate-100 hover:border-rose-100 shadow-sm">
                 <i data-lucide="power" class="w-3.5 h-3.5"></i>登出
             </button>
         </div>
     </nav>
 
-    <main id="app" class="w-full max-w-md px-6 pt-12">
+    <main id="app" class="w-full max-w-md px-6 pt-6 sm:pt-10">
         
         <!-- 登入介面 -->
-        <section id="login-view" class="space-y-8 fade-up text-center">
+        <section id="login-view" class="space-y-5 fade-up text-center">
             <div>
                 <div class="app-icon-card">
                     <img src="Baiyang.png" alt="Logo" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=CY&backgroundColor=6366f1';">
                 </div>
-                <h1 class="text-3xl font-[900] text-slate-800 tracking-tighter mb-2">崇正國樂團</h1>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100">
+                <h1 class="text-2xl font-[900] text-slate-800 tracking-tighter mb-1 text-center">崇正國樂團</h1>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-center mx-auto shadow-sm">
                     <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                    <p class="text-indigo-600 text-[10px] font-black uppercase tracking-widest">Smart Sign-in System</p>
+                    <p class="text-indigo-600 text-[9px] font-black uppercase tracking-widest text-center">Smart Sign-in System</p>
                 </div>
             </div>
 
-            <div class="glass-panel p-8 rounded-[32px] space-y-6">
-                <div class="space-y-4">
+            <div class="glass-panel p-7 rounded-[32px] space-y-5 shadow-xl text-center">
+                <div class="space-y-3">
                     <div class="group relative">
-                        <i data-lucide="mail" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
-                        <input type="text" id="login-email" class="w-full pl-14 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium" placeholder="帳號 / 電子郵件">
+                        <i data-lucide="mail" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+                        <input type="text" id="login-email" class="w-full pl-14 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center" placeholder="帳號 / 電子郵件">
                     </div>
                     <div class="group relative">
-                        <i data-lucide="key-round" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
-                        <input type="password" id="login-password" class="w-full pl-14 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium" placeholder="請輸入密碼">
+                        <i data-lucide="key-round" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+                        <input type="password" id="login-password" class="w-full pl-14 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center" placeholder="密碼">
                     </div>
                 </div>
-                <button id="login-submit-btn" onclick="handleLogin()" class="w-full btn-premium text-white font-black py-4 rounded-[20px] text-lg tracking-wide flex items-center justify-center gap-2">
+                <button id="login-submit-btn" onclick="handleLogin()" class="w-full btn-premium text-white font-black py-4 rounded-[20px] text-lg tracking-wide flex items-center justify-center gap-2 text-center shadow-lg active:scale-95 transition-all">
                     立即登入 <i data-lucide="arrow-right" class="w-5 h-5"></i>
                 </button>
-                <div class="text-center">
-                    <button onclick="switchAuthMode('register')" class="text-slate-400 text-sm font-bold hover:text-indigo-600 transition-colors">還沒有帳號？點此註冊</button>
+                <div class="text-center pt-1">
+                    <button onclick="switchAuthMode('register')" class="text-slate-400 text-xs font-bold hover:text-indigo-600 transition-colors text-center underline decoration-indigo-200 underline-offset-4">註冊新成員</button>
                 </div>
             </div>
         </section>
 
         <!-- 註冊介面 -->
-        <section id="register-view" class="hidden space-y-6 fade-up">
-            <div class="text-center">
-                <h2 class="text-2xl font-[900] text-slate-800 tracking-tight">新成員註冊</h2>
-                <p class="text-slate-400 text-sm font-medium mt-1">請填寫基本資料加入我們</p>
-            </div>
-            <div class="glass-panel p-8 rounded-[32px] space-y-4">
-                <input type="text" id="reg-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-bold text-center" placeholder="您的姓名">
+        <section id="register-view" class="hidden space-y-6 fade-up text-center">
+            <h2 class="text-2xl font-[900] text-slate-800 tracking-tight text-center">成員註冊</h2>
+            <div class="glass-panel p-8 rounded-[32px] space-y-4 text-center shadow-xl">
+                <input type="text" id="reg-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-bold text-center" placeholder="您的真實姓名">
                 <div class="grid grid-cols-2 gap-4">
                     <select id="reg-section" onchange="updateInstrumentOptions()" class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center">
                         <option value="">選擇組別</option>
@@ -197,225 +195,181 @@
                         <option value="">選擇樂器</option>
                     </select>
                 </div>
-                <input type="email" id="reg-email" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="登入 Email">
-                <input type="password" id="reg-password" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="設定密碼">
+                <input type="email" id="reg-email" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="常用 Email">
+                <input type="password" id="reg-password" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="設定登入密碼">
                 
-                <button id="reg-submit-btn" onclick="handleRegister()" class="w-full btn-premium text-white font-black py-4 rounded-[20px] mt-4 tracking-wide">完成註冊</button>
-                <button onclick="switchAuthMode('login')" class="w-full text-slate-400 text-sm font-black text-center mt-2">返回登入</button>
+                <button id="reg-submit-btn" onclick="handleRegister()" class="w-full btn-premium text-white font-black py-4 rounded-[20px] mt-4 tracking-wide text-center shadow-lg active:scale-95 transition-all text-center">確認加入</button>
+                <button onclick="switchAuthMode('login')" class="w-full text-slate-400 text-sm font-black text-center mt-2 text-center">返回登入</button>
             </div>
         </section>
 
         <!-- 儀表板主介面 -->
-        <section id="dashboard-view" class="hidden space-y-6 fade-up pb-12">
-            <!-- 個人資訊與時數卡片 -->
-            <div class="glass-panel p-7 rounded-[36px] border-white/80">
+        <section id="dashboard-view" class="hidden space-y-6 fade-up pb-12 text-center flex flex-col items-center">
+            <!-- 時數儀表盤 -->
+            <div class="glass-panel p-7 rounded-[36px] border-white/80 w-full text-center shadow-xl">
                 <div class="flex justify-between items-center mb-8">
-                    <div>
+                    <div class="text-left">
                         <h2 class="text-2xl font-[900] text-slate-800 leading-none" id="user-display">你好</h2>
                         <div id="info-badge" class="mt-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 text-[10px] font-black tracking-widest inline-block uppercase">載入中...</div>
                     </div>
-                    <button onclick="openProfileModal()" class="w-12 h-12 rounded-[18px] bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100 hover:bg-indigo-100 transition-all active:scale-95 group">
-                        <i data-lucide="user-round" class="w-6 h-6 transition-transform group-hover:scale-110"></i>
+                    <!-- 個人檔案按鈕 (右上角) -->
+                    <button onclick="openProfileModal()" class="w-12 h-12 rounded-[18px] bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100 hover:bg-indigo-100 transition-all active:scale-90 group text-center">
+                        <i data-lucide="user-round" class="w-6 h-6"></i>
                     </button>
                 </div>
                 
-                <div class="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[32px] text-white shadow-2xl">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-12 -mt-12 blur-3xl"></div>
-                    <p class="text-[9px] opacity-50 font-black tracking-[0.3em] mb-2 uppercase">Total Practice Record</p>
-                    <div class="flex items-baseline gap-2">
-                        <h3 id="total-duration-display" class="text-4xl font-[900] tracking-tighter">0</h3>
-                        <span class="text-xs font-bold opacity-60">累計時數</span>
+                <div class="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[32px] text-white shadow-2xl text-center flex flex-col items-center">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-12 -mt-12 blur-3xl text-center"></div>
+                    <p class="text-[9px] opacity-50 font-black tracking-[0.3em] mb-2 uppercase text-center">Rehearsal Statistics</p>
+                    <div class="flex items-baseline gap-2 justify-center text-center">
+                        <h3 id="total-duration-display" class="text-5xl font-[900] tracking-tighter text-center">0</h3>
+                        <span class="text-xs font-bold opacity-60 text-center uppercase tracking-widest">Hours</span>
                     </div>
                 </div>
 
+                <!-- 簽到互動區 -->
                 <div class="mt-10 text-center flex flex-col items-center">
-                    <div class="mb-6 space-y-1">
-                        <p id="current-event-display" class="text-sm font-bold text-slate-500">同步活動資訊中...</p>
-                        <p id="checkin-time-display" class="text-indigo-500 text-[11px] font-black uppercase tracking-widest opacity-0 transition-opacity">--:--</p>
+                    <div class="mb-6 space-y-1 text-center">
+                        <p id="current-event-display" class="text-sm font-bold text-slate-500 text-center tracking-tight">正在同步...</p>
+                        <p id="checkin-time-display" class="text-indigo-500 text-[11px] font-black uppercase tracking-widest opacity-0 transition-opacity text-center">--:--</p>
                     </div>
-                    
-                    <div class="relative">
-                        <button id="checkin-btn" onclick="submitCheckin()" disabled class="relative z-10 w-36 h-36 bg-slate-200 rounded-full text-white font-black shadow-2xl flex flex-col items-center justify-center transition-all duration-700 border-[10px] border-white overflow-hidden">
-                            <i data-lucide="scan-face" class="w-12 h-12 mb-2"></i>
-                            <span class="text-lg tracking-tight">點擊簽到</span>
+                    <div class="relative text-center">
+                        <button id="checkin-btn" onclick="submitCheckin()" disabled class="relative z-10 w-36 h-36 bg-slate-200 rounded-full text-white font-black shadow-2xl flex flex-col items-center justify-center transition-all duration-700 border-[10px] border-white overflow-hidden text-center hover:scale-105 active:scale-95 cursor-pointer">
+                            <i data-lucide="scan-face" class="w-12 h-12 mb-2 text-center"></i>
+                            <span class="text-lg tracking-tight text-center">簽到</span>
                         </button>
-                        <div id="btn-pulse" class="absolute inset-0 rounded-full"></div>
+                        <div id="btn-pulse" class="absolute inset-0 rounded-full text-center"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 分頁導覽列 -->
-            <div id="tab-nav" class="flex bg-slate-200/50 p-1.5 rounded-[22px] border border-white/50 backdrop-blur-md">
-                <button onclick="switchTab('history')" id="btn-history" class="flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn tab-active text-center">
-                    <i data-lucide="clipboard-list" class="w-4 h-4 mx-auto mb-1.5"></i>紀錄
+            <!-- 選項卡 -->
+            <div id="tab-nav" class="flex bg-slate-200/50 p-1.5 rounded-[22px] border border-white/50 backdrop-blur-md w-full text-center shadow-inner">
+                <button onclick="switchTab('history')" id="btn-history" class="flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn tab-active text-center flex flex-col items-center justify-center">
+                    <i data-lucide="clipboard-list" class="w-4 h-4 mb-1.5"></i>我的紀錄
                 </button>
-                <button onclick="switchTab('monitor')" id="btn-monitor" class="hidden flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn text-slate-500 text-center">
-                    <i data-lucide="users" class="w-4 h-4 mx-auto mb-1.5"></i>組員
+                <button onclick="switchTab('monitor')" id="btn-monitor" class="hidden flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn text-slate-500 text-center flex flex-col items-center justify-center">
+                    <i data-lucide="users" class="w-4 h-4 mb-1.5"></i>組員名單
                 </button>
-                <button onclick="switchTab('admin')" id="btn-admin" class="hidden flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn text-slate-500 text-center">
-                    <i data-lucide="layout-grid" class="w-4 h-4 mx-auto mb-1.5"></i>管理
+                <button onclick="switchTab('admin')" id="btn-admin" class="hidden flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn text-slate-500 text-center flex flex-col items-center justify-center">
+                    <i data-lucide="settings" class="w-4 h-4 mb-1.5"></i>管理中心
                 </button>
             </div>
 
-            <div id="history-section" class="space-y-4">
-                <div id="attendance-list" class="space-y-3"></div>
+            <div id="history-section" class="space-y-4 w-full text-center">
+                <div id="attendance-list" class="space-y-3 w-full text-center"></div>
             </div>
 
-            <div id="monitor-section" class="hidden animate-in">
-                <div class="glass-panel p-6 rounded-[32px]">
-                    <div class="flex justify-between items-center mb-6 px-1">
-                        <h4 class="font-[900] text-slate-800 text-lg tracking-tight" id="monitor-title">全員狀態</h4>
-                        <button onclick="loadRealtimeStatus()" class="w-10 h-10 bg-white shadow-sm border border-slate-100 text-indigo-600 rounded-xl flex items-center justify-center hover:rotate-180 transition-all duration-500">
-                            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-                        </button>
+            <!-- 監控區域 -->
+            <div id="monitor-section" class="hidden animate-in w-full text-center">
+                <div class="glass-panel p-6 rounded-[32px] w-full text-center shadow-lg">
+                    <div class="flex justify-between items-center mb-6 px-1 text-center">
+                        <h4 class="font-[900] text-slate-800 text-lg tracking-tight text-center" id="monitor-title">全員狀態</h4>
+                        <button onclick="loadRealtimeStatus()" class="w-10 h-10 bg-white shadow-sm border border-slate-100 text-indigo-600 rounded-xl flex items-center justify-center hover:rotate-180 transition-all duration-500 text-center"><i data-lucide="refresh-cw" class="w-5 h-5 text-center"></i></button>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mb-6 text-center">
-                        <div class="bg-emerald-500/5 p-4 rounded-[22px] border border-emerald-100/50">
-                            <p class="text-[9px] text-emerald-600 font-black uppercase tracking-widest mb-1">Present</p>
-                            <p class="text-3xl font-[900] text-emerald-700" id="stat-present">0</p>
+                        <div class="bg-emerald-500/5 p-4 rounded-[22px] border border-emerald-100/50 text-center flex flex-col items-center">
+                            <p class="text-[9px] text-emerald-600 font-black uppercase tracking-widest mb-1 text-center">Present</p>
+                            <p class="text-3xl font-[900] text-emerald-700 text-center leading-none" id="stat-present">0</p>
                         </div>
-                        <div class="bg-rose-500/5 p-4 rounded-[22px] border border-rose-100/50">
-                            <p class="text-[9px] text-rose-600 font-black uppercase tracking-widest mb-1">Absent</p>
-                            <p class="text-3xl font-[900] text-rose-700" id="stat-absent">0</p>
+                        <div class="bg-rose-500/5 p-4 rounded-[22px] border border-rose-100/50 text-center flex flex-col items-center">
+                            <p class="text-[9px] text-rose-600 font-black uppercase tracking-widest mb-1 text-center">Absent</p>
+                            <p class="text-3xl font-[900] text-rose-700 text-center leading-none" id="stat-absent">0</p>
                         </div>
                     </div>
-                    <div id="realtime-status-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scroll pr-1"></div>
+                    <div id="realtime-status-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scroll pr-1 w-full text-center"></div>
                 </div>
             </div>
 
-            <div id="admin-section" class="hidden animate-in">
-                <div class="glass-panel p-6 rounded-[32px]">
-                    <div class="flex justify-between items-center mb-6 px-1">
-                        <h4 class="font-[900] text-slate-800 text-lg">活動管理</h4>
-                        <button onclick="openEditModal(null)" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl text-[11px] font-black shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
-                            <i data-lucide="plus-circle" class="w-4 h-4"></i>新增活動
-                        </button>
+            <!-- 管理區域 -->
+            <div id="admin-section" class="hidden animate-in w-full text-center">
+                <div class="glass-panel p-6 rounded-[32px] w-full text-center shadow-lg">
+                    <div class="flex justify-between items-center mb-6 px-1 text-center">
+                        <h4 class="font-[900] text-slate-800 text-lg tracking-tight text-center">活動廣播中心</h4>
+                        <button id="admin-add-btn" onclick="openEditModal(null)" class="hidden bg-indigo-600 text-white px-5 py-2.5 rounded-2xl text-[11px] font-black shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 text-center"><i data-lucide="plus-circle" class="w-4 h-4 text-center"></i>新增活動</button>
                     </div>
-                    <div id="admin-event-list" class="space-y-4"></div>
+                    <div id="admin-event-list" class="space-y-4 w-full text-center"></div>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- 彈窗: 個人檔案 -->
-    <div id="profile-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeProfileModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center">
-            <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white" id="profile-initial">-</div>
-            <h3 class="text-2xl font-[900] text-slate-800 mb-1" id="profile-name">-</h3>
-            <p class="text-slate-400 text-xs font-black tracking-widest uppercase mb-8" id="profile-role">-</p>
+    <div id="profile-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-6 text-center">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md text-center" onclick="closeProfileModal()"></div>
+        <div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+            <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white text-center" id="profile-initial">-</div>
+            
+            <div class="w-full space-y-2 mb-6 text-center">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">個人姓名 (僅本人可修改)</label>
+                <input type="text" id="profile-name-input" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 tracking-tight shadow-inner">
+                <p class="text-slate-400 text-xs font-black tracking-widest uppercase text-center mt-1" id="profile-role">-</p>
+            </div>
 
-            <div class="w-full space-y-3">
-                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] border border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="music-2" class="w-4 h-4 text-indigo-500"></i>
-                        <span class="text-[10px] font-black text-slate-500 uppercase">組別/樂器</span>
-                    </div>
-                    <span class="text-sm font-bold text-slate-700" id="profile-details">-</span>
+            <div class="w-full space-y-4 text-center">
+                <div class="space-y-2 text-center">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">負責樂器</label>
+                    <select id="profile-instrument-input" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none text-slate-700 shadow-sm"></select>
                 </div>
-                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] border border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="mail" class="w-4 h-4 text-indigo-500"></i>
-                        <span class="text-[10px] font-black text-slate-500 uppercase">登入帳號</span>
-                    </div>
-                    <span class="text-sm font-bold text-slate-700 truncate max-w-[150px]" id="profile-email">-</span>
+                
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] border border-slate-100 text-center">
+                    <span class="text-[10px] font-black text-slate-500 uppercase text-center">所屬組別</span>
+                    <span class="text-sm font-bold text-slate-700 text-right text-center" id="profile-section-display">-</span>
+                </div>
+                
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] border border-slate-100 text-center">
+                    <span class="text-[10px] font-black text-slate-500 uppercase text-center">登入帳號</span>
+                    <span class="text-sm font-bold text-slate-700 truncate max-w-[150px] text-right text-center" id="profile-email">-</span>
                 </div>
 
-                <div class="mt-4 pt-4 border-t border-slate-100 space-y-3">
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">修改密碼</p>
-                    <div class="relative">
-                        <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                        <input type="password" id="profile-new-password" class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-slate-100/80 outline-none border-none text-xs font-bold" placeholder="請輸入新密碼">
+                <div class="mt-4 pt-4 border-t border-slate-100 space-y-3 text-center">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">修改密碼</p>
+                    <div class="relative text-center">
+                        <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 text-center"></i>
+                        <input type="password" id="profile-new-password" class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-slate-100/80 outline-none border-none text-xs font-bold text-center" placeholder="不變請留空">
                     </div>
-                    <button id="update-password-btn" onclick="handleUpdatePassword()" class="w-full py-3.5 bg-slate-800 text-white font-black rounded-2xl text-xs hover:bg-slate-700 transition-all">更新資料</button>
+                    <button id="update-password-btn" onclick="handleUpdatePassword()" class="w-full py-3.5 btn-premium text-white font-black rounded-2xl text-xs shadow-lg text-center transition-all text-center">更新個人資料</button>
                 </div>
             </div>
-            <button onclick="closeProfileModal()" class="mt-8 text-slate-400 text-[10px] font-black uppercase tracking-widest">關閉視窗</button>
+            <button onclick="closeProfileModal()" class="mt-8 text-slate-400 text-[10px] font-black uppercase tracking-widest text-center hover:text-indigo-600 transition-colors text-center">取消並返回</button>
         </div>
     </div>
 
-    <!-- 彈窗: 編輯成員 (管理員/組長用) -->
-    <div id="member-edit-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeMemberEditModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up">
-            <h3 class="text-xl font-[900] text-slate-800 mb-8 text-center tracking-tight">編輯成員資料</h3>
-            <div class="space-y-4">
+    <!-- 彈窗: 輔助編輯成員 -->
+    <div id="member-edit-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-6 text-center">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md text-center" onclick="closeMemberEditModal()"></div>
+        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center">
+            <h3 class="text-xl font-[900] text-slate-800 mb-8 text-center tracking-tight text-center">成員資料管理</h3>
+            <div class="space-y-4 text-center">
                 <div class="space-y-1 text-center">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">成員姓名</label>
-                    <input type="text" id="edit-member-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">姓名 (限本人修改)</label>
+                    <input type="text" id="edit-member-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner" readonly>
                 </div>
                 <div class="space-y-1 text-center">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">負責樂器</label>
-                    <select id="edit-member-instrument" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold appearance-none text-center"></select>
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">負責樂器</label>
+                    <select id="edit-member-instrument" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold appearance-none text-center shadow-sm"></select>
                 </div>
                 <div id="role-edit-container" class="space-y-1 hidden text-center">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">系統權限</label>
-                    <select id="edit-member-role" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold appearance-none text-center">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">系統權限</label>
+                    <select id="edit-member-role" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold appearance-none text-center shadow-sm">
                         <option value="Member">一般團員</option>
                         <option value="Leader">組長 (Leader)</option>
                         <option value="Officer">幹部 (Officer)</option>
                         <option value="Admin">最高管理員 (Admin)</option>
                     </select>
                 </div>
+                
+                <div id="modifier-info-container" class="text-center bg-slate-50 p-3 rounded-2xl border border-slate-100 mt-2 hidden text-center shadow-inner">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 text-center">最後修改紀錄</p>
+                    <p id="edit-member-modifier" class="text-[10px] font-bold text-slate-500 text-center"></p>
+                </div>
                 <input type="hidden" id="edit-member-email">
             </div>
-            <div class="flex gap-4 mt-8">
+            <div class="flex gap-4 mt-8 text-center">
                 <button onclick="closeMemberEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center">取消</button>
-                <button id="save-member-btn" onclick="saveMemberInfo()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm text-center">儲存</button>
+                <button id="save-member-btn" onclick="saveMemberInfo()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm text-center shadow-lg text-center">儲存變更</button>
             </div>
         </div>
-    </div>
-
-    <!-- 抽屜式彈窗: 出勤歷史 -->
-    <div id="member-history-modal" class="hidden fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeMemberHistory()"></div>
-        <div class="bg-white w-full max-w-sm rounded-t-[42px] sm:rounded-[42px] shadow-2xl p-8 relative fade-up max-h-[85vh] flex flex-col">
-            <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6 sm:hidden"></div>
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <h3 id="m-history-name" class="text-xl font-[900] text-slate-800 tracking-tight">簽到紀錄</h3>
-                    <p id="m-history-email" class="text-[11px] text-slate-400 font-bold tracking-wide mt-1"></p>
-                </div>
-                <button onclick="closeMemberHistory()" class="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center hover:bg-rose-50 hover:text-rose-500 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="bg-indigo-50/50 p-4 rounded-[24px] text-center border border-indigo-100/50">
-                    <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">簽到次數</p>
-                    <p id="m-history-count" class="text-2xl font-[900] text-indigo-600">0</p>
-                </div>
-                <div id="m-absent-block" class="p-4 rounded-[24px] text-center transition-colors border shadow-sm">
-                    <p class="text-[9px] font-black opacity-60 uppercase tracking-widest mb-1">累積缺席</p>
-                    <p id="m-history-absent" class="text-2xl font-[900]">0</p>
-                </div>
-            </div>
-            <div id="m-history-list" class="flex-1 overflow-y-auto space-y-3 hide-scroll pr-1"></div>
-        </div>
-    </div>
-
-    <!-- 活動編輯 Modal -->
-    <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onclick="closeEditModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up">
-            <h3 id="modal-title" class="text-xl font-[900] text-slate-800 mb-8 text-center tracking-tight">活動資訊設定</h3>
-            <div class="space-y-4">
-                <input type="text" id="edit-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center" placeholder="活動名稱">
-                <input type="date" id="edit-date" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="time" id="edit-start" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center">
-                    <input type="time" id="edit-end" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center">
-                </div>
-            </div>
-            <div class="flex gap-4 mt-8">
-                <button onclick="closeEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center">取消</button>
-                <button id="save-event-btn" onclick="saveEvent()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm text-center shadow-lg">儲存</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast 通知 -->
-    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 hidden flex items-center justify-center gap-3 px-6 py-4 rounded-[20px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 translate-y-0 opacity-100 min-w-[220px] border-white">
-        <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
-        <span id="toast-msg" class="font-black text-sm text-center"></span>
     </div>
 
     <script>
@@ -447,7 +401,8 @@
         function updateInstrumentOptions() {
             const section = document.getElementById('reg-section').value;
             const instSelect = document.getElementById('reg-instrument');
-            instSelect.innerHTML = '<option value="">選擇樂器</option>';
+            if (!instSelect) return;
+            instSelect.innerHTML = '<option value="">樂器</option>';
             if (section && orchestraData[section]) {
                 orchestraData[section].forEach(inst => {
                     const opt = document.createElement('option'); opt.value = inst; opt.innerText = inst; instSelect.appendChild(opt);
@@ -463,27 +418,22 @@
                 const response = await fetch(GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action, data }) });
                 const result = await response.json();
                 return result;
-            } catch (e) { 
-                console.error("Backend Error:", e);
-                return { success: false, message: "連線失敗，請檢查網路設定" }; 
-            }
+            } catch (e) { return { success: false, message: "網路連線異常" }; }
         }
 
         async function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-            if(!email || !password) return showToast("請輸入完整帳密", true);
+            const emailEl = document.getElementById('login-email');
+            const pwdEl = document.getElementById('login-password');
+            if(!emailEl || !pwdEl) return;
+            const email = emailEl.value.trim();
+            const password = pwdEl.value.trim();
+            if(!email || !password) return showToast("請輸入帳密", true);
             const btn = document.getElementById('login-submit-btn');
             setBtnLoading(btn, true, "驗證中...");
             const res = await callBackend('loginUser', { email, password });
             setBtnLoading(btn, false, "立即登入");
-            if (res?.success) {
-                currentUser = res.user;
-                setupDashboard();
-                switchView('dashboard-view');
-                refreshSystemStatus();
-                loadAttendanceHistory();
-            } else showToast(res?.message || "登入失敗", true);
+            if (res?.success) { currentUser = res.user; setupDashboard(); switchView('dashboard-view'); refreshSystemStatus(); loadAttendanceHistory(); } 
+            else showToast(res?.message || "帳密有誤", true);
         }
 
         async function handleRegister() {
@@ -492,166 +442,243 @@
             const instrument = document.getElementById('reg-instrument').value;
             const email = document.getElementById('reg-email').value.trim();
             const password = document.getElementById('reg-password').value.trim();
-            if(!name || !section || !instrument || !email || !password) return showToast("欄位不可為空", true);
+            if(!name || !section || !instrument || !email || !password) return showToast("請填寫所有欄位", true);
             const btn = document.getElementById('reg-submit-btn');
             setBtnLoading(btn, true, "處理中...");
             const res = await callBackend('registerUser', { name, section, instrument, email, password });
             setBtnLoading(btn, false, "確認註冊");
-            if (res?.success) { showToast("註冊成功！"); switchAuthMode('login'); } 
-            else showToast(res?.message || "註冊失敗", true);
+            if (res?.success) { showToast("註冊成功！"); switchAuthMode('login'); } else showToast(res?.message || "註冊失敗", true);
         }
 
         function setupDashboard() {
-            document.getElementById('user-display').innerText = `你好，${currentUser.Name}`;
-            document.getElementById('info-badge').innerText = `${currentUser.Section} / ${currentUser.Instrument}`;
-            document.getElementById('nav-user-info').innerText = currentUser.Name;
+            const userDisp = document.getElementById('user-display');
+            const infoBadge = document.getElementById('info-badge');
+            const navInfo = document.getElementById('nav-user-info');
+            if (userDisp) userDisp.innerText = `你好，${currentUser.Name}`;
+            if (infoBadge) infoBadge.innerText = `${currentUser.Section} / ${currentUser.Instrument}`;
+            if (navInfo) navInfo.innerText = currentUser.Name;
+            
             if (['Admin', 'Officer', 'Leader'].includes(currentUser.Role)) {
-                document.getElementById('btn-monitor').classList.remove('hidden');
-                document.getElementById('btn-monitor').innerHTML = `<i data-lucide="users" class="w-4 h-4 mx-auto mb-1.5"></i>組員`;
-                document.getElementById('monitor-title').innerText = currentUser.Role === 'Leader' ? `${currentUser.Section} 狀態` : "成員狀態監控";
+                const btnMon = document.getElementById('btn-monitor');
+                const monTitle = document.getElementById('monitor-title');
+                if (btnMon) btnMon.classList.remove('hidden');
+                if (monTitle) monTitle.innerText = currentUser.Role === 'Leader' ? `${currentUser.Section} 狀態` : "成員監控";
             }
-            if (currentUser.Role === 'Admin') document.getElementById('btn-admin').classList.remove('hidden');
+            
+            if (['Admin', 'Officer'].includes(currentUser.Role)) {
+                const btnAdm = document.getElementById('btn-admin');
+                if (btnAdm) btnAdm.classList.remove('hidden');
+                if (currentUser.Role === 'Admin') {
+                    const addBtn = document.getElementById('admin-add-btn');
+                    if (addBtn) addBtn.classList.remove('hidden');
+                }
+            }
             safeCreateIcons();
         }
 
         function openProfileModal() {
             const modal = document.getElementById('profile-modal');
-            document.getElementById('profile-name').innerText = currentUser.Name;
-            document.getElementById('profile-role').innerText = currentUser.Role || 'Member';
-            document.getElementById('profile-details').innerText = `${currentUser.Section} • ${currentUser.Instrument}`;
-            document.getElementById('profile-email').innerText = currentUser.Email;
-            document.getElementById('profile-initial').innerText = String(currentUser.Name).substring(0, 1);
-            document.getElementById('profile-new-password').value = "";
+            const nameInput = document.getElementById('profile-name-input');
+            const instSelect = document.getElementById('profile-instrument-input');
+            const roleEl = document.getElementById('profile-role');
+            const sectionDisplay = document.getElementById('profile-section-display'); // 修正 ID
+            const emailEl = document.getElementById('profile-email');
+            const initEl = document.getElementById('profile-initial');
+            
+            if (!modal || !nameInput || !instSelect || !roleEl || !sectionDisplay || !emailEl || !initEl) {
+                console.error("Profile Modal 元素缺失");
+                return;
+            }
+
+            nameInput.value = currentUser.Name;
+            roleEl.innerText = currentUser.Role || 'Member';
+            sectionDisplay.innerText = currentUser.Section || '-';
+            emailEl.innerText = currentUser.Email;
+            initEl.innerText = String(currentUser.Name).substring(0, 1);
+            
+            const pwdInput = document.getElementById('profile-new-password');
+            if (pwdInput) pwdInput.value = "";
+            
+            instSelect.innerHTML = '';
+            const section = currentUser.Section;
+            if (orchestraData[section]) {
+                orchestraData[section].forEach(inst => {
+                    const opt = document.createElement('option');
+                    opt.value = inst; opt.innerText = inst;
+                    if (inst === currentUser.Instrument) opt.selected = true;
+                    instSelect.appendChild(opt);
+                });
+            }
+            
             modal.classList.remove('hidden');
             safeCreateIcons();
         }
 
-        function closeProfileModal() { document.getElementById('profile-modal').classList.add('hidden'); }
+        function closeProfileModal() { 
+            const modal = document.getElementById('profile-modal');
+            if (modal) modal.classList.add('hidden'); 
+        }
 
         async function handleUpdatePassword() {
-            const newPwd = document.getElementById('profile-new-password').value.trim();
-            if (!newPwd) return showToast("請輸入新密碼", true);
+            const nameInput = document.getElementById('profile-name-input');
+            const instInput = document.getElementById('profile-instrument-input');
+            const pwdInput = document.getElementById('profile-new-password');
+            
+            if (!nameInput || !instInput) return;
+            const newName = nameInput.value.trim();
+            const newInstrument = instInput.value;
+            const newPwd = pwdInput ? pwdInput.value.trim() : "";
+            
+            if (!newName) return showToast("姓名不可為空", true);
+            
             const btn = document.getElementById('update-password-btn');
             const originalText = btn.innerText;
-            btn.disabled = true; btn.innerText = "更新中...";
-            const res = await callBackend('saveMember', { email: currentUser.Email, name: currentUser.Name, instrument: currentUser.Instrument, password: newPwd });
+            btn.disabled = true; btn.innerText = "正在儲存...";
+
+            const res = await callBackend('saveMember', { 
+                email: currentUser.Email, 
+                adminEmail: currentUser.Email, 
+                name: newName, 
+                instrument: newInstrument, 
+                password: newPwd || undefined
+            });
+
             btn.disabled = false; btn.innerText = originalText;
-            if (res?.success) { showToast("密碼已更新！"); closeProfileModal(); } else showToast(res?.message || "更新失敗", true);
+            if (res?.success) { 
+                showToast("個人資料更新成功！"); 
+                currentUser.Name = newName; 
+                currentUser.Instrument = newInstrument; 
+                setupDashboard(); 
+                closeProfileModal(); 
+            } 
+            else showToast(res?.message || "更新失敗", true);
         }
 
         async function loadRealtimeStatus() {
             const list = document.getElementById('realtime-status-list');
-            list.innerHTML = '<div class="text-center py-10 opacity-50 text-[10px] font-black uppercase tracking-widest">Syncing...</div>';
+            if (!list) return;
+            list.innerHTML = '<div class="text-center py-10 opacity-50 text-[10px] font-black uppercase text-center">Syncing...</div>';
             const res = await callBackend('getRealtimeStatus', { role: currentUser.Role, section: currentUser.Section });
             if (res?.success) {
-                document.getElementById('stat-present').innerText = res.stats.present;
-                document.getElementById('stat-absent').innerText = res.stats.absent;
+                const statP = document.getElementById('stat-present');
+                const statA = document.getElementById('stat-absent');
+                if (statP) statP.innerText = res.stats.present;
+                if (statA) statA.innerText = res.stats.absent;
                 list.innerHTML = (res.data || []).map(u => {
                     const initial = String(u.Name || "U").substring(0, 1);
                     const absCount = u.absenceCount || 0;
-                    const absLabelClass = getAbsenceLabelClass(absCount);
                     const showEdit = ['Admin', 'Leader', 'Officer'].includes(currentUser.Role);
-                    const editBtn = showEdit ? `
-                        <button onclick="openMemberEditModal('${u.Email}', '${u.Name}', '${u.Instrument}', '${u.Section}', '${u.Role || 'Member'}')" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all border border-indigo-100">
-                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                            <span class="text-[10px] font-black">編輯</span>
-                        </button>` : '';
-                    const historyBtn = `
-                        <button onclick="viewMemberHistory('${u.Email}', '${u.Name}')" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-slate-100 text-slate-500 rounded-xl hover:bg-slate-800 hover:text-white transition-all border border-slate-200">
-                            <i data-lucide="history" class="w-3.5 h-3.5"></i>
-                            <span class="text-[10px] font-black">紀錄</span>
-                        </button>`;
+                    const editBtn = showEdit ? `<button onclick="openMemberEditModal('${u.Email}', '${u.Name}', '${u.Instrument}', '${u.Section}', '${u.Role || 'Member'}', '${u.Modifier || ''}')" class="flex-1 flex items-center justify-center gap-1 px-2 py-2 bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-100 text-center"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i><span class="text-[10px] font-black">編輯</span></button>` : '';
+                    const historyBtn = `<button onclick="viewMemberHistory('${u.Email}', '${u.Name}')" class="flex-1 flex items-center justify-center gap-1 px-2 py-2 bg-slate-100 text-slate-500 rounded-xl border border-slate-200 text-center"><i data-lucide="history" class="w-3.5 h-3.5"></i><span class="text-[10px] font-black tracking-tight">紀錄</span></button>`;
                     return `
-                    <div class="flex flex-col p-5 bg-white/70 rounded-[28px] border border-white shadow-sm gap-4 transition-all hover:shadow-md">
-                        <div class="flex items-center gap-4 w-full text-left">
-                            <div class="w-12 h-12 rounded-[18px] bg-slate-800 text-white flex items-center justify-center font-black shadow-lg">${initial}</div>
-                            <div class="flex-1 overflow-hidden">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-[900] text-slate-800 text-sm truncate">${u.Name}</span>
-                                    <span class="text-[9px] px-2 py-0.5 rounded-full font-black ${absLabelClass}">缺 ${absCount}</span>
-                                </div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate mt-0.5">${u.Instrument} • ${u.Section}</p>
+                    <div class="flex flex-col p-5 bg-white/70 rounded-[28px] border border-white shadow-sm gap-4 transition-all hover:shadow-md text-center">
+                        <div class="flex items-center gap-4 w-full text-left text-center">
+                            <div class="w-12 h-12 rounded-[18px] bg-slate-800 text-white flex items-center justify-center font-black shadow-lg text-center">${initial}</div>
+                            <div class="flex-1 overflow-hidden text-center">
+                                <div class="flex items-center gap-2 text-center justify-center sm:justify-start"><span class="font-[900] text-slate-800 text-sm truncate tracking-tight text-center">${u.Name}</span><span class="text-[9px] px-2 py-0.5 rounded-full font-black ${getAbsenceLabelClass(absCount)} shadow-sm text-center">缺 ${absCount}</span></div>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase truncate mt-0.5">${u.Instrument} • ${u.Section}</p>
                             </div>
-                            <div class="text-right">
-                                <span class="text-xs font-black ${u.status === '已簽到' ? 'text-emerald-500' : 'text-slate-300'}">${u.status}</span>
-                            </div>
+                            <div class="text-right text-center"><span class="text-xs font-black ${u.status === '已簽到' ? 'text-emerald-500' : 'text-slate-300'} text-center">${u.status}</span></div>
                         </div>
-                        <div class="flex gap-2 w-full">
-                            ${editBtn} ${historyBtn}
-                        </div>
+                        <div class="flex gap-2 w-full text-center">${editBtn} ${historyBtn}</div>
                     </div>`;
                 }).join('');
                 safeCreateIcons();
-            } else list.innerHTML = `<div class="text-center py-10 text-rose-400 font-bold">${res.message}</div>`;
+            } else list.innerHTML = `<div class="text-center py-10 text-rose-400 font-bold text-center">${res.message}</div>`;
         }
 
-        function openMemberEditModal(email, name, currentInst, section, role) {
+        function openMemberEditModal(email, name, currentInst, section, role, modifier) {
             const modal = document.getElementById('member-edit-modal');
+            const nameInput = document.getElementById('edit-member-name');
+            const roleCont = document.getElementById('role-edit-container');
+            const modCont = document.getElementById('modifier-info-container');
+            const modText = document.getElementById('edit-member-modifier');
+            const roleInp = document.getElementById('edit-member-role');
+            const emailInp = document.getElementById('edit-member-email');
+            
+            if (!modal || !nameInput) return;
+
+            emailInp.value = email;
+            nameInput.value = name;
+            if (modifier) { modCont.classList.remove('hidden'); modText.innerText = modifier; } else modCont.classList.add('hidden');
+            if (currentUser.Role === 'Admin' && roleCont) { roleCont.classList.remove('hidden'); roleInp.value = role; } else if(roleCont) roleCont.classList.add('hidden');
+            
             const instSelect = document.getElementById('edit-member-instrument');
-            const roleSelect = document.getElementById('edit-member-role');
-            const roleContainer = document.getElementById('role-edit-container');
-            document.getElementById('edit-member-email').value = email;
-            document.getElementById('edit-member-name').value = name;
-            if (currentUser.Role === 'Admin') { roleContainer.classList.remove('hidden'); roleSelect.value = role; } else { roleContainer.classList.add('hidden'); }
-            instSelect.innerHTML = '';
-            if (orchestraData[section]) {
-                orchestraData[section].forEach(inst => {
-                    const opt = document.createElement('option'); opt.value = inst; opt.innerText = inst;
-                    if (inst === currentInst) opt.selected = true;
-                    instSelect.appendChild(opt);
-                });
+            if (instSelect) {
+                instSelect.innerHTML = '';
+                if (orchestraData[section]) {
+                    orchestraData[section].forEach(inst => {
+                        const opt = document.createElement('option'); opt.value = inst; opt.innerText = inst;
+                        if (inst === currentInst) opt.selected = true;
+                        instSelect.appendChild(opt);
+                    });
+                }
             }
             modal.classList.remove('hidden');
             safeCreateIcons();
         }
 
-        function closeMemberEditModal() { document.getElementById('member-edit-modal').classList.add('hidden'); }
+        function closeMemberEditModal() { 
+            const modal = document.getElementById('member-edit-modal');
+            if (modal) modal.classList.add('hidden'); 
+        }
 
         async function saveMemberInfo() {
-            const data = { adminEmail: currentUser.Email, email: document.getElementById('edit-member-email').value, name: document.getElementById('edit-member-name').value.trim(), instrument: document.getElementById('edit-member-instrument').value, role: document.getElementById('edit-member-role').value };
-            if (!data.name) return showToast("姓名不可為空", true);
+            const email = document.getElementById('edit-member-email').value;
+            const name = document.getElementById('edit-member-name').value.trim();
+            const inst = document.getElementById('edit-member-instrument').value;
+            const role = document.getElementById('edit-member-role').value;
+            
+            if (!name) return showToast("姓名不可為空", true);
             const btn = document.getElementById('save-member-btn');
-            setBtnLoading(btn, true, "處理中...");
-            const res = await callBackend('saveMember', data);
-            setBtnLoading(btn, false, "儲存");
-            if (res?.success) { showToast("資料已更新"); closeMemberEditModal(); loadRealtimeStatus(); } 
-            else showToast(res?.message || "更新失敗", true);
+            setBtnLoading(btn, true, "儲存中...");
+            const res = await callBackend('saveMember', { adminEmail: currentUser.Email, email: email, name: name, instrument: inst, role: role });
+            setBtnLoading(btn, false, "儲存變更");
+            if (res?.success) { showToast("資料已更新"); closeMemberEditModal(); loadRealtimeStatus(); } else showToast(res?.message || "更新失敗", true);
         }
 
         async function viewMemberHistory(email, name) {
             const modal = document.getElementById('member-history-modal');
             const list = document.getElementById('m-history-list');
-            const absentBlock = document.getElementById('m-absent-block');
-            document.getElementById('m-history-name').innerText = `${name}`;
-            document.getElementById('m-history-email').innerText = email;
-            list.innerHTML = '<div class="text-center py-12 opacity-30 text-xs font-black uppercase tracking-widest">Loading...</div>';
+            const hName = document.getElementById('m-history-name');
+            const hEmail = document.getElementById('m-history-email');
+            if (!modal || !list || !hName) return;
+
+            hName.innerText = `${name}`;
+            hEmail.innerText = email;
+            list.innerHTML = '<div class="text-center py-12 opacity-30 text-xs font-black uppercase text-center text-center">Loading...</div>';
             modal.classList.remove('hidden');
+            
             const res = await callBackend('getMemberHistory', { adminEmail: currentUser.Email, targetEmail: email });
             if (res?.success) {
-                const absCount = res.absenceCount || 0;
                 document.getElementById('m-history-count').innerText = res.list.length;
-                document.getElementById('m-history-absent').innerText = absCount;
-                absentBlock.className = `p-4 rounded-[22px] text-center transition-colors border shadow-sm ${getAbsenceBlockClass(absCount)}`;
-                list.innerHTML = res.list.length === 0 ? '<div class="text-center py-12 text-slate-400 font-bold">目前無紀錄</div>' : 
+                document.getElementById('m-history-absent').innerText = res.absenceCount;
+                const abBlock = document.getElementById('m-absent-block');
+                if (abBlock) abBlock.className = `p-4 rounded-[22px] text-center transition-colors border shadow-sm flex flex-col items-center justify-center text-center ${getAbsenceBlockClass(res.absenceCount)}`;
+                
+                list.innerHTML = res.list.length === 0 ? '<div class="text-center py-12 text-slate-400 font-bold text-center">查無紀錄</div>' : 
                     res.list.map(h => `
                         <div class="bg-slate-50/70 p-5 rounded-[22px] border border-slate-100 flex justify-between items-center text-left">
                             <div><span class="font-[900] text-slate-700 text-sm block tracking-tight">${h.eventName}</span><p class="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wider">${h.date}</p></div>
-                            <span class="text-[10px] bg-white text-indigo-600 px-3 py-1.5 rounded-xl font-[900] border border-indigo-100 shadow-sm">${formatDurationDisplay(h.duration)}</span>
+                            <span class="text-[10px] bg-white text-indigo-600 px-3 py-1.5 rounded-xl font-[900] border border-indigo-100 shadow-sm text-center">${formatDurationDisplay(h.duration)}</span>
                         </div>`).join('');
-            } else list.innerHTML = `<div class="text-center py-12 text-rose-400 font-bold">${res.message}</div>`;
+            } else list.innerHTML = `<div class="text-center py-12 text-rose-400 font-bold text-center">${res.message}</div>`;
             safeCreateIcons();
         }
 
-        function closeMemberHistory() { document.getElementById('member-history-modal').classList.add('hidden'); }
+        function closeMemberHistory() { 
+            const modal = document.getElementById('member-history-modal');
+            if (modal) modal.classList.add('hidden'); 
+        }
 
         async function submitCheckin() {
             if (currentEventData.hasCheckedIn) return showToast("您今天已簽到囉！");
             const btn = document.getElementById('checkin-btn');
-            btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-12 h-12 animate-spin"></i>';
+            btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-12 h-12 animate-spin text-center"></i>';
             safeCreateIcons();
             const res = await callBackend('submitCheckin', { email: currentUser.Email, name: currentUser.Name, section: currentUser.Section, date: currentEventData.eventDate, type: currentEventData.eventType, eventName: currentEventData.eventName, eventTimeRange: `${currentEventData.eventStart} ~ ${currentEventData.eventEnd}` });
             if (res?.success) { showToast("簽到成功！祝練習愉快"); currentEventData.hasCheckedIn = true; updateCheckinBtnStatus(true); setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1500); } 
-            else { showToast(res?.message || "簽到失敗", true); btn.disabled = false; btn.innerHTML = '<i data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span class="text-lg">點擊簽到</span>'; }
+            else { showToast(res?.message || "簽到失敗", true); btn.disabled = false; btn.innerHTML = '<i data-lucide="scan-face" class="w-12 h-12 mb-2 text-center text-center"></i><span class="text-lg text-center">簽到</span>'; }
             safeCreateIcons();
         }
 
@@ -659,16 +686,18 @@
             const btn = document.getElementById('checkin-btn');
             const pulse = document.getElementById('btn-pulse');
             const timeInfo = document.getElementById('checkin-time-display');
+            if (!btn || !pulse || !timeInfo) return;
+
             if (hasCheckedIn) {
                 btn.disabled = true;
-                btn.className = "relative z-10 w-36 h-36 bg-emerald-500 rounded-full text-white font-black shadow-xl mx-auto border-[10px] border-white flex flex-col items-center justify-center scale-110 transition-all duration-700";
-                btn.innerHTML = '<i data-lucide="check-circle" class="w-12 h-12 mb-1"></i><span class="text-[10px] font-black">完成點名</span>';
+                btn.className = "relative z-10 w-36 h-36 bg-emerald-500 rounded-full text-white font-black shadow-xl mx-auto border-[10px] border-white flex flex-col items-center justify-center scale-110 transition-all duration-700 text-center";
+                btn.innerHTML = '<i data-lucide="check-circle" class="w-12 h-12 mb-1 text-center"></i><span class="text-[10px] font-black text-center">完成</span>';
                 pulse.classList.remove('pulse-effect'); timeInfo.classList.add('opacity-0');
             } else {
                 const isEnabled = currentEventData?.enabled;
                 btn.disabled = !isEnabled;
-                btn.innerHTML = isEnabled ? '<i data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span class="text-lg tracking-tight">點擊簽到</span>' : '<i data-lucide="clock" class="w-10 h-10 mb-2 opacity-30"></i><span class="text-sm">未開放</span>';
-                btn.className = isEnabled ? "relative z-10 w-36 h-36 btn-premium rounded-full text-white font-black shadow-2xl mx-auto border-[10px] border-white flex flex-col items-center justify-center" : "relative z-10 w-36 h-36 bg-slate-200 rounded-full text-slate-400 font-black shadow-inner mx-auto border-[10px] border-white flex flex-col items-center justify-center cursor-not-allowed";
+                btn.innerHTML = isEnabled ? '<i data-lucide="scan-face" class="w-12 h-12 mb-2 text-center"></i><span class="text-lg tracking-tight text-center">點擊簽到</span>' : '<i data-lucide="clock" class="w-10 h-10 mb-2 opacity-30 text-center"></i><span class="text-sm">尚未開放</span>';
+                btn.className = isEnabled ? "relative z-10 w-36 h-36 btn-premium rounded-full text-white font-black shadow-2xl mx-auto border-[10px] border-white flex flex-col items-center justify-center text-center active:scale-90" : "relative z-10 w-36 h-36 bg-slate-200 rounded-full text-slate-400 font-black shadow-inner mx-auto border-[10px] border-white flex flex-col items-center justify-center cursor-not-allowed text-center";
                 if(isEnabled) { pulse.classList.add('pulse-effect'); timeInfo.classList.remove('opacity-0'); } else { pulse.classList.remove('pulse-effect'); timeInfo.classList.add('opacity-0'); }
             }
             safeCreateIcons();
@@ -676,20 +705,23 @@
 
         async function refreshSystemStatus() {
             const res = await callBackend('getSystemStatus', { email: currentUser.Email });
-            if (res?.success) {
-                currentEventData = res;
-                updateCheckinBtnStatus(res.hasCheckedIn);
-                document.getElementById('current-event-display').innerText = res.enabled ? `${res.eventName}` : "目前沒有正在進行的活動";
-                document.getElementById('checkin-time-display').innerText = res.enabled ? `${res.eventStart} ~ ${res.eventEnd}` : "--:--";
+            if (res?.success) { 
+                currentEventData = res; 
+                updateCheckinBtnStatus(res.hasCheckedIn); 
+                const evDisp = document.getElementById('current-event-display');
+                const tiDisp = document.getElementById('checkin-time-display');
+                if (evDisp) evDisp.innerText = res.enabled ? `${res.eventName}` : "目前無活動"; 
+                if (tiDisp) {
+                    tiDisp.innerText = res.enabled ? `${res.eventStart} ~ ${res.eventEnd}` : "--:--"; 
+                    tiDisp.classList.toggle('opacity-100', res.enabled);
+                }
             }
         }
 
         function formatDurationDisplay(dur) {
             if (!dur) return "0時0分";
             const s = String(dur);
-            if (s.includes('1899-12-') || s.includes('T')) {
-                try { const date = new Date(s); return `${date.getHours()}時${date.getMinutes()}分`; } catch(e) { return "格式錯誤"; }
-            }
+            if (s.includes('1899-12-') || s.includes('T')) { try { const date = new Date(s); return `${date.getHours()}時${date.getMinutes()}分`; } catch(e) { return "0時0分"; } }
             return s;
         }
 
@@ -697,112 +729,140 @@
             const res = await callBackend('getAttendanceHistory', { email: currentUser.Email });
             if (res?.success) {
                 let totalMin = 0;
-                document.getElementById('attendance-list').innerHTML = (res.list || []).map(i => {
+                const attList = document.getElementById('attendance-list');
+                const totDisp = document.getElementById('total-duration-display');
+                if (!attList || !totDisp) return;
+
+                attList.innerHTML = (res.list || []).map(i => {
                     const dur = formatDurationDisplay(i.duration);
                     const m = dur.match(/(\d+)時(\d+)分/);
                     if(m) totalMin += parseInt(m[1])*60 + parseInt(m[2]);
-                    return `<div class="glass-panel p-5 rounded-[26px] flex justify-between items-center border-white/60 shadow-sm transition-all hover:scale-[1.02] hover:bg-white">
-                        <div class="flex items-center gap-4 text-left">
-                            <div class="w-12 h-12 rounded-[18px] bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100"><i data-lucide="music" class="w-5 h-5"></i></div>
-                            <div><p class="font-[900] text-slate-700 text-sm tracking-tight">${i.status}</p><p class="text-slate-400 text-[10px] font-bold mt-0.5 uppercase">${i.date}</p></div>
-                        </div>
-                        <span class="bg-indigo-500 text-white px-4 py-2 rounded-2xl font-black text-[11px] shadow-lg shadow-indigo-100">${dur}</span>
-                    </div>`;
+                    return `<div class="glass-panel p-5 rounded-[26px] flex justify-between items-center border-white/60 shadow-sm transition-all hover:scale-[1.02] hover:bg-white text-center text-center"><div class="flex items-center gap-4 text-left text-center"><div class="w-12 h-12 rounded-[18px] bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100 text-center text-center shadow-inner"><i data-lucide="music" class="w-5 h-5 text-center text-center text-center"></i></div><div class="text-center sm:text-left"><p class="font-[900] text-slate-700 text-sm tracking-tight text-center sm:text-left text-center">${i.status}</p><p class="text-slate-400 text-[10px] font-bold mt-0.5 uppercase tracking-tighter text-center sm:text-left text-center">${i.date}</p></div></div><span class="bg-indigo-500 text-white px-4 py-2 rounded-2xl font-black text-[11px] shadow-lg shadow-indigo-100 text-center text-center text-center">${dur}</span></div>`;
                 }).join('');
-                document.getElementById('total-duration-display').innerText = `${Math.floor(totalMin/60)} 小時 ${totalMin%60} 分`;
+                totDisp.innerText = `${Math.floor(totalMin/60)}`;
                 safeCreateIcons();
             }
         }
 
         function switchView(id) { 
-            ['login-view', 'register-view', 'dashboard-view'].forEach(v => document.getElementById(v).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden'); 
-            document.getElementById('nav-bar').classList.toggle('hidden', id !== 'dashboard-view'); 
+            const views = ['login-view', 'register-view', 'dashboard-view'];
+            views.forEach(v => {
+                const el = document.getElementById(v);
+                if (el) el.classList.add('hidden');
+            }); 
+            const target = document.getElementById(id);
+            if (target) target.classList.remove('hidden'); 
+            const nav = document.getElementById('nav-bar');
+            if (nav) nav.classList.toggle('hidden', id !== 'dashboard-view'); 
         }
 
         function switchTab(t) { 
-            ['history', 'monitor', 'admin'].forEach(tab => {
-                const sec = document.getElementById(`${tab}-section`);
-                const btn = document.getElementById(`btn-${tab}`);
-                if(sec) sec.classList.toggle('hidden', tab !== t);
-                if(btn) { btn.classList.toggle('tab-active', tab === t); btn.classList.toggle('text-slate-500', tab !== t); }
-            });
-            if(t === 'monitor') loadRealtimeStatus();
-            if(t === 'admin') loadEventList();
+            const tabs = ['history', 'monitor', 'admin'];
+            tabs.forEach(tab => { 
+                const sec = document.getElementById(`${tab}-section`); 
+                const btn = document.getElementById(`btn-${tab}`); 
+                if(sec) sec.classList.toggle('hidden', tab !== t); 
+                if(btn) { 
+                    btn.classList.toggle('tab-active', tab === t); 
+                    btn.classList.toggle('text-slate-500', tab !== t); 
+                } 
+            }); 
+            if(t === 'monitor') loadRealtimeStatus(); 
+            if(t === 'admin') loadEventList(); 
         }
 
         async function loadEventList() {
             const list = document.getElementById('admin-event-list');
-            list.innerHTML = '<div class="text-center py-10 text-slate-400 font-black text-[10px] uppercase tracking-widest">Synchronizing...</div>';
+            if (!list) return;
+            list.innerHTML = '<div class="text-center py-10 text-slate-400 font-black text-[10px] uppercase text-center tracking-widest text-center">Synchronizing...</div>';
             const res = await callBackend('getEventList', {});
             if (res?.success) {
                 allEvents = res.data || [];
-                list.innerHTML = allEvents.map(ev => `
-                <div class="bg-white/70 p-6 rounded-[28px] border border-white shadow-sm gap-5 text-center">
-                    <p class="font-[900] text-slate-800 text-base tracking-tight mb-1">${ev.Name}</p>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4">${ev.Date} • ${ev.StartTime} - ${ev.EndTime}</p>
-                    <div class="flex gap-2.5 w-full">
-                        <button onclick="activateEventFromList('${ev.ID}')" class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-orange-500 shadow-sm rounded-2xl hover:bg-orange-500 hover:text-white transition-all border border-orange-100">
-                            <i data-lucide="zap" class="w-4 h-4"></i><span class="text-xs font-black">廣播</span>
-                        </button>
-                        <button onclick="openEditModal('${ev.ID}')" class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-2xl shadow-sm text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all border border-indigo-100">
-                            <i data-lucide="edit-3" class="w-4 h-4"></i><span class="text-xs font-black">編輯</span>
-                        </button>
-                    </div>
-                </div>`).join('');
+                list.innerHTML = allEvents.map(ev => {
+                    const isOfficer = currentUser.Role === 'Officer';
+                    const zapBtn = `<button onclick="activateEventFromList('${ev.ID}')" class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-orange-500 shadow-sm rounded-2xl hover:bg-orange-500 hover:text-white transition-all border border-orange-100 text-center shadow-md text-center"><i data-lucide="zap" class="w-4 h-4 text-center"></i><span class="text-xs font-black text-center text-center">廣播活動</span></button>`;
+                    const editBtn = !isOfficer ? `<button onclick="openEditModal('${ev.ID}')" class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-2xl shadow-sm text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all border border-indigo-100 text-center shadow-md text-center"><i data-lucide="edit-3" class="w-4 h-4 text-center"></i><span class="text-[10px] font-black text-center">編輯資訊</span></button>` : '';
+
+                    return `<div class="bg-white/70 p-6 rounded-[28px] border border-white shadow-sm gap-5 text-center transition-all hover:bg-white text-center"><p class="font-[900] text-slate-800 text-base tracking-tight mb-1 text-center text-center">${ev.Name}</p><p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4 text-center text-center">${ev.Date} • ${ev.StartTime} - ${ev.EndTime}</p><div class="flex gap-2.5 w-full text-center text-center">${zapBtn} ${editBtn}</div></div>`;
+                }).join('');
                 safeCreateIcons();
             }
         }
 
-        async function activateEventFromList(id) {
-            const ev = allEvents.find(e => String(e.ID) === String(id));
-            if (!ev) return;
-            showToast("正在廣播活動...");
-            const res = await callBackend('activateEvent', { id: ev.ID, name: ev.Name, type: ev.Type, date: ev.Date, start: ev.StartTime, end: ev.EndTime });
-            if (res?.success) { showToast(`已廣播：${ev.Name}`); refreshSystemStatus(); }
+        async function activateEventFromList(id) { 
+            const ev = allEvents.find(e => String(e.ID) === String(id)); 
+            if (!ev) return; 
+            showToast("正在廣播活動..."); 
+            const res = await callBackend('activateEvent', { id: ev.ID, name: ev.Name, type: ev.Type, date: ev.Date, start: ev.StartTime, end: ev.EndTime }); 
+            if (res?.success) { showToast(`活動 ${ev.Name} 已廣播成功！`); refreshSystemStatus(); } 
         }
 
-        function openEditModal(id) {
-            editingId = id; document.getElementById('edit-modal').classList.remove('hidden');
-            if (id) {
-                const ev = allEvents.find(e => String(e.ID) === String(id));
-                if (ev) { document.getElementById('edit-name').value = ev.Name; document.getElementById('edit-date').value = ev.Date; document.getElementById('edit-start').value = ev.StartTime; document.getElementById('edit-end').value = ev.EndTime; }
-            } else {
-                document.getElementById('edit-name').value = ""; document.getElementById('edit-date').value = new Date().toISOString().split('T')[0]; document.getElementById('edit-start').value = "19:00"; document.getElementById('edit-end').value = "21:30";
-            }
+        function openEditModal(id) { 
+            const modal = document.getElementById('edit-modal');
+            const nameInp = document.getElementById('edit-name');
+            const dateInp = document.getElementById('edit-date');
+            const startInp = document.getElementById('edit-start');
+            const endInp = document.getElementById('edit-end');
+            
+            if (!modal || !nameInp) return;
+            editingId = id; 
+            if (id) { 
+                const ev = allEvents.find(e => String(e.ID) === String(id)); 
+                if (ev) { nameInp.value = ev.Name; dateInp.value = ev.Date; startInp.value = ev.StartTime; endInp.value = ev.EndTime; } 
+            } else { 
+                nameInp.value = ""; dateInp.value = new Date().toISOString().split('T')[0]; startInp.value = "19:00"; endInp.value = "21:30"; 
+            } 
+            modal.classList.remove('hidden');
         }
 
-        function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
-
-        async function saveEvent() {
-            const data = { id: editingId, name: document.getElementById('edit-name').value, date: document.getElementById('edit-date').value, startTime: document.getElementById('edit-start').value, endTime: document.getElementById('edit-end').value };
-            if(!data.name) return showToast("請輸入名稱", true);
-            showToast("正在儲存...");
-            const res = await callBackend('saveEvent', data);
-            if (res?.success) { showToast("設定已儲存"); closeEditModal(); loadEventList(); }
+        function closeEditModal() { 
+            const modal = document.getElementById('edit-modal');
+            if (modal) modal.classList.add('hidden'); 
         }
 
-        function showToast(m, e=false) {
-            const t = document.getElementById('toast');
+        async function saveEvent() { 
+            const name = document.getElementById('edit-name').value;
+            const date = document.getElementById('edit-date').value;
+            const start = document.getElementById('edit-start').value;
+            const end = document.getElementById('edit-end').value;
+            if(!name) return showToast("請輸入活動名稱", true); 
+            showToast("正在儲存設定..."); 
+            const res = await callBackend('saveEvent', { id: editingId, name: name, date: date, startTime: start, endTime: end }); 
+            if (res?.success) { showToast("設定已儲存成功！"); closeEditModal(); loadEventList(); } 
+        }
+
+        function showToast(m, e=false) { 
+            const t = document.getElementById('toast'); 
+            const msg = document.getElementById('toast-msg'); 
             const icon = document.getElementById('toast-icon');
-            const msg = document.getElementById('toast-msg');
-            msg.innerText = m;
-            t.className = `fixed top-12 left-1/2 -translate-x-1/2 px-6 py-4 rounded-[22px] flex items-center justify-center gap-3 glass-panel shadow-2xl z-[200] transition-all transform duration-500 translate-y-0 opacity-100 border-white ${e?'text-rose-500':'text-indigo-600'}`;
+            if (!t || !msg || !icon) return;
+
+            msg.innerText = m; 
+            t.className = `fixed top-12 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 border-white text-center ${e?'text-rose-500':'text-indigo-600'}`; 
             icon.setAttribute('data-lucide', e ? 'alert-circle' : 'check-circle');
-            t.classList.remove('hidden');
+            t.classList.remove('hidden'); 
             safeCreateIcons();
-            setTimeout(() => { t.classList.add('opacity-0'); t.classList.add('-translate-y-4'); setTimeout(() => t.classList.add('hidden'), 500); }, 3000);
+            setTimeout(() => { 
+                t.classList.add('opacity-0'); 
+                setTimeout(() => { t.classList.add('hidden'); t.classList.remove('opacity-0'); }, 500); 
+            }, 3000); 
         }
 
         function setBtnLoading(btn, isLoading, text) { 
-            btn.innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto"></i>' : text; 
-            btn.disabled = isLoading; btn.classList.toggle('opacity-70', isLoading);
-            safeCreateIcons();
+            if (!btn) return;
+            btn.innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto text-center text-center"></i>' : text; 
+            btn.disabled = isLoading; 
+            btn.classList.toggle('opacity-70', isLoading); 
+            safeCreateIcons(); 
         }
+
         function handleLogout() { location.reload(); }
+
         function switchAuthMode(mode) { 
-            document.getElementById('login-view').classList.toggle('hidden', mode === 'register'); 
-            document.getElementById('register-view').classList.toggle('hidden', mode === 'login'); 
+            const loginView = document.getElementById('login-view');
+            const regView = document.getElementById('register-view');
+            if (loginView) loginView.classList.toggle('hidden', mode === 'register'); 
+            if (regView) regView.classList.toggle('hidden', mode === 'login'); 
         }
     </script>
 </body>
