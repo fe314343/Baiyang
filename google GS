@@ -1,6 +1,6 @@
 /**
- * 國樂團簽到系統 - GAS 後端 (全功能最終版)
- * 功能：身分驗證、自動統計、活動廣播、組員管理、修改追蹤
+ * 國樂團簽到系統 - GAS 後端 (預排活動相容版)
+ * 修正：缺席次數僅統計「今日（含）以前」已發生的活動
  */
 
 function doPost(e) {
@@ -10,7 +10,6 @@ function doPost(e) {
     const action = requestData.action;
     const data = requestData.data;
 
-    // 自動初始化所有分頁，確保系統正常執行
     checkAndInitSheets();
 
     switch (action) {
@@ -24,7 +23,7 @@ function doPost(e) {
       case 'saveEvent': result = saveEvent(data); break; 
       case 'activateEvent': result = activateEvent(data); break;
       case 'getRealtimeStatus': result = getRealtimeStatus(data); break; 
-      case 'saveMember': result = saveMember(data); break; // 包含權限更改與修改人記錄
+      case 'saveMember': result = saveMember(data); break; 
       default: result = { success: false, message: "未知指令: " + action };
     }
   } catch (err) {
@@ -34,81 +33,7 @@ function doPost(e) {
 }
 
 /**
- * 編輯成員資料與權限 (含修改人追蹤)
- */
-function saveMember(data) {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName("Members");
-    const values = sheet.getDataRange().getValues();
-    const targetEmail = String(data.email).trim().toLowerCase();
-    const modifier = data.adminEmail || "User Self"; // 記錄是誰修改的
-
-    for (let i = 1; i < values.length; i++) {
-      // 假設 Email 欄位在第 4 欄 (Index 3)
-      if (String(values[i][3]).trim().toLowerCase() === targetEmail) {
-        
-        // 更新姓名 (第 2 欄)
-        if (data.name) sheet.getRange(i + 1, 2).setValue(data.name.trim());
-        
-        // 更新樂器 (第 7 欄)
-        if (data.instrument) sheet.getRange(i + 1, 7).setValue(data.instrument);
-        
-        // 更新權限 (第 6 欄) - 僅當前端有傳送 role 且不為空時
-        if (data.role) sheet.getRange(i + 1, 6).setValue(data.role);
-        
-        // 更新密碼 (第 5 欄) - 處理個人檔案中的密碼變更
-        if (data.password) sheet.getRange(i + 1, 5).setValue(String(data.password).trim());
-
-        // 紀錄修改資訊 (第 9 欄) - 記錄「最後修改者 | 時間」
-        const timestamp = Utilities.formatDate(new Date(), "GMT+8", "yyyy-MM-dd HH:mm");
-        sheet.getRange(i + 1, 9).setValue(modifier + " (" + timestamp + ")");
-
-        return { success: true, message: "資料已更新" };
-      }
-    }
-    return { success: false, message: "找不到該帳號" };
-  } catch (err) {
-    return { success: false, message: "更新失敗: " + err.toString() };
-  }
-}
-
-/**
- * 獲取特定成員詳細歷史與缺席統計
- */
-function getMemberHistory(data) {
-  if (!data.adminEmail) return { success: false, message: "權限不足" };
-  
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const attSheet = ss.getSheetByName("Attendance");
-    const eventSheet = ss.getSheetByName("Events");
-    const values = attSheet.getDataRange().getValues();
-    const history = [];
-    const targetEmail = String(data.targetEmail).trim().toLowerCase();
-
-    for (let i = values.length - 1; i >= 1; i--) {
-      if (String(values[i][3]).trim().toLowerCase() === targetEmail) {
-        let d = values[i][5];
-        history.push({ 
-          date: (d instanceof Date) ? Utilities.formatDate(d, "GMT+8", "yyyy-MM-dd") : d, 
-          eventName: values[i][4], 
-          duration: values[i][8] || "0時0分" 
-        });
-      }
-    }
-
-    const totalEvents = Math.max(0, eventSheet.getLastRow() - 1);
-    const absenceCount = Math.max(0, totalEvents - history.length);
-
-    return { success: true, list: history, absenceCount: absenceCount };
-  } catch (err) {
-    return { success: false, message: "資料讀取失敗" };
-  }
-}
-
-/**
- * 監控功能：獲取全員狀態與動態缺席標籤
+ * 監控功能：獲取全員狀態 (優化：僅計算已發生的活動作為缺席基準)
  */
 function getRealtimeStatus(userData) {
   try {
@@ -118,8 +43,19 @@ function getRealtimeStatus(userData) {
     const events = ss.getSheetByName("Events").getDataRange().getValues();
     const sys = getSystemStatus();
     const todayDate = sys.eventDate;
-    const totalEventsCount = Math.max(0, events.length - 1);
     
+    // --- 核心邏輯：計算「截至今日為止」的總活動次數 ---
+    const now = new Date();
+    const todayStr = Utilities.formatDate(now, "GMT+8", "yyyy-MM-dd");
+    let pastEventsCount = 0;
+    for (let k = 1; k < events.length; k++) {
+      let ed = events[k][3];
+      if (ed instanceof Date) ed = Utilities.formatDate(ed, "GMT+8", "yyyy-MM-dd");
+      if (String(ed) <= todayStr) {
+        pastEventsCount++;
+      }
+    }
+
     let filterSection = (userData && userData.role === 'Leader') ? userData.section : null;
 
     const userStats = {};
@@ -149,109 +85,164 @@ function getRealtimeStatus(userData) {
         Email: members[j][3], 
         Section: mSection,
         Instrument: members[j][6], 
-        Role: members[j][5], // 傳送 Role 以便前端開啟編輯時預設權限
+        Role: members[j][5],
+        Modifier: members[j][8] || "無修改紀錄",
         status: stats.today ? "已簽到" : "未簽到",
-        absenceCount: Math.max(0, totalEventsCount - stats.count)
+        // 缺席數 = 歷史總活動數(已發生) - 個人簽到數
+        absenceCount: Math.max(0, pastEventsCount - stats.count)
       });
     }
 
     return { success: true, data: res, stats: { present: p, absent: a } };
   } catch (err) {
-    return { success: false, message: "讀取失敗: " + err.toString() };
+    return { success: false, message: "資料庫讀取失敗" };
   }
 }
 
 /**
- * 獲取當前系統廣播狀態
+ * 獲取特定成員歷史 (優化：缺席計算同步改進)
  */
+function getMemberHistory(data) {
+  if (!data.adminEmail) return { success: false, message: "權限不足" };
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const attSheet = ss.getSheetByName("Attendance");
+    const eventSheet = ss.getSheetByName("Events");
+    const attValues = attSheet.getDataRange().getValues();
+    const events = eventSheet.getDataRange().getValues();
+    const history = [];
+    const targetEmail = String(data.targetEmail).trim().toLowerCase();
+
+    // 歷史紀錄
+    for (let i = attValues.length - 1; i >= 1; i--) {
+      if (String(attValues[i][3]).trim().toLowerCase() === targetEmail) {
+        let d = attValues[i][5];
+        history.push({ 
+          date: (d instanceof Date) ? Utilities.formatDate(d, "GMT+8", "yyyy-MM-dd") : d, 
+          eventName: attValues[i][4], 
+          duration: attValues[i][8] || "0時0分" 
+        });
+      }
+    }
+
+    // 計算截至今日已發生次數
+    const now = new Date();
+    const todayStr = Utilities.formatDate(now, "GMT+8", "yyyy-MM-dd");
+    let pastEventsCount = 0;
+    for (let k = 1; k < events.length; k++) {
+      let ed = events[k][3];
+      if (ed instanceof Date) ed = Utilities.formatDate(ed, "GMT+8", "yyyy-MM-dd");
+      if (String(ed) <= todayStr) pastEventsCount++;
+    }
+
+    return { success: true, list: history, absenceCount: Math.max(0, pastEventsCount - history.length) };
+  } catch (err) { return { success: false, message: "讀取失敗" }; }
+}
+
+/**
+ * 編輯成員資料 (保持姓名反查邏輯)
+ */
+function saveMember(data) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName("Members");
+    const values = sheet.getDataRange().getValues();
+    const targetEmail = String(data.email || "").trim().toLowerCase();
+    
+    if (!targetEmail) return { success: false, message: "Email 資訊缺失" };
+
+    let modifierName = "本人";
+    const adminEmail = String(data.adminEmail || "").trim().toLowerCase();
+
+    if (adminEmail && adminEmail !== targetEmail) {
+      modifierName = "未知管理員";
+      for (let j = 1; j < values.length; j++) {
+        if (String(values[j][3]).trim().toLowerCase() === adminEmail) {
+          modifierName = values[j][1];
+          break;
+        }
+      }
+    }
+
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][3]).trim().toLowerCase() === targetEmail) {
+        if (data.name) sheet.getRange(i + 1, 2).setValue(data.name.trim());
+        if (data.instrument) sheet.getRange(i + 1, 7).setValue(data.instrument);
+        if (data.role) sheet.getRange(i + 1, 6).setValue(data.role);
+        if (data.password) sheet.getRange(i + 1, 5).setValue(String(data.password).trim());
+
+        const timestamp = Utilities.formatDate(new Date(), "GMT+8", "yyyy-MM-dd HH:mm");
+        sheet.getRange(i + 1, 9).setValue(modifierName + " (" + timestamp + ")");
+
+        return { success: true, message: "資料已成功更新" };
+      }
+    }
+    return { success: false, message: "找不到帳號" };
+  } catch (err) {
+    return { success: false, message: "更新失敗" };
+  }
+}
+
+// --- 系統基礎功能 (其餘部分保持不變) ---
+
 function getSystemStatus(userData) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const configSheet = ss.getSheetByName("SystemConfig");
     const configRows = configSheet.getDataRange().getValues();
     if (configRows.length < 2) return { success: true, enabled: false };
-    
     const configValues = configRows[1]; 
     let eventDate = configValues[7];
     if (eventDate instanceof Date) eventDate = Utilities.formatDate(eventDate, "GMT+8", "yyyy-MM-dd");
-    
-    const status = { 
-      success: true, 
-      enabled: configValues[0] === "on", 
-      eventName: configValues[1], 
-      eventType: configValues[2], 
-      eventStart: formatTimeValue(configValues[3]), 
-      eventEnd: formatTimeValue(configValues[4]), 
-      eventDate: eventDate, 
-      hasCheckedIn: false 
-    };
-
+    const status = { success: true, enabled: configValues[0] === "on", eventName: configValues[1], eventType: configValues[2], eventStart: formatTimeValue(configValues[3]), eventEnd: formatTimeValue(configValues[4]), eventDate: eventDate, hasCheckedIn: false };
     if (status.enabled && userData && userData.email) {
-      const attSheet = ss.getSheetByName("Attendance");
-      const attValues = attSheet.getDataRange().getValues();
+      const attValues = ss.getSheetByName("Attendance").getDataRange().getValues();
       const userEmail = String(userData.email).trim().toLowerCase();
       for (let i = 1; i < attValues.length; i++) {
         let rowDate = attValues[i][5];
         if (rowDate instanceof Date) rowDate = Utilities.formatDate(rowDate, "GMT+8", "yyyy-MM-dd");
-        if (String(attValues[i][3]).trim().toLowerCase() === userEmail && rowDate === eventDate && String(attValues[i][4]) === status.eventName) {
-          status.hasCheckedIn = true;
-          break;
-        }
+        if (String(attValues[i][3]).trim().toLowerCase() === userEmail && rowDate === eventDate && String(attValues[i][4]) === status.eventName) { status.hasCheckedIn = true; break; }
       }
     }
     return status;
-  } catch (err) { return { success: false, message: "狀態獲取失敗" }; }
+  } catch (err) { return { success: false, message: "系統狀態同步失敗" }; }
 }
 
-/**
- * 執行簽到寫入
- */
 function submitCheckin(data) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName("Attendance");
-    const checkStatus = getSystemStatus({ email: data.email });
-    if (checkStatus.hasCheckedIn) return { success: false, message: "今日已簽到過囉！" };
-    
     let finalDuration = "0時0分";
     if (data.eventTimeRange && data.eventTimeRange.includes('~')) {
       const times = data.eventTimeRange.split('~').map(t => t.trim());
       if (times.length === 2) {
         const [startH, startM] = times[0].split(':').map(Number);
         const [endH, endM] = times[1].split(':').map(Number);
-        let diffMinutes = (endH * 60 + endM) - (startH * 60 + startM);
-        if (diffMinutes < 0) diffMinutes += 1440; 
-        finalDuration = `${Math.floor(diffMinutes / 60)}時${diffMinutes % 60}分`;
+        let diff = (endH * 60 + endM) - (startH * 60 + startM);
+        if (diff < 0) diff += 1440; 
+        finalDuration = `${Math.floor(diff / 60)}時${diff % 60}分`;
       }
     }
-    // 欄位：紀錄時間, 姓名, 組別, Email, 活動名, 日期, 類型, 時段, 時長
     sheet.appendRow([new Date(), data.name, data.section, String(data.email).trim().toLowerCase(), data.eventName, data.date, data.type, data.eventTimeRange, finalDuration]);
     return { success: true };
-  } catch (err) { return { success: false, message: "簽到寫入失敗" }; }
+  } catch (err) { return { success: false, message: "簽到失敗" }; }
 }
 
-/**
- * 輔助功能：格式化時間
- */
 function formatTimeValue(val) {
   if (val instanceof Date) return Utilities.formatDate(val, "GMT+8", "HH:mm");
   if (typeof val === 'string' && val.includes(':')) return val.substring(0, 5);
   return val ? String(val) : "";
 }
 
-/**
- * 成員登入與註冊
- */
 function registerUser(data) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName("Members");
   const values = sheet.getDataRange().getValues();
   const email = String(data.email).trim().toLowerCase();
   for (let i = 1; i < values.length; i++) {
-    if (String(values[i][3]).trim().toLowerCase() === email) return { success: false, message: "此帳號已被註冊" };
+    if (String(values[i][3]).trim().toLowerCase() === email) return { success: false, message: "帳號已存在" };
   }
-  // 欄位：ID, 姓名, 組別, Email, 密碼, 權限, 樂器, 建立時間
-  sheet.appendRow(["MEM-" + new Date().getTime(), data.name.trim(), data.section, email, String(data.password).trim(), "Member", data.instrument, new Date()]);
+  sheet.appendRow(["MEM-" + new Date().getTime(), data.name.trim(), data.section, email, String(data.password).trim(), "Member", data.instrument, new Date(), "系統建立"]);
   return { success: true };
 }
 
@@ -264,12 +255,9 @@ function loginUser(data) {
       return { success: true, user: { Name: values[i][1], Section: values[i][2], Email: values[i][3], Role: values[i][5], Instrument: values[i][6] } };
     }
   }
-  return { success: false, message: "帳號或密碼錯誤" };
+  return { success: false, message: "帳密錯誤" };
 }
 
-/**
- * 活動管理功能
- */
 function getEvents() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Events");
   const values = sheet.getDataRange().getValues();
@@ -295,9 +283,7 @@ function saveEvent(data) {
   const rowData = [data.id || "EVT-" + new Date().getTime(), data.name, data.type || "團練", data.date, data.startTime, data.endTime, dur, new Date()];
   if (data.id) {
     const values = sheet.getDataRange().getValues();
-    for (let i = 1; i < values.length; i++) {
-      if (String(values[i][0]) === String(data.id)) { sheet.getRange(i + 1, 1, 1, rowData.length).setValues([rowData]); break; }
-    }
+    for (let i = 1; i < values.length; i++) { if (String(values[i][0]) === String(data.id)) { sheet.getRange(i + 1, 1, 1, rowData.length).setValues([rowData]); break; } }
   } else { sheet.appendRow(rowData); }
   return { success: true };
 }
