@@ -172,10 +172,12 @@
                         <input type="password" id="login-password" class="w-full pl-14 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center" placeholder="密碼">
                     </div>
                 </div>
-                <button id="login-submit-btn" onclick="handleLogin()" class="w-full btn-premium text-white font-black py-4 rounded-[20px] text-lg tracking-wide flex items-center justify-center gap-2 text-center shadow-lg active:scale-95 transition-all">
-                    <span>立即登入</span>
-                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                </button>
+                <button class="relative w-full btn-premium text-white font-black py-4 px-4 rounded-[20px] text-lg tracking-wide shadow-lg active:scale-95 transition-all overflow-hidden">
+                  <span class="block w-full text-center">立即登入</span>
+                  <div class="absolute z-10 right-6 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                  <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                  </div>
+                  </button>
                 <div class="text-center pt-1">
                     <button onclick="switchAuthMode('register')" class="text-slate-400 text-xs font-bold hover:text-indigo-600 transition-colors text-center underline decoration-indigo-200 underline-offset-4 text-center">註冊新成員</button>
                 </div>
