@@ -3,143 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>崇正國樂團簽到系統</title>
+    <title>崇正國樂團智能系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/umd/lucide.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
-        
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4338ca;
-            --accent: #f43f5e;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.5);
-        }
-
-        body { 
-            font-family: 'Noto Sans TC', sans-serif; 
-            background: linear-gradient(135deg, #f8faff 0%, #ffffff 50%, #f1f5ff 100%);
-            min-height: 100vh;
-            color: #1e293b;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(#6366f1 0.5px, transparent 0.5px);
-            background-size: 30px 30px;
-            opacity: 0.04;
-            z-index: -1;
-        }
-
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.1);
-        }
-
-        .btn-premium {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            box-shadow: 0 12px 24px -8px rgba(99, 102, 241, 0.5);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .btn-premium:active {
-            transform: scale(0.96);
-            box-shadow: 0 4px 8px -2px rgba(99, 102, 241, 0.4);
-        }
-
-        @keyframes ripple {
-            0% { transform: scale(1); opacity: 0.4; }
-            100% { transform: scale(1.4); opacity: 0; }
-        }
-
-        .pulse-effect::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--primary);
-            border-radius: 9999px;
-            z-index: -1;
-            animation: ripple 2s infinite ease-out;
-        }
-
+        :root { --primary: #6366f1; --primary-dark: #4338ca; --accent: #f43f5e; --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.5); }
+        body { font-family: 'Noto Sans TC', sans-serif; background: linear-gradient(135deg, #f8faff 0%, #ffffff 50%, #f1f5ff 100%); min-height: 100vh; color: #1e293b; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(#6366f1 0.5px, transparent 0.5px); background-size: 30px 30px; opacity: 0.04; z-index: -1; }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.1); }
+        .btn-premium { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); box-shadow: 0 12px 24px -8px rgba(99, 102, 241, 0.5); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-premium:active { transform: scale(0.96); box-shadow: 0 4px 8px -2px rgba(99, 102, 241, 0.4); }
+        @keyframes ripple { 0% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(1.4); opacity: 0; } }
+        .pulse-effect::after { content: ''; position: absolute; inset: 0; background: var(--primary); border-radius: 9999px; z-index: -1; animation: ripple 2s infinite ease-out; }
         .tab-btn { transition: all 0.4s ease; }
-        .tab-btn.tab-active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
-            transform: translateY(-1px);
-        }
-
+        .tab-btn.tab-active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08); transform: translateY(-1px); }
         .fade-up { animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        @keyframes fadeUp { 
-            from { opacity: 0; transform: translateY(30px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .hide-scroll::-webkit-scrollbar { display: none; }
-        
-        .app-icon-card {
-            width: 85px;
-            height: 85px;
-            background: #ffffff;
-            border-radius: 26px;
-            box-shadow: 10px 10px 25px #d1d9e6, -8px -8px 20px #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 0.8rem;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-
-        .app-icon-card img {
-            width: 70%;
-            height: 70%;
-            object-fit: contain;
-            z-index: 2;
-        }
-
-        input, select {
-            border: 1px solid rgba(0, 0, 0, 0.03) !important;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--primary) !important;
-            background: #ffffff !important;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08) !important;
-        }
-
-        input:read-only {
-            background-color: #f1f5f9 !important;
-            color: #64748b !important;
-            cursor: not-allowed;
-            border: 1px dashed #cbd5e1 !important;
-        }
+        .app-icon-card { width: 85px; height: 85px; background: #ffffff; border-radius: 26px; box-shadow: 10px 10px 25px #d1d9e6, -8px -8px 20px #ffffff; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.8); }
+        .app-icon-card img { width: 70%; height: 70%; object-fit: contain; z-index: 2; }
+        input, select, textarea { border: 1px solid rgba(0, 0, 0, 0.03) !important; transition: all 0.3s ease; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary) !important; background: #ffffff !important; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08) !important; }
     </style>
 </head>
 <body class="pb-10">
 
     <!-- 頂部導覽列 -->
-    <nav id="nav-bar" class="hidden fixed top-0 w-full max-w-md z-50 p-4 flex justify-center">
+    <nav id="nav-bar" class="hidden fixed top-0 w-full max-w-md z-50 p-4 flex justify-center text-center">
         <div class="glass-panel rounded-[22px] p-2 flex justify-between items-center px-4 border-white/60 w-full shadow-lg">
-            <div class="flex items-center gap-3 text-center">
+            <div class="flex items-center gap-3">
                 <div class="relative flex items-center justify-center">
                     <div id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                     <div class="absolute w-4 h-4 rounded-full border border-emerald-400 animate-ping opacity-20"></div>
                 </div>
-                <span id="nav-user-info" class="text-sm font-bold text-slate-700 tracking-tight">正在載入...</span>
+                <span id="nav-user-info" class="text-sm font-bold text-slate-700 tracking-tight">載入中...</span>
             </div>
             <button onclick="handleLogout()" class="bg-slate-50 text-slate-500 px-4 py-2 rounded-xl text-[11px] font-black hover:bg-rose-50 hover:text-rose-500 transition-all flex items-center gap-2 border border-slate-100 hover:border-rose-100 shadow-sm">
                 <i data-lucide="power" class="w-3.5 h-3.5"></i>登出
@@ -147,729 +45,246 @@
         </div>
     </nav>
 
-    <main id="app" class="w-full max-w-md px-6 pt-24 sm:pt-28 transition-all duration-500">
-        
-        <!-- 登入介面 -->
+    <main id="app" class="w-full max-w-md px-6 pt-6 sm:pt-10 transition-all duration-500">
+        <!-- 登入視圖 -->
         <section id="login-view" class="space-y-5 fade-up text-center">
-            <div class="text-center">
-                <div class="app-icon-card mx-auto">
-                    <img src="Baiyang.png" alt="Logo" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=CY&backgroundColor=6366f1';">
-                </div>
-                <h1 class="text-2xl font-[900] text-slate-800 tracking-tighter mb-1">崇正國樂團</h1>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-center mx-auto shadow-sm">
-                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                    <p class="text-indigo-600 text-[9px] font-black uppercase tracking-widest text-center">Smart Sign-in System</p>
-                </div>
-            </div>
-
-            <div class="glass-panel p-7 rounded-[32px] space-y-5 shadow-xl text-center">
+            <div class="app-icon-card mx-auto"><img src="Baiyang.png" alt="Logo" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=CY&backgroundColor=6366f1';"></div>
+            <h1 class="text-2xl font-[900] text-slate-800 tracking-tighter mb-1 text-center">崇正國樂團</h1>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 mx-auto shadow-sm text-center"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span><p class="text-indigo-600 text-[9px] font-black uppercase tracking-widest text-center">Smart System</p></div>
+            <div class="glass-panel p-7 rounded-[32px] space-y-5 shadow-xl">
                 <div class="space-y-3">
-                    <div class="group relative">
-                        <i data-lucide="mail" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
-                        <input type="text" id="login-email" class="w-full pl-14 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center" placeholder="帳號 / Email">
-                    </div>
-                    <div class="group relative">
-                        <i data-lucide="key-round" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
-                        <input type="password" id="login-password" class="w-full pl-14 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center" placeholder="密碼">
-                    </div>
+                    <div class="group relative text-center"><i data-lucide="mail" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i><input type="text" id="login-email" class="w-full pl-12 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium" placeholder="帳號 / Email"></div>
+                    <div class="group relative text-center"><i data-lucide="key-round" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i><input type="password" id="login-password" class="w-full pl-12 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium" placeholder="密碼"></div>
                 </div>
-                <button id="login-submit-btn" onclick="handleLogin()" class="relative w-full btn-premium text-white font-black py-4 px-4 rounded-[20px] text-lg tracking-wide shadow-lg active:scale-95 transition-all overflow-hidden flex items-center justify-center gap-2">
-                    <span>立即登入</span>
-                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                </button>
-                <div class="text-center pt-1">
-                    <button onclick="switchAuthMode('register')" class="text-slate-400 text-xs font-bold hover:text-indigo-600 transition-colors underline decoration-indigo-200 underline-offset-4">註冊新成員</button>
-                </div>
+                <button id="login-submit-btn" onclick="handleLogin()" class="relative w-full btn-premium text-white font-black py-4 rounded-[20px] text-lg tracking-wide shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">立即登入 <i data-lucide="arrow-right" class="w-5 h-5"></i></button>
+                <div class="text-center pt-1"><button onclick="switchAuthMode('register')" class="text-slate-400 text-xs font-bold hover:text-indigo-600 underline decoration-indigo-200 underline-offset-4">註冊新成員</button></div>
             </div>
         </section>
 
-        <!-- 註冊介面 (略) -->
+        <!-- 註冊視圖 -->
         <section id="register-view" class="hidden space-y-6 fade-up text-center">
             <h2 class="text-2xl font-[900] text-slate-800 tracking-tight text-center">成員註冊</h2>
-            <div class="glass-panel p-8 rounded-[32px] space-y-4 text-center shadow-xl">
-                <input type="text" id="reg-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-bold text-center" placeholder="您的真實姓名">
+            <div class="glass-panel p-8 rounded-[32px] space-y-4 shadow-xl text-center">
+                <input type="text" id="reg-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-bold text-center" placeholder="真實姓名">
                 <div class="grid grid-cols-2 gap-4">
-                    <select id="reg-section" onchange="updateInstrumentOptions()" class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center">
-                        <option value="">選擇組別</option>
-                        <option value="吹管組">吹管組</option><option value="拉弦組">拉弦組</option><option value="彈撥組">彈撥組</option><option value="揚打組">揚打組</option><option value="低音組">低音組</option>
-                    </select>
-                    <select id="reg-instrument" class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center">
-                        <option value="">選擇樂器</option>
-                    </select>
+                    <select id="reg-section" onchange="updateInstrumentOptions()" class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center"><option value="">選擇組別</option><option value="吹管組">吹管組</option><option value="拉弦組">拉弦組</option><option value="彈撥組">彈撥組</option><option value="揚打組">揚打組</option><option value="低音組">低音組</option></select>
+                    <select id="reg-instrument" class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center"><option value="">選擇樂器</option></select>
                 </div>
-                <input type="email" id="reg-email" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="常用帳號">
+                <input type="email" id="reg-email" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="常用 Email (帳號)">
                 <input type="password" id="reg-password" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="設定密碼">
                 <button id="reg-submit-btn" onclick="handleRegister()" class="w-full btn-premium text-white font-black py-4 rounded-[20px] mt-4 tracking-wide shadow-lg active:scale-95 transition-all text-center">確認加入</button>
                 <button onclick="switchAuthMode('login')" class="w-full text-slate-400 text-sm font-black mt-2">返回登入</button>
             </div>
         </section>
 
-        <!-- 儀表板主介面 -->
-        <section id="dashboard-view" class="hidden space-y-6 fade-up pb-12 text-center flex flex-col items-center">
-            
-            <!-- 公告欄區塊 -->
-            <div id="announcement-board" class="w-full glass-panel p-5 rounded-[28px] border-amber-200 bg-amber-50 shadow-md mb-4 text-left relative overflow-hidden flex items-start gap-4 transition-all hover:shadow-lg">
-                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
-                    <i data-lucide="megaphone" class="w-6 h-6"></i>
-                </div>
-                <div class="flex-1">
+        <!-- 儀表板視圖 -->
+        <section id="dashboard-view" class="hidden space-y-6 fade-up pb-12 w-full flex flex-col items-center text-center">
+            <!-- 公告欄 -->
+            <div id="announcement-board" class="w-full glass-panel p-5 rounded-[28px] border-amber-200 bg-amber-50 shadow-md mb-2 flex items-start gap-4 transition-all hover:shadow-lg text-left">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0"><i data-lucide="megaphone" class="w-6 h-6"></i></div>
+                <div class="flex-1 overflow-hidden text-center sm:text-left">
                     <p class="text-[10px] font-[900] text-amber-600/70 uppercase tracking-[0.2em] mb-1">Official Announcement</p>
-                    <div id="announcement-content" class="text-sm font-bold text-slate-700 leading-relaxed whitespace-pre-wrap">載入公告中...</div>
+                    <div id="announcement-content" class="text-sm font-bold text-slate-700 leading-relaxed whitespace-pre-wrap">同步公告中...</div>
                     <p id="announcement-time" class="text-[9px] text-slate-400 mt-2 font-bold"></p>
                 </div>
             </div>
-
-            <!-- 時數儀表盤 -->
-            <div class="glass-panel p-7 rounded-[36px] border-white/80 w-full shadow-xl">
-                <div class="flex justify-between items-center mb-8">
-                    <div class="text-left">
-                        <h2 class="text-2xl font-[900] text-slate-800 leading-none" id="user-display">你好</h2>
-                        <div id="info-badge" class="mt-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 text-[10px] font-black tracking-widest inline-block uppercase">載入中...</div>
-                    </div>
-                    <button onclick="openProfileModal()" class="w-12 h-12 rounded-[18px] bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100 hover:bg-indigo-100 transition-all active:scale-90 group">
-                        <i data-lucide="user-round" class="w-6 h-6"></i>
-                    </button>
-                </div>
-                
-                <div class="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[32px] text-white shadow-2xl flex flex-col items-center">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-12 -mt-12 blur-3xl"></div>
-                    <p class="text-[9px] opacity-50 font-black tracking-[0.3em] mb-2 uppercase text-indigo-200/50">Total Practice Record</p>
-                    <div class="flex items-baseline gap-2 justify-center">
-                        <h3 id="total-duration-display" class="text-5xl font-[900] tracking-tighter leading-none">0</h3>
-                        <div class="flex flex-col items-start leading-none text-center">
-                            <span class="text-xs font-bold opacity-60 uppercase tracking-widest">Hours</span>
-                            <span id="total-minutes-label" class="text-[10px] font-black text-indigo-300 mt-1 opacity-80"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 簽到互動區 -->
-                <div class="mt-10 flex flex-col items-center">
-                    <div class="mb-6 space-y-1 text-center">
-                        <p id="current-event-display" class="text-sm font-bold text-slate-500 tracking-tight">正在同步...</p>
-                        <p id="checkin-time-display" class="text-indigo-500 text-[11px] font-black uppercase tracking-widest opacity-0 transition-opacity">--:--</p>
-                        <p id="checkin-rest-display" class="text-amber-500 text-[9px] font-black uppercase opacity-0 transition-opacity"></p>
-                    </div>
-                    <div class="relative">
-                        <button id="checkin-btn" onclick="submitCheckin()" disabled class="relative z-10 w-36 h-36 bg-slate-200 rounded-full text-white font-black shadow-2xl flex flex-col items-center justify-center transition-all duration-700 border-[10px] border-white overflow-hidden hover:scale-105 active:scale-95 cursor-pointer">
-                            <i data-lucide="scan-face" class="w-12 h-12 mb-2"></i>
-                            <span class="text-lg tracking-tight">簽到</span>
-                        </button>
-                        <div id="btn-pulse" class="absolute inset-0 rounded-full"></div>
-                    </div>
+            <!-- 調查提示 -->
+            <div id="survey-board" class="hidden w-full glass-panel p-5 rounded-[28px] border-indigo-200 bg-indigo-50/50 shadow-md mb-2 flex items-start gap-4 transition-all hover:shadow-lg text-left">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0"><i data-lucide="clipboard-check" class="w-6 h-6"></i></div>
+                <div class="flex-1 text-center sm:text-left">
+                    <div class="flex justify-between items-start mb-1 text-center sm:text-left"><p class="text-[10px] font-[900] text-indigo-600/70 uppercase tracking-[0.2em]">Survey</p><span id="survey-status-badge" class="text-[8px] font-black px-2 py-0.5 rounded-full"></span></div>
+                    <h4 id="survey-display-title" class="text-sm font-black text-slate-800 mb-1 leading-tight">演出意願調查</h4>
+                    <p id="survey-display-desc" class="text-xs text-slate-500 line-clamp-1 text-center sm:text-left"></p>
+                    <button onclick="openSurveyModal()" class="mt-3 text-xs font-black text-indigo-600 underline underline-offset-4 hover:text-indigo-800 transition-colors">填寫/修改回覆</button>
                 </div>
             </div>
+            <!-- 時數大儀表 -->
+            <div class="glass-panel p-7 rounded-[36px] border-white/80 w-full shadow-xl text-center"><div class="flex justify-between items-center mb-8"><div class="text-left text-center sm:text-left"><h2 class="text-2xl font-[900] text-slate-800 leading-none" id="user-display">你好</h2><div id="info-badge" class="mt-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 text-[10px] font-black tracking-widest inline-block uppercase text-center">載入中...</div></div><button onclick="openProfileModal()" class="w-12 h-12 rounded-[18px] bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100 active:scale-90 text-center text-center"><i data-lucide="user-round" class="w-6 h-6"></i></button></div><div class="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[32px] text-white shadow-2xl flex flex-col items-center text-center"><div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div><p class="text-[9px] opacity-50 font-black tracking-[0.3em] mb-2 uppercase text-center text-indigo-200/50">Total Practice Record</p><div class="flex items-baseline gap-2 justify-center text-center"><h3 id="total-duration-display" class="text-5xl font-[900] tracking-tighter text-center leading-none">0</h3><div class="flex flex-col items-start leading-none text-center"><span class="text-xs font-bold opacity-60 uppercase tracking-widest text-center">Hours</span><span id="total-minutes-label" class="text-[10px] font-black text-indigo-300 mt-1 opacity-80 text-center"></span></div></div></div><div class="mt-10 flex flex-col items-center text-center"><div class="mb-6 space-y-1 text-center text-center"><p id="current-event-display" class="text-sm font-bold text-slate-500 tracking-tight text-center">同步活動中...</p><p id="checkin-time-display" class="text-indigo-500 text-[11px] font-black uppercase tracking-widest opacity-0 transition-opacity text-center">--:--</p></div><div class="relative text-center"><button id="checkin-btn" onclick="submitCheckin()" disabled class="relative z-10 w-36 h-36 bg-slate-200 rounded-full text-white font-black shadow-2xl flex flex-col items-center justify-center transition-all duration-700 border-[10px] border-white overflow-hidden hover:scale-105 active:scale-95 text-center"><i data-lucide="scan-face" class="w-12 h-12 mb-2 text-center"></i><span class="text-lg tracking-tight text-center">簽到</span></button><div id="btn-pulse" class="absolute inset-0 rounded-full text-center"></div></div></div></div>
+            
+            <!-- 選項卡 -->
+            <div id="tab-nav" class="flex bg-slate-200/50 p-1.5 rounded-[22px] border border-white/50 backdrop-blur-md w-full shadow-inner text-center"><button onclick="switchTab('history')" id="btn-history" class="flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn tab-active flex flex-col items-center justify-center text-center text-center text-center"><i data-lucide="clipboard-list" class="w-4 h-4 mb-1.5 text-center"></i>我的紀錄</button><button onclick="switchTab('monitor')" id="btn-monitor" class="hidden flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn text-slate-500 flex flex-col items-center justify-center text-center text-center text-center text-center"><i data-lucide="users" class="w-4 h-4 mb-1.5 text-center"></i>組員名單</button><button onclick="switchTab('admin')" id="btn-admin" class="hidden flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn text-slate-500 flex flex-col items-center justify-center text-center text-center text-center text-center text-center"><i data-lucide="settings" class="w-4 h-4 mb-1.5 text-center text-center"></i>管理中心</button></div>
+            <div id="history-section" class="w-full space-y-3 text-center"><div id="attendance-list" class="space-y-3 text-center"></div></div>
 
-            <!-- 選項卡 (略) -->
-            <div id="tab-nav" class="flex bg-slate-200/50 p-1.5 rounded-[22px] border border-white/50 backdrop-blur-md w-full shadow-inner text-center">
-                <button onclick="switchTab('history')" id="btn-history" class="flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn tab-active flex flex-col items-center justify-center text-center">
-                    <i data-lucide="clipboard-list" class="w-4 h-4 mb-1.5"></i>我的紀錄
-                </button>
-                <button onclick="switchTab('monitor')" id="btn-monitor" class="hidden flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn text-slate-500 flex flex-col items-center justify-center">
-                    <i data-lucide="users" class="w-4 h-4 mb-1.5"></i>組員名單
-                </button>
-                <button onclick="switchTab('admin')" id="btn-admin" class="hidden flex-1 py-4 text-xs font-black rounded-[18px] transition-all tab-btn text-slate-500 flex flex-col items-center justify-center">
-                    <i data-lucide="settings" class="w-4 h-4 mb-1.5"></i>管理中心
-                </button>
-            </div>
-
-            <div id="history-section" class="space-y-4 w-full text-center">
-                <div id="attendance-list" class="space-y-3 w-full text-center"></div>
-            </div>
-
-            <!-- 監控區域 (略) -->
-            <div id="monitor-section" class="hidden animate-in w-full">
+            <!-- 管理中心區 -->
+            <div id="admin-section" class="hidden animate-in w-full space-y-6 text-center text-center">
                 <div class="glass-panel p-6 rounded-[32px] w-full shadow-lg text-center text-center">
-                    <div class="flex justify-between items-center mb-6 px-1">
-                        <h4 class="font-[900] text-slate-800 text-lg tracking-tight" id="monitor-title">全員狀態</h4>
-                        <button onclick="loadRealtimeStatus()" class="w-10 h-10 bg-white shadow-sm border border-slate-100 text-indigo-600 rounded-xl flex items-center justify-center hover:rotate-180 transition-all duration-500"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>
+                    <div class="flex justify-between items-center mb-6 px-1 text-center text-center">
+                        <h4 class="font-[900] text-slate-800 text-lg tracking-tight text-center">活動庫管理</h4>
+                        <button id="admin-add-btn" onclick="openEditModal(null)" class="bg-indigo-600 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black shadow-lg flex items-center gap-2 active:scale-95 text-center text-center"><i data-lucide="plus-circle" class="w-4 h-4 text-center"></i>新增活動</button>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-3 mb-6 w-full text-center text-center">
-                        <div class="flex-1 text-center"><select id="monitor-filter-section" onchange="applyMonitorFilters()" class="w-full px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 appearance-none shadow-sm text-center"><option value="all">全體成員</option><option value="吹管組">吹管組</option><option value="拉弦組">拉弦組</option><option value="彈撥組">彈撥組</option><option value="揚打組">揚打組</option><option value="低音組">低音組</option></select></div>
-                        <div class="flex-1 text-center"><select id="monitor-sort-order" onchange="applyMonitorFilters()" class="w-full px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 appearance-none shadow-sm text-center"><option value="default">預設排序</option><option value="checkin">簽到優先</option><option value="absence">缺席優先</option></select></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-6 text-center text-center text-center">
-                        <div class="bg-emerald-500/5 p-4 rounded-[22px] border border-emerald-100/50 text-center flex flex-col items-center shadow-sm"><p class="text-[9px] text-emerald-600 font-black mb-1">Present</p><p class="text-3xl font-[900] text-emerald-700" id="stat-present">0</p></div>
-                        <div class="bg-rose-500/5 p-4 rounded-[22px] border border-rose-100/50 text-center flex flex-col items-center shadow-sm"><p class="text-[9px] text-rose-600 font-black mb-1">Absent</p><p class="text-3xl font-[900] text-rose-700" id="stat-absent">0</p></div>
-                    </div>
-                    <div id="realtime-status-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scroll pr-1 w-full text-center"></div>
+                    <div id="admin-event-list" class="space-y-4 text-center text-center text-center"></div>
                 </div>
+                <div class="glass-panel p-6 rounded-[32px] w-full shadow-lg text-center text-center">
+                    <div class="flex justify-between items-center mb-6 px-1 text-center text-center">
+                        <h4 class="font-[900] text-slate-800 text-lg tracking-tight text-center">問卷模板庫</h4>
+                        <button id="admin-add-survey-btn" onclick="openSurveyAdminModal(null)" class="bg-indigo-50 text-indigo-600 px-4 py-2.5 rounded-2xl text-[10px] font-black border border-indigo-100 active:scale-95 flex items-center gap-2 text-center text-center text-center"><i data-lucide="plus" class="w-4 h-4 text-center"></i>建立問卷</button>
+                    </div>
+                    <div id="admin-survey-list" class="space-y-4 text-center text-center text-center"></div>
+                </div>
+                <button onclick="openAnnouncementModal()" class="bg-amber-100 text-amber-700 px-6 py-4 rounded-[22px] text-xs font-black flex items-center justify-center gap-3 border border-amber-200 active:scale-95 w-full text-center text-center"><i data-lucide="megaphone" class="w-5 h-5 text-center text-center"></i>發布廣播公告</button>
             </div>
 
-            <!-- 管理區域 -->
-            <div id="admin-section" class="hidden animate-in w-full">
-                <div class="glass-panel p-6 rounded-[32px] w-full shadow-lg text-center text-center">
-                    <div class="flex justify-between items-center mb-6 px-1">
-                        <h4 class="font-[900] text-slate-800 text-lg tracking-tight">廣播中心</h4>
-                        <div class="flex gap-2">
-                            <button id="admin-edit-announcement-btn" onclick="openAnnouncementModal()" class="bg-amber-100 text-amber-700 px-4 py-2.5 rounded-2xl text-[10px] font-black flex items-center gap-2 border border-amber-200 active:scale-95 transition-all text-center"><i data-lucide="edit-2" class="w-4 h-4"></i>編輯公告</button>
-                            <button id="admin-add-btn" onclick="openEditModal(null)" class="bg-indigo-600 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black shadow-lg flex items-center gap-2 active:scale-95 transition-all text-center"><i data-lucide="plus-circle" class="w-4 h-4"></i>新增活動</button>
-                        </div>
-                    </div>
-                    <div id="admin-event-list" class="space-y-4 w-full text-center text-center"></div>
-                </div>
+            <!-- 組員名單監控 -->
+            <div id="monitor-section" class="hidden animate-in w-full text-center">
+                <div class="glass-panel p-6 rounded-[32px] w-full shadow-lg text-center text-center"><div class="flex justify-between items-center mb-6 px-1 text-center text-center text-center"><h4 class="font-[900] text-slate-800 text-lg tracking-tight text-center text-center text-center" id="monitor-title">全員狀態</h4><button onclick="loadRealtimeStatus()" class="w-10 h-10 bg-white shadow-sm border border-slate-100 text-indigo-600 rounded-xl flex items-center justify-center hover:rotate-180 transition-all duration-500 text-center"><i data-lucide="refresh-cw" class="w-5 h-5 text-center"></i></button></div><div class="flex gap-3 mb-6 text-center text-center text-center text-center"><select id="monitor-filter-section" onchange="applyMonitorFilters()" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 appearance-none shadow-sm text-center"><option value="all">全體成員</option><option value="吹管組">吹管組</option><option value="拉弦組">拉弦組</option><option value="彈撥組">彈撥組</option><option value="揚打組">揚打組</option><option value="低音組">低音組</option></select><select id="monitor-sort-order" onchange="applyMonitorFilters()" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 appearance-none shadow-sm text-center text-center text-center"><option value="default">預設排序</option><option value="checkin">簽到優先</option><option value="absence">缺席優先</option></select></div><div class="grid grid-cols-2 gap-4 mb-6 text-center text-center text-center"><div class="bg-emerald-500/5 p-4 rounded-[22px] border border-emerald-100/50 flex flex-col items-center shadow-sm text-center text-center text-center text-center">
+                <p class="text-[9px] text-emerald-600 font-black mb-1 text-center text-center">Present</p><p class="text-3xl font-[900] text-emerald-700 text-center text-center" id="stat-present">0</p></div><div class="bg-rose-500/5 p-4 rounded-[22px] border border-rose-100/50 flex flex-col items-center shadow-sm text-center text-center text-center text-center"><p class="text-[9px] text-rose-600 font-black mb-1 text-center text-center">Absent</p><p class="text-3xl font-[900] text-rose-700 text-center text-center" id="stat-absent">0</p></div></div><div id="realtime-status-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scroll text-center text-center text-center text-center text-center text-center text-center"></div></div>
             </div>
         </section>
     </main>
 
-    <!-- 定位與簽到邏輯彈窗... (省略 profile-modal, member-edit-modal, member-history-modal) -->
-    
-    <!-- 個人檔案彈窗 (略) -->
-    <div id="profile-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-6 text-center shadow-2xl">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md text-center shadow-xl text-center" onclick="closeProfileModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] text-center text-center text-center">
-            <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white text-center text-center text-center" id="profile-initial">-</div>
-            <div class="w-full space-y-2 mb-6 text-center text-center text-center"><label class="text-[10px] font-black text-slate-400 tracking-widest text-center">個人姓名 (僅本人可修改)</label><input type="text" id="profile-name-input" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 tracking-tight shadow-inner"><p class="text-slate-400 text-xs font-black tracking-widest uppercase mt-1" id="profile-role">-</p></div>
-            <div class="w-full space-y-4 text-center text-center text-center"><div class="space-y-2 text-center text-center"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">負責樂器</label><select id="profile-instrument-input" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none text-slate-700 shadow-sm text-center"></select></div><div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] border border-slate-100 text-center"><span class="text-[10px] font-black text-slate-500 uppercase">所屬組別</span><span class="text-sm font-bold text-slate-700 text-right" id="profile-section-display">-</span></div><div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] border border-slate-100 text-center"><span class="text-[10px] font-black text-slate-500 uppercase">登入帳號</span><span class="text-sm font-bold text-slate-700 truncate max-w-[150px] text-right" id="profile-email">-</span></div><div class="mt-4 pt-4 border-t border-slate-100 space-y-3 text-center text-center text-center"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">安全性</p><div class="relative text-center"><i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 text-center"></i><input type="password" id="profile-new-password" class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-slate-100/80 outline-none border-none text-xs font-bold text-center text-center" placeholder="不變請留空"></div><button id="update-password-btn" onclick="handleUpdatePassword()" class="w-full py-3.5 btn-premium text-white font-black rounded-2xl text-xs shadow-lg text-center transition-all text-center">更新個人資料</button></div></div>
-            <button onclick="closeProfileModal()" class="mt-8 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-indigo-600 transition-colors text-center text-center">取消並返回</button>
-        </div>
-    </div>
+    <!-- Modals 區塊 -->
+    <div id="modals-container">
+        <!-- 成員編輯 -->
+        <div id="member-edit-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-6 text-center shadow-2xl text-center"><div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeMemberEditModal()"></div><div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center text-center text-center"><h3 class="text-xl font-[900] text-slate-800 mb-8 tracking-tight text-center text-center">成員設定</h3><div class="space-y-4 text-center text-center"><input type="text" id="edit-member-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner text-center" readonly><select id="edit-member-instrument" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold appearance-none text-center shadow-sm text-center text-center"></select><div id="role-edit-container" class="space-y-1 hidden text-center text-center text-center"><label class="text-[10px] font-black text-slate-400 uppercase text-center text-center text-center">權限等級</label><select id="edit-member-role" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold appearance-none text-center text-center text-center text-center"><option value="Member">一般團員</option><option value="Leader">組長</option><option value="Officer">幹部</option><option value="Admin">最高管理員</option></select></div><input type="hidden" id="edit-member-email"></div><div class="flex gap-4 mt-8 justify-center text-center text-center"><button onclick="closeMemberEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center text-center">取消</button><button onclick="saveMemberInfo()" id="save-member-btn" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center text-center">儲存變更</button></div></div></div>
+        
+        <!-- 問卷模板管理 (設計+統計) -->
+        <div id="survey-admin-modal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-6 text-center shadow-2xl text-center"><div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md text-center" onclick="closeSurveyAdminModal()"></div><div class="bg-white w-full max-lg rounded-[36px] shadow-2xl p-8 relative fade-up text-center max-h-[90vh] flex flex-col text-center text-center text-center"><h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2 text-center text-center text-center"><i data-lucide="settings-2" class="w-5 h-5 text-indigo-500 text-center"></i>問卷模板管理</h3><div class="flex bg-slate-100 p-1.5 rounded-2xl mb-6 text-center text-center text-center text-center text-center text-center"><button onclick="switchSurveyAdminTab('config')" id="sur-tab-config" class="flex-1 py-3 text-[10px] font-black rounded-xl bg-white text-indigo-600 shadow-sm transition-all text-center">設計題目</button><button onclick="switchSurveyAdminTab('result')" id="sur-tab-result" class="flex-1 py-3 text-[10px] font-black rounded-xl text-slate-500 transition-all text-center">統計結果</button></div><div id="sur-admin-config" class="space-y-4 flex-1 overflow-y-auto text-left text-center text-center text-center text-center text-center"><div class="space-y-2 text-center text-center text-center"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center text-center">問卷標題</label><input type="text" id="sur-admin-title" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm text-center"></div><div class="space-y-2 text-center text-center text-center text-center"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center text-center text-center">詳細說明</label><textarea id="sur-admin-desc" class="w-full h-20 p-5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm resize-none text-center"></textarea></div><div class="pt-4 border-t border-slate-100 text-center text-center text-center text-center text-center text-center text-center"><div class="flex justify-between items-center mb-3 text-center text-center text-center text-center text-center text-center"><label class="text-[10px] font-black text-indigo-500 uppercase text-center text-center text-center">題目設定</label><button onclick="addSurveyQuestion()" class="text-[9px] bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full font-black flex items-center gap-1 text-center text-center text-center text-center text-center text-center"><i data-lucide="plus" class="w-3 h-3 text-center text-center"></i>新增題目</button></div><div id="sur-admin-questions-list" class="space-y-3 text-center text-center text-center text-center text-center text-center text-center text-center text-center"></div></div><div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mt-4 text-center text-center text-center text-center text-center text-center"><span class="text-sm font-black text-slate-700 text-center">對全員開放中</span><input type="checkbox" id="sur-admin-status" class="w-6 h-6 accent-indigo-600 text-center text-center"></div><button onclick="handleUpdateSurveyConfig()" id="btn-save-sur-config" class="w-full py-4 btn-premium text-white rounded-2xl font-black text-sm mt-4 shadow-lg text-center text-center text-center text-center text-center text-center text-center">儲存並同步</button></div><div id="sur-admin-result" class="hidden flex-1 overflow-y-auto space-y-3 text-center text-center text-center text-center text-center text-center text-center"></div><button onclick="closeSurveyAdminModal()" class="mt-6 text-slate-400 text-[10px] font-black uppercase text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">返回</button></div></div>
 
-    <!-- 輔助編輯彈窗 (略) -->
-    <div id="member-edit-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-6 text-center shadow-2xl text-center">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md text-center shadow-2xl text-center text-center" onclick="closeMemberEditModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] text-center text-center">
-            <h3 class="text-xl font-[900] text-slate-800 mb-8 text-center tracking-tight text-center text-center">成員資料管理</h3>
-            <div class="space-y-4 text-center text-center"><div class="space-y-1 text-center text-center"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">姓名 (限本人修改)</label><input type="text" id="edit-member-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner text-center" readonly></div><div class="space-y-1 text-center text-center text-center"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center text-center">負責樂器</label><select id="edit-member-instrument" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold appearance-none text-center shadow-sm text-center text-center"></select></div><div id="role-edit-container" class="space-y-1 hidden text-center text-center"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center text-center">系統權限</label><select id="edit-member-role" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold appearance-none text-center shadow-sm text-center text-center text-center"><option value="Member">一般團員</option><option value="Leader">組長</option><option value="Officer">幹部</option><option value="Admin">最高管理員</option></select></div><div id="modifier-info-container" class="text-center bg-slate-50 p-3 rounded-2xl border border-slate-100 mt-2 hidden text-center shadow-inner text-center"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 text-center">最後修改紀錄</p><p id="edit-member-modifier" class="text-[10px] font-bold text-slate-500 text-center text-center"></p></div><input type="hidden" id="edit-member-email"></div>
-            <div class="flex gap-4 mt-8 text-center justify-center text-center text-center"><button onclick="closeMemberEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center justify-center">取消</button><button id="save-member-btn" onclick="saveMemberInfo()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center justify-center text-center">儲存變更</button></div>
-        </div>
-    </div>
-
-    <!-- 簽到紀錄詳情彈窗 (略) -->
-    <div id="member-history-modal" class="hidden fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4 text-center shadow-2xl text-center">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md text-center shadow-xl text-center" onclick="closeMemberHistory()"></div>
-        <div class="bg-white w-full max-w-sm rounded-t-[42px] sm:rounded-[42px] shadow-2xl p-8 relative fade-up max-h-[85vh] flex flex-col items-center text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] text-center text-center">
-            <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6 sm:hidden text-center text-center"></div>
-            <div class="flex justify-between items-start w-full mb-6 text-left text-center text-center text-center text-center">
-                <div class="text-center text-center text-center text-center"><h3 id="m-history-name" class="text-xl font-[900] text-slate-800 tracking-tight text-center text-center">簽到詳情</h3><p id="m-history-email" class="text-[11px] text-slate-400 font-bold text-center text-center"></p></div>
-                <button onclick="closeMemberHistory()" class="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center text-center text-center text-center"><i data-lucide="x" class="w-5 h-5 text-center text-center"></i></button>
-            </div>
-            <div class="grid grid-cols-2 gap-4 w-full mb-6 text-center text-center text-center">
-                <div class="bg-indigo-50/50 p-4 rounded-[24px] text-center border border-indigo-100/50 text-center flex flex-col items-center shadow-sm text-center text-center"><p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1 text-center text-center text-center">累計簽到</p><p id="m-history-count" class="text-2xl font-[900] text-indigo-600 leading-none text-center">0</p></div>
-                <div id="m-absent-block" class="p-4 rounded-[24px] text-center transition-colors border text-center flex flex-col items-center shadow-sm text-center text-center"><p class="text-[9px] font-black opacity-60 uppercase tracking-widest mb-1 text-center text-center">預估缺席</p><p id="m-history-absent" class="text-2xl font-[900] text-center leading-none text-center">0</p></div>
-            </div>
-            <div id="m-history-list" class="w-full flex-1 overflow-y-auto space-y-3 hide-scroll pr-1 text-center text-center text-center text-center"></div>
-        </div>
-    </div>
-
-    <!-- 活動編輯彈窗 (新增休息時間欄位) -->
-    <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 text-center text-center">
-        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md text-center text-center text-center text-center" onclick="closeEditModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center text-center">
-            <h3 id="modal-title" class="text-xl font-[900] text-slate-800 mb-6 text-center tracking-tight text-center text-center">練習活動設定</h3>
-            <div class="space-y-4 text-center">
-                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">活動名稱</label><input type="text" id="edit-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner text-center" placeholder="如：週六團練"></div>
-                <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">日期</label><input type="date" id="edit-date" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center shadow-inner text-center"></div>
-                <div class="grid grid-cols-2 gap-4 text-center text-center"><div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">開始時間</label><input type="time" id="edit-start" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div><div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">結束時間</label><input type="time" id="edit-end" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div></div>
-                
-                <!-- 新增：休息時間輸入區 -->
-                <div class="pt-2 mt-2 border-t border-slate-100">
-                    <p class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3">休息時段 (將自動扣除時數)</p>
-                    <div class="grid grid-cols-2 gap-4 text-center">
-                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">休息開始</label><input type="time" id="edit-rest-start" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700"></div>
-                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">休息結束</label><input type="time" id="edit-rest-end" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="flex gap-4 mt-8 justify-center text-center text-center text-center"><button onclick="closeEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center text-center">取消</button><button id="save-event-btn" onclick="saveEvent()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center text-center">儲存設定</button></div>
-        </div>
-    </div>
-
-    <!-- 公告編輯彈窗 (略) -->
-    <div id="announcement-modal" class="hidden fixed inset-0 z-[140] flex items-center justify-center p-6 text-center text-center">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md text-center shadow-2xl text-center" onclick="closeAnnouncementModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center text-center">
-            <h3 class="text-xl font-[900] text-slate-800 mb-6 text-center tracking-tight flex items-center justify-center gap-2"><i data-lucide="megaphone" class="w-5 h-5 text-amber-500"></i>發布團務公告</h3>
-            <textarea id="announcement-edit-input" class="w-full h-40 px-6 py-4 rounded-[22px] bg-slate-50 border-none outline-none font-bold text-sm text-slate-700 shadow-inner resize-none mb-6 text-center" placeholder="請輸入公告內容..."></textarea>
-            <div class="flex gap-4 text-center justify-center"><button onclick="closeAnnouncementModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm">取消</button><button id="save-announcement-btn" onclick="handleSaveAnnouncement()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">發布公告</button></div>
-        </div>
+        <!-- 公告、活動、個人資料 Modal -->
+        <div id="announcement-modal" class="hidden fixed inset-0 z-[140] flex items-center justify-center p-6 text-center shadow-2xl text-center"><div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAnnouncementModal()"></div><div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)]"><h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2 text-center text-center"><i data-lucide="megaphone" class="w-5 h-5 text-amber-500 text-center text-center"></i>發布公告</h3><textarea id="announcement-edit-input" class="w-full h-40 px-6 py-4 rounded-[22px] bg-slate-50 border-none outline-none font-bold text-sm text-slate-700 shadow-inner resize-none mb-6 text-center text-center"></textarea><div class="flex gap-4 text-center justify-center"><button onclick="closeAnnouncementModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center">取消</button><button id="save-announcement-btn" onclick="handleSaveAnnouncement()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center">發布</button></div></div></div>
+        <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 text-center shadow-2xl text-center"><div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md text-center" onclick="closeEditModal()"></div><div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)]"><h3 id="modal-title" class="text-xl font-[900] text-slate-800 mb-6 tracking-tight text-center">活動設定</h3><div class="space-y-4 text-center text-center"><input type="text" id="edit-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner text-center" placeholder="名稱"><input type="date" id="edit-date" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center shadow-inner text-center text-center"><div class="grid grid-cols-2 gap-4 text-center text-center"><input type="time" id="edit-start" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"><input type="time" id="edit-end" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div><div class="pt-2 border-t border-slate-100 text-center text-center text-center text-center"><p class="text-[10px] font-black text-accent uppercase mb-2 text-center text-center">休息時段</p><div class="grid grid-cols-2 gap-4 text-center text-center text-center text-center text-center"><input type="time" id="edit-rest-start" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center"><input type="time" id="edit-rest-end" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center"></div></div></div><div class="flex gap-4 mt-8 justify-center text-center text-center text-center text-center text-center"><button onclick="closeEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center text-center">取消</button><button id="save-event-btn" onclick="saveEvent()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center text-center">儲存</button></div></div></div>
+        <div id="survey-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-6 text-center shadow-2xl text-center"><div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeSurveyModal()"></div><div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up max-h-[85vh] overflow-y-auto hide-scroll text-center text-center text-center"><h3 id="survey-modal-title" class="text-xl font-[900] text-slate-800 mb-2 tracking-tight text-center text-center">演出調查</h3><p id="survey-modal-desc" class="text-xs text-slate-400 mb-8 text-center text-center"></p><div id="survey-dynamic-fields" class="space-y-6 text-left text-center text-center"></div><div class="flex gap-4 mt-8 justify-center text-center text-center text-center text-center text-center"><button onclick="closeSurveyModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center text-center text-center">取消</button><button id="save-survey-btn" onclick="handleSaveSurvey()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center text-center text-center text-center">提交</button></div></div></div>
+        <div id="profile-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-6 text-center shadow-2xl text-center"><div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md text-center text-center" onclick="closeProfileModal()"></div><div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white text-center text-center text-center text-center text-center text-center text-center" id="profile-initial">-</div><div class="w-full space-y-2 mb-6 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center text-center text-center text-center text-center text-center text-center text-center text-center">姓名 (限本人修改)</label><input type="text" id="profile-name-input" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 shadow-inner text-center text-center text-center text-center text-center"></div><div class="w-full space-y-4 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><select id="profile-instrument-input" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none shadow-sm text-center text-center text-center text-center text-center text-center text-center text-center text-center"></select><div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><span class="text-[10px] font-black text-slate-500 uppercase text-center">組別</span><span class="text-sm font-bold text-slate-700 text-center text-center" id="profile-section-display">-</span></div><div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><span class="text-[10px] font-black text-slate-500 uppercase text-center">帳號</span><span class="text-sm font-bold text-slate-700 text-center text-center" id="profile-email">-</span></div><input type="password" id="profile-new-password" class="w-full px-4 py-3.5 rounded-2xl bg-slate-100 outline-none border-none text-xs font-bold text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><button id="update-password-btn" onclick="handleUpdatePassword()" class="w-full py-3.5 btn-premium text-white font-black rounded-2xl text-xs shadow-lg text-center text-center text-center text-center text-center text-center text-center text-center text-center">更新資料</button></div><button onclick="closeProfileModal()" class="mt-8 text-slate-400 text-[10px] font-black uppercase text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">返回</button></div></div>
+        
+        <div id="member-history-modal" class="hidden fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4 text-center shadow-2xl text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md text-center text-center text-center" onclick="closeMemberHistory()"></div><div class="bg-white w-full max-w-sm rounded-t-[42px] sm:rounded-[42px] shadow-2xl p-8 relative fade-up max-h-[85vh] flex flex-col items-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><div class="flex justify-between items-start w-full mb-6 text-left text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><div><h3 id="m-history-name" class="text-xl font-[900] text-slate-800 tracking-tight text-center text-center text-center text-center text-center text-center text-center text-center">簽到詳情</h3><p id="m-history-email" class="text-[11px] text-slate-400 font-bold text-center text-center text-center text-center text-center text-center text-center text-center text-center"></p></div><button onclick="closeMemberHistory()" class="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><i data-lucide="x" class="w-5 h-5 text-center text-center text-center text-center text-center"></i></button></div><div class="grid grid-cols-2 gap-4 w-full mb-6 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><div class="bg-indigo-50/50 p-4 rounded-[24px] border border-indigo-100/50 flex flex-col items-center shadow-sm text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+        <p class="text-[9px] font-black text-indigo-400 uppercase mb-1 text-center text-center text-center text-center">次數</p><p id="m-history-count" class="text-2xl font-[900] text-indigo-600 leading-none text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">0</p></div><div id="m-absent-block" class="p-4 rounded-[24px] border flex flex-col items-center shadow-sm text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"><p class="text-[9px] font-black opacity-60 uppercase mb-1 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">缺席</p><p id="m-history-absent" class="text-2xl font-[900] leading-none text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">0</p></div></div><div id="m-history-list" class="w-full flex-1 overflow-y-auto space-y-3 hide-scroll pr-1 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center"></div></div></div>
+        
+        <!-- Toast 通知元件 -->
+        <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 hidden flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 border-white text-center text-center text-center shadow-lg"><i id="toast-icon" data-lucide="info" class="w-5 h-5 text-center text-center text-center"></i><span id="toast-msg" class="font-black text-sm text-center text-center text-center text-center"></span></div>
     </div>
 
     <script>
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwoFafqNYZIZ2IQqdJIi6yK9E9RD2zDM1m6fmBp3M5w2-3Yc9d3RGVOS4cdOimMGRY-/exec";
-        
-        // --- 核心資料 ---
-        const MAX_DISTANCE = 500; 
-        const ALLOWED_LOCATIONS = [{ name: "崇正寶宮", lat: 24.133658, lng: 120.717338 }];
+        // --- 核心工具 ---
         const orchestraData = { "吹管組": ["笛", "嗩", "笙", "(上)低音號"], "拉弦組": ["高胡", "二胡", "中胡"], "彈撥組": ["柳琴", "琵琶", "中阮", "大阮", "古箏"], "揚打組": ["揚琴", "打擊"], "低音組": ["大提琴", "低音提琴"] };
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxU-wKdbAQBPueeOUgp_szRJ_DexSQpW5Amlb3Jn0uVTw6Z-3c9mvNpwnefFKpmSrp-/exec";
+        const MAX_DISTANCE = 500, ALLOWED_LOCATIONS = [{ name: "崇正寶宮", lat: 24.133658, lng: 120.717338 }];
+        
+        let currentUser = null, currentEventData = null, allEvents = [], allSurveys = [], editingSurveyId = null, editingId = null, cachedMemberList = [];
+        let surveyQuestions = [], userResponses = {}, adminQuestions = [];
 
-        let currentUser = null, currentEventData = null, allEvents = [], editingId = null, cachedMemberList = [];
-
+        function showToast(m, e = false) { const t = document.getElementById('toast'), msg = document.getElementById('toast-msg'), icon = document.getElementById('toast-icon'); if (!t || !msg || !icon) return; msg.innerText = m; t.className = `fixed top-12 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 border-white text-center shadow-lg ${e ? 'text-rose-500 border-rose-100' : 'text-indigo-600 border-indigo-100'}`; icon.setAttribute('data-lucide', e ? 'alert-circle' : 'check-circle'); t.classList.remove('hidden', 'opacity-0'); safeCreateIcons(); setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => { t.classList.add('hidden'); }, 500); }, 3000); }
+        async function callBackend(action, data) { try { const response = await fetch(GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action, data }) }); const text = await response.text(); try { return JSON.parse(text); } catch (e) { return { success: false, message: "解析失敗" }; } } catch (e) { return { success: false, message: "通訊異常" }; } }
         function safeCreateIcons() { if (typeof lucide !== 'undefined') lucide.createIcons(); }
+        function setBtnLoading(btn, isLoading, text) { if (!btn) return; btn.innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto"></i>' : text; btn.disabled = isLoading; btn.classList.toggle('opacity-70', isLoading); safeCreateIcons(); }
+
         window.onload = () => { safeCreateIcons(); };
 
-        function getAbsenceLabelClass(count) {
-            if (count <= 0) return 'bg-emerald-500 text-white shadow-sm';
-            if (count === 1) return 'bg-yellow-400 text-slate-800 shadow-sm';
-            if (count === 2) return 'bg-orange-500 text-white shadow-sm';
-            return 'bg-rose-600 text-white shadow-sm';
-        }
+        // --- 介面管理 ---
+        function switchView(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); const t = document.getElementById(id); if (t) t.classList.remove('hidden'); const n = document.getElementById('nav-bar'); if (n) { const isDash = (id === 'dashboard-view'); n.classList.toggle('hidden', !isDash); const app = document.getElementById('app'); if (app) { if (isDash) { app.classList.remove('pt-6', 'sm:pt-10'); app.classList.add('pt-24', 'sm:pt-28'); } else { app.classList.remove('pt-24', 'sm:pt-28'); app.classList.add('pt-6', 'sm:pt-10'); } } } }
+        function switchTab(t) { document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('tab-active'); b.classList.add('text-slate-500'); }); const b = document.getElementById(`btn-${t}`); if (b) { b.classList.add('tab-active'); b.classList.remove('text-slate-500'); } ['history', 'monitor', 'admin'].forEach(s => { const el = document.getElementById(`${s}-section`); if (el) el.classList.toggle('hidden', s !== t); }); if (t === 'monitor') loadRealtimeStatus(); if (t === 'admin') { loadEventList(); loadSurveyList(); } }
 
-        function getAbsenceBlockClass(count) {
-            if (count <= 0) return 'bg-emerald-50 text-emerald-600 border-emerald-100 shadow-sm';
-            if (count === 1) return 'bg-yellow-50 text-yellow-700 border-yellow-100 shadow-sm';
-            if (count === 2) return 'bg-orange-50 text-orange-600 border-orange-100 shadow-sm';
-            return 'bg-rose-50 text-rose-600 border-rose-100 shadow-sm';
-        }
-
-        // --- 公告功能 (修正：時間格式化) ---
-        async function fetchAnnouncement() {
-            const res = await callBackend('getAnnouncement', {});
-            if (res?.success) {
-                document.getElementById('announcement-content').innerText = res.content;
-                let rawTime = res.updateTime ? String(res.updateTime) : "";
-                let formattedTime = "";
-                if (rawTime.includes('T')) {
-                    const datePart = rawTime.split('T')[0];
-                    const timePart = rawTime.split('T')[1].substring(0, 5);
-                    formattedTime = `${datePart} ${timePart}`;
-                } else {
-                    formattedTime = rawTime;
-                }
-                document.getElementById('announcement-time').innerText = formattedTime ? `最後更新：${formattedTime}` : "";
-                document.getElementById('announcement-edit-input').value = res.content;
-            }
-        }
-
-        function openAnnouncementModal() {
-            document.getElementById('announcement-modal').classList.remove('hidden');
-            safeCreateIcons();
-        }
-
-        function closeAnnouncementModal() {
-            document.getElementById('announcement-modal').classList.add('hidden');
-        }
-
-        async function handleSaveAnnouncement() {
-            const content = document.getElementById('announcement-edit-input').value.trim();
-            if (!content) return showToast("請輸入公告內容", true);
-            const btn = document.getElementById('save-announcement-btn');
-            setBtnLoading(btn, true, "發布中...");
-            const res = await callBackend('saveAnnouncement', { content });
-            setBtnLoading(btn, false, "發布公告");
-            if (res?.success) {
-                showToast("公告已發布成功！");
-                closeAnnouncementModal();
-                fetchAnnouncement();
-            } else showToast("發布失敗", true);
-        }
-
-        // --- 業務邏輯 ---
+        // --- 核心邏輯 ---
         async function handleLogin() {
-            const emailEl = document.getElementById('login-email');
-            const pwdEl = document.getElementById('login-password');
-            if(!emailEl || !pwdEl) return;
-            const btn = document.getElementById('login-submit-btn');
-            setBtnLoading(btn, true, "驗證中...");
+            const emailEl = document.getElementById('login-email'), pwdEl = document.getElementById('login-password');
+            if (!emailEl || !pwdEl) return;
+            const btn = document.getElementById('login-submit-btn'); setBtnLoading(btn, true, "驗證中...");
             const res = await callBackend('loginUser', { email: emailEl.value.trim(), password: pwdEl.value.trim() });
             setBtnLoading(btn, false, "立即登入");
-            if (res?.success) { 
-                currentUser = res.user; setupDashboard(); switchView('dashboard-view'); 
-                refreshSystemStatus(); loadAttendanceHistory(); fetchAnnouncement();
-            } 
-            else showToast(res?.message || "帳密不正確", true);
-        }
-
-        async function callBackend(action, data) {
-            try {
-                const response = await fetch(GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action, data }) });
-                return await response.json();
-            } catch (e) { return { success: false, message: "連線通訊異常" }; }
-        }
-
-        function updateInstrumentOptions() {
-            const section = document.getElementById('reg-section')?.value;
-            const instSelect = document.getElementById('reg-instrument');
-            if (!instSelect) return;
-            instSelect.innerHTML = '<option value="">樂器</option>';
-            if (section && orchestraData[section]) {
-                orchestraData[section].forEach(inst => {
-                    const opt = document.createElement('option'); opt.value = inst; opt.innerText = inst; instSelect.appendChild(opt);
-                });
-            }
-        }
-
-        async function handleRegister() {
-            const data = { name: document.getElementById('reg-name').value.trim(), section: document.getElementById('reg-section').value, instrument: document.getElementById('reg-instrument').value, email: document.getElementById('reg-email').value.trim(), password: document.getElementById('reg-password').value.trim() };
-            if(!data.name || !data.section || !data.instrument || !data.email || !data.password) return showToast("所有欄位必填", true);
-            const btn = document.getElementById('reg-submit-btn');
-            setBtnLoading(btn, true, "註冊中...");
-            const res = await callBackend('registerUser', data);
-            setBtnLoading(btn, false, "確認加入");
-            if (res?.success) { showToast("註冊成功！請重新登入"); switchAuthMode('login'); } else showToast("註冊失敗", true);
+            if (res?.success) { currentUser = res.user; setupDashboard(); switchView('dashboard-view'); refreshSystemStatus(); loadAttendanceHistory(); fetchAnnouncement(); fetchSurveyStatus(); } else showToast(res?.message || "登入失敗", true);
         }
 
         function setupDashboard() {
             if (!currentUser) return;
             document.getElementById('user-display').innerText = `你好，${currentUser.Name}`;
             document.getElementById('info-badge').innerText = `${currentUser.Section} / ${currentUser.Instrument}`;
-            const navInfo = document.getElementById('nav-user-info');
-            if (navInfo) navInfo.innerText = currentUser.Name;
-            
-            const btnMon = document.getElementById('btn-monitor');
-            if (btnMon) {
-                btnMon.classList.toggle('hidden', !['Admin', 'Officer', 'Leader'].includes(currentUser.Role));
-                document.getElementById('monitor-title').innerText = currentUser.Role === 'Leader' ? `${currentUser.Section} 狀態` : "成員監控";
-            }
-            const btnAdm = document.getElementById('btn-admin');
-            if (btnAdm) {
-                btnAdm.classList.toggle('hidden', !['Admin', 'Officer'].includes(currentUser.Role));
-                document.getElementById('admin-add-btn').classList.toggle('hidden', currentUser.Role !== 'Admin');
-            }
+            const navInfo = document.getElementById('nav-user-info'); if (navInfo) navInfo.innerText = currentUser.Name;
+            const btnMon = document.getElementById('btn-monitor'); if (btnMon) btnMon.classList.toggle('hidden', !['Admin', 'Officer', 'Leader'].includes(currentUser.Role));
+            const btnAdm = document.getElementById('btn-admin'); if (btnAdm) btnAdm.classList.toggle('hidden', !['Admin', 'Officer'].includes(currentUser.Role));
+            const addBtn = document.getElementById('admin-add-btn'); if(addBtn) addBtn.classList.toggle('hidden', currentUser.Role !== 'Admin');
+            const addSurBtn = document.getElementById('admin-add-survey-btn'); if(addSurBtn) addSurBtn.classList.toggle('hidden', currentUser.Role !== 'Admin');
             safeCreateIcons();
         }
 
-        function openProfileModal() {
-            const modal = document.getElementById('profile-modal');
-            const nameI = document.getElementById('profile-name-input');
-            const instS = document.getElementById('profile-instrument-input');
-            if (!modal || !nameI || !currentUser) return;
-            nameI.value = currentUser.Name;
-            document.getElementById('profile-role').innerText = currentUser.Role || 'Member';
-            document.getElementById('profile-section-display').innerText = currentUser.Section || '-';
-            document.getElementById('profile-email').innerText = currentUser.Email;
-            document.getElementById('profile-initial').innerText = String(currentUser.Name).substring(0, 1);
-            instS.innerHTML = '';
-            if (orchestraData[currentUser.Section]) {
-                orchestraData[currentUser.Section].forEach(i => {
-                    const opt = document.createElement('option'); opt.value = i; opt.innerText = i;
-                    if (i === currentUser.Instrument) opt.selected = true;
-                    instS.appendChild(opt);
-                });
-            }
-            modal.classList.remove('hidden');
-            safeCreateIcons();
-        }
-
-        function closeProfileModal() { document.getElementById('profile-modal').classList.add('hidden'); }
-
-        async function handleUpdatePassword() {
-            const newN = document.getElementById('profile-name-input').value.trim();
-            const newI = document.getElementById('profile-instrument-input').value;
-            const newP = document.getElementById('profile-new-password').value.trim();
-            if (!newN) return showToast("姓名不可為空", true);
-            const btn = document.getElementById('update-password-btn');
-            setBtnLoading(btn, true, "正在儲存...");
-            const res = await callBackend('saveMember', { email: currentUser.Email, adminEmail: currentUser.Email, name: newN, instrument: newI, password: newP || undefined });
-            setBtnLoading(btn, false, "更新資料");
-            if (res?.success) { showToast("個人資料已更新成功！"); currentUser.Name = newN; currentUser.Instrument = newI; setupDashboard(); closeProfileModal(); } 
-            else showToast("儲存失敗", true);
-        }
-
-        async function loadRealtimeStatus() {
-            const list = document.getElementById('realtime-status-list');
-            if (!list) return;
-            list.innerHTML = '<div class="py-10 opacity-50 text-[10px] font-black uppercase text-center">Syncing...</div>';
-            const res = await callBackend('getRealtimeStatus', { role: currentUser.Role, section: currentUser.Section });
-            if (res?.success) {
-                cachedMemberList = res.data || [];
-                document.getElementById('stat-present').innerText = res.stats.present;
-                document.getElementById('stat-absent').innerText = res.stats.absent;
-                renderMemberList(cachedMemberList);
-            }
-        }
-
-        function applyMonitorFilters() {
-            const sF = document.getElementById('monitor-filter-section').value;
-            const sO = document.getElementById('monitor-sort-order').value;
-            let filtered = [...cachedMemberList];
-            if (sF !== "all") filtered = filtered.filter(u => u.Section === sF);
-            if (sO === "checkin") filtered.sort((a, b) => (a.status === "已簽到" ? -1 : 1));
-            else if (sO === "absence") filtered.sort((a, b) => (b.absenceCount || 0) - (a.absenceCount || 0));
-            renderMemberList(filtered);
-        }
-
-        function renderMemberList(data) {
-            const list = document.getElementById('realtime-status-list');
-            if (!list) return;
-            list.innerHTML = data.map(u => {
-                const absC = u.absenceCount || 0;
-                const showE = ['Admin', 'Leader', 'Officer'].includes(currentUser.Role);
-                const sN = String(u.Name || '').replace(/'/g, "\\'");
-                const sE = String(u.Email || '').replace(/'/g, "\\'");
-                const sM = String(u.Modifier || '').replace(/'/g, "\\'");
-                const eBtn = showE ? `<button onclick="openMemberEditModal('${sE}', '${sN}', '${u.Instrument}', '${u.Section}', '${u.Role || 'Member'}', '${sM}')" class="flex-1 px-2 py-2 bg-indigo-50 text-indigo-600 rounded-xl active:scale-95 text-[10px] font-black shadow-sm text-center">編輯</button>` : '';
-                const hBtn = `<button onclick="viewMemberHistory('${sE}', '${sN}')" class="flex-1 px-2 py-2 bg-slate-100 text-slate-500 rounded-xl active:scale-95 text-[10px] font-black text-center shadow-sm">紀錄</button>`;
-                return `
-                <div class="flex flex-col p-4 bg-white/70 rounded-[28px] border border-white shadow-sm gap-3 transition-all hover:shadow-md">
-                    <div class="flex items-center gap-4 text-left">
-                        <div class="w-10 h-10 rounded-[14px] bg-slate-800 text-white flex items-center justify-center font-black shadow-md text-center">${String(u.Name).substring(0,1)}</div>
-                        <div class="flex-1 overflow-hidden">
-                            <div class="flex items-center gap-1.5"><span class="font-[900] text-slate-800 text-sm truncate text-center">${u.Name}</span><span class="text-[8px] px-2 py-0.5 rounded-full font-black ${getAbsenceLabelClass(absC)} text-center shadow-sm">缺 ${absC}</span></div>
-                            <p class="text-[9px] text-slate-400 font-bold uppercase truncate">${u.Instrument} • ${u.Section}</p>
-                        </div>
-                        <div class="text-right text-center"><span class="text-xs font-black ${u.status === '已簽到' ? 'text-emerald-500' : 'text-slate-300'}">${u.status}</span></div>
-                    </div>
-                    <div class="flex gap-2 text-center text-center">${eBtn} ${hBtn}</div>
-                </div>`;
-            }).join('');
-            safeCreateIcons();
-        }
-
-        function openMemberEditModal(e, n, i, s, r, m) {
-            const modal = document.getElementById('member-edit-modal');
-            if (!modal) return;
-            document.getElementById('edit-member-email').value = e;
-            document.getElementById('edit-member-name').value = n;
-            const mC = document.getElementById('modifier-info-container');
-            if (m && m !== "無修改紀錄") { mC.classList.remove('hidden'); document.getElementById('edit-member-modifier').innerText = m; } else mC.classList.add('hidden');
-            const rC = document.getElementById('role-edit-container');
-            if (currentUser.Role === 'Admin') { rC.classList.remove('hidden'); document.getElementById('edit-member-role').value = r; } else rC.classList.add('hidden');
-            const instS = document.getElementById('edit-member-instrument');
-            instS.innerHTML = '';
-            if (orchestraData[s]) {
-                orchestraData[s].forEach(item => {
-                    const opt = document.createElement('option'); opt.value = item; opt.innerText = item;
-                    if (item === i) opt.selected = true;
-                    instS.appendChild(opt);
-                });
-            }
-            modal.classList.remove('hidden');
-            safeCreateIcons();
-        }
-
-        function closeMemberEditModal() { document.getElementById('member-edit-modal').classList.add('hidden'); }
-
-        async function saveMemberInfo() {
-            const btn = document.getElementById('save-member-btn');
-            setBtnLoading(btn, true, "正在更新...");
-            const res = await callBackend('saveMember', { adminEmail: currentUser.Email, email: document.getElementById('edit-member-email').value, name: document.getElementById('edit-member-name').value, instrument: document.getElementById('edit-member-instrument').value, role: document.getElementById('edit-member-role').value });
-            setBtnLoading(btn, false, "儲存變更");
-            if (res?.success) { showToast("設定已同步成功"); closeMemberEditModal(); loadRealtimeStatus(); } else showToast("同步失敗", true);
-        }
-
-        async function viewMemberHistory(e, n) {
-            const modal = document.getElementById('member-history-modal');
-            if (!modal) return;
-            document.getElementById('m-history-name').innerText = n;
-            document.getElementById('m-history-email').innerText = e;
-            document.getElementById('m-history-list').innerHTML = '<div class="py-10 opacity-30 text-xs font-black uppercase text-center text-center">Syncing...</div>';
-            modal.classList.remove('hidden');
-            const res = await callBackend('getMemberHistory', { adminEmail: currentUser.Email, targetEmail: e });
-            if (res?.success) {
-                document.getElementById('m-history-count').innerText = res.list.length;
-                document.getElementById('m-history-absent').innerText = res.absenceCount;
-                document.getElementById('m-absent-block').className = `p-4 rounded-[22px] border text-center ${getAbsenceBlockClass(res.absenceCount)}`;
-                document.getElementById('m-history-list').innerHTML = res.list.length === 0 ? '<div class="py-10 text-slate-400 font-bold text-center text-center">目前無紀錄可循</div>' : 
-                    res.list.map(h => `<div class="bg-slate-50/70 p-4 rounded-[22px] flex justify-between items-center text-left shadow-sm"><div><p class="font-black text-slate-700 text-xs text-center sm:text-left">${h.eventName}</p><p class="text-[9px] text-slate-400 font-bold text-center sm:text-left">${h.date}</p></div><span class="text-[9px] bg-white text-indigo-600 px-3 py-1 rounded-lg font-black shadow-sm text-center text-center">${formatDurationDisplay(h.duration)}</span></div>`).join('');
-            }
-            safeCreateIcons();
-        }
-
-        function closeMemberHistory() { document.getElementById('member-history-modal').classList.add('hidden'); }
-
-        // 定位與簽到邏輯
-        function getDistanceMeters(lat1, lon1, lat2, lon2) {
-            const R = 6371e3;
-            const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
-            const Δφ = (lat2-lat1) * Math.PI/180, Δλ = (lon2-lon1) * Math.PI/180;
-            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        }
-
-        async function getLocation() {
-            return new Promise((resolve, reject) => {
-                if (!navigator.geolocation) return reject("不支援定位");
-                navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-            });
-        }
-
-        async function submitCheckin() {
-            if (!currentEventData) return showToast("同步資訊中，請稍候", true);
-            if (currentEventData.hasCheckedIn) return showToast("您今天已簽到囉！");
-            const btn = document.getElementById('checkin-btn');
-            if (!btn) return;
-            const oldHTML = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-12 h-12 animate-spin text-center"></i><span class="text-xs mt-1 text-center">定位測距中...</span>';
-            safeCreateIcons();
-            try {
-                const pos = await getLocation();
-                const dist = getDistanceMeters(pos.coords.latitude, pos.coords.longitude, ALLOWED_LOCATIONS[0].lat, ALLOWED_LOCATIONS[0].lng);
-                if (dist > MAX_DISTANCE) {
-                    showToast(`距離崇正寶宮約 ${Math.round(dist)}m，請靠近 500m 內再簽到`, true);
-                    return; 
-                }
-                const res = await callBackend('submitCheckin', { 
-                    email: currentUser.Email, 
-                    name: currentUser.Name, 
-                    section: currentUser.Section, 
-                    date: currentEventData.eventDate, 
-                    type: currentEventData.eventType, 
-                    eventName: currentEventData.eventName, 
-                    eventTimeRange: `${currentEventData.eventStart} ~ ${currentEventData.eventEnd}`,
-                    restTimeRange: `${currentEventData.restStart || ""} ~ ${currentEventData.restEnd || ""}`
-                });
-                if (res?.success) { showToast("簽到成功！祝排練愉快"); currentEventData.hasCheckedIn = true; updateCheckinBtnStatus(true); setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1500); } 
-                else { showToast(res.message || "失敗", true); }
-            } catch (err) { showToast("定位失敗：請檢查 GPS 權限或訊號", true); } finally {
-                if (!currentEventData.hasCheckedIn) { btn.disabled = false; btn.innerHTML = oldHTML; safeCreateIcons(); }
-            }
-        }
-
-        function updateCheckinBtnStatus(hasCheckedIn) {
-            const btn = document.getElementById('checkin-btn'), pulse = document.getElementById('btn-pulse');
-            if (!btn || !pulse) return;
-            if (hasCheckedIn) {
-                btn.disabled = true; btn.className = "relative z-10 w-36 h-36 bg-emerald-500 rounded-full text-white font-black shadow-xl mx-auto border-[10px] border-white flex flex-col items-center justify-center scale-110 transition-all duration-700 shadow-emerald-100";
-                btn.innerHTML = '<i data-lucide="check-circle" class="w-12 h-12 mb-1 text-center"></i><span class="text-[10px] font-black uppercase text-center text-center">簽到完成</span>';
-                pulse.classList.remove('pulse-effect');
-            } else {
-                const isE = currentEventData?.enabled;
-                btn.disabled = !isE;
-                btn.innerHTML = isE ? '<i data-lucide="scan-face" class="w-12 h-12 mb-2 text-center text-center"></i><span class="text-lg">簽到</span>' : '<i data-lucide="clock" class="w-10 h-10 mb-2 opacity-30 text-center text-center text-center text-center"></i><span class="text-xs text-center text-center text-center">尚未開放</span>';
-                btn.className = isE ? "relative z-10 w-36 h-36 btn-premium rounded-full text-white font-black shadow-2xl mx-auto border-[10px] border-white flex flex-col items-center justify-center active:scale-90 shadow-indigo-100" : "relative z-10 w-36 h-36 bg-slate-200 rounded-full text-slate-400 font-black shadow-inner mx-auto border-[10px] border-white flex flex-col items-center justify-center cursor-not-allowed";
-                if(isE) pulse.classList.add('pulse-effect'); else pulse.classList.remove('pulse-effect');
-            }
-            safeCreateIcons();
-        }
-
-        async function refreshSystemStatus() {
-            if (!currentUser) return;
-            const res = await callBackend('getSystemStatus', { email: currentUser.Email });
-            if (res?.success) { 
-                currentEventData = res; 
-                updateCheckinBtnStatus(res.hasCheckedIn); 
-                document.getElementById('current-event-display').innerText = res.enabled ? res.eventName : "目前暫無活動"; 
-                const ti = document.getElementById('checkin-time-display'); 
-                if(ti) { ti.innerText = res.enabled ? `${res.eventStart} ~ ${res.eventEnd}` : "--:--"; ti.classList.toggle('opacity-100', res.enabled); }
-                const restEl = document.getElementById('checkin-rest-display');
-                if(restEl) {
-                    const hasRest = res.enabled && res.restStart && res.restEnd;
-                    restEl.innerText = hasRest ? `(休息時間：${res.restStart} ~ ${res.restEnd})` : "";
-                    restEl.classList.toggle('opacity-100', hasRest);
-                }
-            }
-        }
-
-        function formatDurationDisplay(dur) { 
-            if (!dur) return "0時0分"; 
-            let s = String(dur); 
-            if (s.includes('時')) return s;
-            if (/^\d{1,2}:\d{1,2}/.test(s)) { const p = s.split(':'); return `${parseInt(p[0])}時${parseInt(p[1])}分`; }
-            return s; 
-        }
-
+        // --- 簽到紀錄一行化 ---
         async function loadAttendanceHistory() {
             if (!currentUser) return;
             const res = await callBackend('getAttendanceHistory', { email: currentUser.Email });
             if (res?.success) {
-                let totalMin = 0;
-                const attList = document.getElementById('attendance-list');
-                if(!attList) return;
+                let totalMin = 0; const attList = document.getElementById('attendance-list'); if (!attList) return;
                 attList.innerHTML = (res.list || []).map(i => {
-                    const dur = formatDurationDisplay(i.duration);
-                    const match = dur.match(/(\d+)時(\d+)分/);
-                    if(match) totalMin += (parseInt(match[1]) * 60 + parseInt(match[2]));
-                    return `<div class="glass-panel p-4 rounded-[26px] flex justify-between items-center border-white/60 shadow-sm transition-all hover:scale-[1.02] hover:bg-white text-center"><div class="flex items-center gap-3 text-left text-center"><div class="w-10 h-10 rounded-[12px] bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-inner text-center"><i data-lucide="music" class="w-4 h-4 text-center"></i></div><div><p class="font-black text-slate-700 text-xs">${i.status}</p><p class="text-[9px] text-slate-400 font-bold uppercase">${i.date}</p></div></div><span class="bg-indigo-500 text-white px-3 py-1.5 rounded-xl font-black text-[10px] shadow-lg text-center text-center">${dur}</span></div>`;
+                    const durText = i.duration || "0時0分";
+                    const match = durText.match(/(\d+)時(\d+)分/); if (match) totalMin += (parseInt(match[1]) * 60 + parseInt(match[2]));
+                    return `<div class="glass-panel p-4 rounded-[22px] flex items-center justify-between border-white/60 shadow-sm transition-all hover:bg-white mb-3 text-left">
+                        <div class="flex items-center gap-3 shrink overflow-hidden text-left">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0"><i data-lucide="music" class="w-4 h-4 text-center"></i></div>
+                            <div class="overflow-hidden">
+                                <p class="font-black text-slate-800 text-[13px] truncate leading-tight text-left">${i.status}</p>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5 text-left">${i.date}</p>
+                            </div>
+                        </div>
+                        <div class="shrink-0 ml-2"><span class="bg-indigo-500 text-white px-3 py-1.5 rounded-[10px] font-black text-[10px] shadow-md whitespace-nowrap text-center">${durText}</span></div>
+                    </div>`;
                 }).join('');
-                const totalDurEl = document.getElementById('total-duration-display');
-                if(totalDurEl) totalDurEl.innerText = `${Math.floor(totalMin/60)}`;
-                const totalMinLabel = document.getElementById('total-minutes-label');
-                if(totalMinLabel) totalMinLabel.innerText = `${totalMin % 60} Minutes`;
+                document.getElementById('total-duration-display').innerText = Math.floor(totalMin / 60);
+                document.getElementById('total-minutes-label').innerText = `${totalMin % 60} Minutes`;
                 safeCreateIcons();
             }
         }
 
-        function switchView(id) { 
-            const views = ['login-view', 'register-view', 'dashboard-view'];
-            views.forEach(v => { const el = document.getElementById(v); if (el) el.classList.add('hidden'); }); 
-            const t = document.getElementById(id); if (t) t.classList.remove('hidden'); 
-            const n = document.getElementById('nav-bar'); 
-            if (n) {
-                const isDash = (id === 'dashboard-view');
-                n.classList.toggle('hidden', !isDash); 
-                const app = document.getElementById('app');
-                if (app) {
-                    if (isDash) { app.classList.remove('pt-6', 'sm:pt-10'); app.classList.add('pt-24', 'sm:pt-28'); } 
-                    else { app.classList.remove('pt-24', 'sm:pt-28'); app.classList.add('pt-6', 'sm:pt-10'); }
-                }
-            }
-        }
-
-        function switchTab(t) { 
-            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('tab-active'); b.classList.add('text-slate-500'); });
-            const b = document.getElementById(`btn-${t}`); if(b) { b.classList.add('tab-active'); b.classList.remove('text-slate-500'); }
-            ['history', 'monitor', 'admin'].forEach(s => { const el = document.getElementById(`${s}-section`); if(el) el.classList.toggle('hidden', s !== t); });
-            if(t === 'monitor') loadRealtimeStatus();
-            if(t === 'admin') loadEventList();
-        }
-
-        async function loadEventList() {
-            const list = document.getElementById('admin-event-list');
+        // --- 問卷管理功能 (修復 ReferenceError) ---
+        function renderAdminQuestions() {
+            const list = document.getElementById('sur-admin-questions-list');
             if (!list) return;
-            list.innerHTML = '<div class="py-10 text-slate-400 font-black text-[10px] uppercase text-center text-center text-center">Syncing...</div>';
-            const res = await callBackend('getEventList', {});
-            if (res?.success) {
-                allEvents = res.data || [];
-                list.innerHTML = allEvents.map(ev => {
-                    const zapB = `<button onclick="activateEventFromList('${ev.ID}')" class="flex-1 py-3 bg-white text-orange-500 shadow-sm rounded-2xl active:scale-95 text-xs font-black shadow-md text-center text-center text-center">廣播</button>`;
-                    const edtB = currentUser.Role === 'Admin' ? `<button onclick="openEditModal('${ev.ID}')" class="flex-1 py-3 bg-white rounded-2xl shadow-sm text-indigo-600 active:scale-95 text-xs font-black shadow-md text-center text-center text-center text-center">編輯</button>` : '';
-                    let restTip = ev.RestStart ? `<p class="text-[8px] text-amber-500 font-black mt-1">休息：${ev.RestStart}-${ev.RestEnd}</p>` : "";
-                    return `<div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm gap-4 text-center transition-all hover:bg-white text-center text-center text-center text-center"><p class="font-[900] text-slate-800 text-sm mb-1 text-center text-center text-center text-center">${ev.Name}</p><p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-1 text-center text-center text-center text-center">${ev.Date} • ${ev.StartTime} - ${ev.EndTime}</p>${restTip}<div class="flex gap-2 text-center text-center text-center mt-3">${zapB} ${edtB}</div></div>`;
-                }).join('');
-                safeCreateIcons();
-            }
-        }
-
-        async function activateEventFromList(id) { 
-            const ev = allEvents.find(e => String(e.ID) === String(id)); 
-            if (!ev) return; 
-            showToast("正在處理廣播..."); 
-            const res = await callBackend('activateEvent', { id: ev.ID, name: ev.Name, type: ev.Type, date: ev.Date, start: ev.StartTime, end: ev.EndTime, restStart: ev.RestStart, restEnd: ev.RestEnd }); 
-            if (res?.success) { showToast(`活動已發布！`); refreshSystemStatus(); } 
-        }
-
-        function openEditModal(id) { 
-            editingId = id; 
-            const ev = id ? allEvents.find(e => String(e.ID) === String(id)) : null; 
-            document.getElementById('edit-name').value = ev ? ev.Name : ""; 
-            document.getElementById('edit-date').value = ev ? ev.Date : new Date().toISOString().split('T')[0]; 
-            document.getElementById('edit-start').value = ev ? ev.StartTime : "19:00"; 
-            document.getElementById('edit-end').value = ev ? ev.EndTime : "21:30"; 
-            document.getElementById('edit-rest-start').value = ev ? ev.RestStart || "" : "";
-            document.getElementById('edit-rest-end').value = ev ? ev.RestEnd || "" : "";
-            document.getElementById('edit-modal').classList.remove('hidden'); 
+            list.innerHTML = (adminQuestions || []).map((q, idx) => `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-center"><div><span class="text-[9px] font-black text-slate-400">題目 ${idx+1}</span><button onclick="adminQuestions.splice(${idx},1); renderAdminQuestions();" class="text-rose-500 float-right"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><input type="text" value="${q.label}" oninput="adminQuestions[${idx}].label=this.value" class="w-full px-4 py-2.5 rounded-xl text-xs font-bold text-center" placeholder="題目名稱"><select onchange="adminQuestions[${idx}].type=this.value; renderAdminQuestions();" class="w-full px-4 py-2.5 rounded-xl font-black text-[10px] text-center"><option value="text" ${q.type==='text'?'selected':''}>簡答</option><option value="select" ${q.type==='select'?'selected':''}>單選</option></select>${q.type==='select' ? `<input type="text" value="${q.options||''}" oninput="adminQuestions[${idx}].options=this.value" class="w-full px-4 py-2.5 rounded-xl font-bold text-[10px] text-center" placeholder="選項 (逗號隔開)">` : ''}</div>`).join('');
             safeCreateIcons();
         }
 
+        async function openSurveyAdminModal(id, initialTab = 'config') {
+            editingSurveyId = id;
+            document.getElementById('survey-admin-modal').classList.remove('hidden');
+            switchSurveyAdminTab(initialTab);
+            if (id) {
+                const res = await callBackend('getSurveyDetail', { id });
+                if (res?.success) {
+                    document.getElementById('sur-admin-title').value = res.title;
+                    document.getElementById('sur-admin-desc').value = res.description;
+                    document.getElementById('sur-admin-status').checked = res.enabled;
+                    adminQuestions = (res.questions || []);
+                }
+            } else {
+                document.getElementById('sur-admin-title').value = "";
+                document.getElementById('sur-admin-desc').value = "";
+                adminQuestions = [];
+            }
+            renderAdminQuestions();
+            loadSurveyResults();
+            safeCreateIcons();
+        }
+
+        // --- 其餘定義 ---
+        function updateCheckinBtnStatus(hasCheckedIn) { const btn = document.getElementById('checkin-btn'), pulse = document.getElementById('btn-pulse'); if (!btn || !pulse) return; if (hasCheckedIn) { btn.disabled = true; btn.className = "relative z-10 w-36 h-36 bg-emerald-500 rounded-full text-white font-black shadow-xl mx-auto border-[10px] border-white flex flex-col items-center justify-center scale-110 transition-all text-center"; btn.innerHTML = '<i data-lucide="check-circle" class="w-12 h-12 mb-1 text-center"></i><span class="text-[10px] font-black uppercase text-center">簽到完成</span>'; pulse.classList.remove('pulse-effect'); } else { const isE = currentEventData?.enabled; btn.disabled = !isE; btn.innerHTML = isE ? '<i data-lucide="scan-face" class="w-12 h-12 mb-2 text-center"></i><span class="text-lg text-center">簽到</span>' : '<i data-lucide="clock" class="w-10 h-10 mb-2 opacity-30 text-center"></i><span class="text-xs text-center text-center">尚未開放</span>'; btn.className = isE ? "relative z-10 w-36 h-36 btn-premium rounded-full text-white font-black shadow-2xl mx-auto border-[10px] border-white flex flex-col items-center justify-center active:scale-90" : "relative z-10 w-36 h-36 bg-slate-200 rounded-full text-slate-400 font-black shadow-inner mx-auto border-[10px] border-white flex flex-col items-center justify-center cursor-not-allowed"; if(isE) pulse.classList.add('pulse-effect'); else pulse.classList.remove('pulse-effect'); } safeCreateIcons(); }
+        async function refreshSystemStatus() { if (!currentUser) return; const res = await callBackend('getSystemStatus', { email: currentUser.Email }); if (res?.success) { currentEventData = res; updateCheckinBtnStatus(res.hasCheckedIn); document.getElementById('current-event-display').innerText = res.enabled ? res.eventName : "目前暫無活動"; const ti = document.getElementById('checkin-time-display'); if(ti) { ti.innerText = res.enabled ? `${res.eventStart} ~ ${res.eventEnd}` : "--:--"; ti.classList.toggle('opacity-100', res.enabled); } } }
+        function openAnnouncementModal() { document.getElementById('announcement-modal').classList.remove('hidden'); safeCreateIcons(); }
+        function closeAnnouncementModal() { document.getElementById('announcement-modal').classList.add('hidden'); }
+        async function handleSaveAnnouncement() { const content = document.getElementById('announcement-edit-input').value.trim(); if (!content) return showToast("內容必填", true); const res = await callBackend('saveAnnouncement', { content }); if (res?.success) { showToast("公告發布成功"); closeAnnouncementModal(); fetchAnnouncement(); } }
+        async function fetchAnnouncement() { const res = await callBackend('getAnnouncement', {}); if (res?.success) { document.getElementById('announcement-content').innerText = res.content; let rt = res.updateTime ? String(res.updateTime) : ""; document.getElementById('announcement-time').innerText = rt.includes('T') ? `最後更新：${rt.split('T')[0]}` : rt ? `最後更新：${rt}` : ""; } }
+        async function loadEventList() { const list = document.getElementById('admin-event-list'); if (!list) return; list.innerHTML = '<div class="py-10 text-slate-400 font-black text-[10px] uppercase text-center text-center">Syncing...</div>'; const res = await callBackend('getEventList', {}); if (res?.success) { allEvents = (res.data || []); list.innerHTML = allEvents.map(ev => { const zapB = `<button onclick="activateEventFromList('${ev.ID}')" class="flex-1 py-3 bg-white text-orange-500 rounded-2xl active:scale-95 text-xs font-black shadow-md text-center">廣播</button>`; const edtB = currentUser.Role === 'Admin' ? `<button onclick="openEditModal('${ev.ID}')" class="flex-1 py-3 bg-white text-indigo-600 rounded-2xl active:scale-95 text-xs font-black shadow-md text-center">編輯</button>` : ''; return `<div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm mb-4 text-center text-center"><p class="font-[900] text-slate-800 text-sm mb-1 text-center">${ev.Name}</p><p class="text-[9px] text-slate-400 font-bold mb-1 text-center">${ev.Date} • ${ev.StartTime} - ${ev.EndTime}</p><div class="flex gap-2 mt-3">${zapB} ${edtB}</div></div>`; }).join(''); safeCreateIcons(); } }
+        async function loadSurveyList() { const list = document.getElementById('admin-survey-list'); if (!list) return; list.innerHTML = '<div class="py-10 text-slate-400 font-black text-[10px] uppercase text-center text-center">正在同步問卷...</div>'; const res = await callBackend('getSurveyList', {}); if (res?.success) { allSurveys = (res.data || []); list.innerHTML = allSurveys.map(sur => { const zapB = `<button onclick="activateSurveyFromList('${sur.ID}')" class="flex-1 py-3 bg-white text-orange-500 rounded-2xl active:scale-95 text-xs font-black shadow-md">廣播</button>`; const statB = `<button onclick="openSurveyAdminModal('${sur.ID}', 'result')" class="flex-1 py-3 bg-white text-indigo-600 rounded-2xl active:scale-95 text-xs font-black shadow-md">統計</button>`; const edtB = currentUser.Role === 'Admin' ? `<button onclick="openSurveyAdminModal('${sur.ID}', 'config')" class="flex-1 py-3 bg-white text-slate-500 rounded-2xl active:scale-95 text-xs font-black shadow-md">編輯</button>` : ''; return `<div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm mb-4 text-center text-center text-center text-center"><p class="font-[900] text-slate-800 text-sm mb-1">${sur.title}</p><div class="flex gap-2">${zapB} ${statB} ${edtB}</div></div>`; }).join(''); safeCreateIcons(); } }
+        function addSurveyQuestion() { adminQuestions.push({ id: 'q' + Date.now(), label: "", type: "text", options: "" }); renderAdminQuestions(); }
+        async function handleUpdateSurveyConfig() { const res = await callBackend('updateSurveyConfig', { id: editingSurveyId, status: document.getElementById('sur-admin-status').checked ? "on" : "off", title: document.getElementById('sur-admin-title').value.trim(), description: document.getElementById('sur-admin-desc').value.trim(), questions: adminQuestions }); if (res?.success) { showToast("問卷模板已儲存"); loadSurveyList(); fetchSurveyStatus(); } }
+        async function loadSurveyResults() { const l = document.getElementById('sur-admin-result'); l.innerHTML = '<div class="py-10 opacity-30 text-xs font-black text-center text-center">Syncing...</div>'; const res = await callBackend('getSurveyAdminData', { id: editingSurveyId }); if (res?.success) { if ((res.data || []).length === 0) { l.innerHTML = '<p class="py-10 text-slate-400 font-bold text-center">尚無回覆</p>'; return; } const qs = (res.questions || []); l.innerHTML = res.data.map(r => `<div class="bg-white p-5 rounded-[26px] border border-slate-100 text-left shadow-sm mb-3"><div class="flex justify-between items-center mb-2"><span class="font-black text-slate-800 text-sm">${r.name}</span><span class="text-[8px] text-slate-300 text-right">${r.time}</span></div><div class="space-y-1">${(qs || []).map(q => `<p class="text-[10px] text-slate-500 font-bold">${q.label}：${(r.responses && r.responses[q.id]) || '(未填)'}</p>`).join('')}</div></div>`).join(''); } }
+        function switchSurveyAdminTab(t) { document.getElementById('sur-admin-config').classList.toggle('hidden', t !== 'config'); document.getElementById('sur-admin-result').classList.toggle('hidden', t !== 'result'); document.getElementById('sur-tab-config').className = t === 'config' ? 'flex-1 py-3 text-[10px] font-black rounded-xl bg-white text-indigo-600 shadow-sm text-center' : 'flex-1 py-3 text-[10px] font-black rounded-xl text-slate-500 text-center'; document.getElementById('sur-tab-result').className = t === 'result' ? 'flex-1 py-3 text-[10px] font-black rounded-xl bg-white text-indigo-600 shadow-sm text-center' : 'flex-1 py-3 text-[10px] font-black rounded-xl text-slate-500 text-center'; }
+        async function fetchSurveyStatus() { if (!currentUser) return; const res = await callBackend('getSurveyStatus', { email: currentUser.Email }); if (res?.success && res.enabled) { document.getElementById('survey-board').classList.remove('hidden'); document.getElementById('survey-display-title').innerText = res.title; document.getElementById('survey-display-desc').innerText = res.description; surveyQuestions = (res.questions || []); userResponses = (res.userResponse || {}); const b = document.getElementById('survey-status-badge'); if (res.userFilled) { b.innerText = "已填寫回覆"; b.className = "text-[8px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 text-center"; } else { b.innerText = "尚未填寫"; b.className = "text-[8px] font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-600 text-center"; } } else { document.getElementById('survey-board').classList.add('hidden'); } }
+        function openSurveyModal() { const container = document.getElementById('survey-dynamic-fields'); container.innerHTML = (surveyQuestions || []).length === 0 ? '<p class="text-center text-slate-400 py-10 font-bold text-center text-center text-center">無題目</p>' : surveyQuestions.map((q, idx) => { const savedVal = userResponses[q.id] || ""; let ih = (q.type === 'select') ? `<select onchange="userResponses['${q.id}']=this.value" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm appearance-none text-center text-center text-center text-center text-center"><option value="">請選擇</option>${(q.options || "").split(',').map(o => `<option value="${o.trim()}" ${savedVal === o.trim() ? 'selected' : ''}>${o.trim()}</option>`).join('')}</select>` : `<input type="text" oninput="userResponses['${q.id}']=this.value" value="${savedVal}" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm text-center text-center text-center text-center text-center" placeholder="請輸入回覆">`; return `<div class="space-y-2 text-center text-center text-center text-center"><label class="text-[10px] font-black text-slate-400 px-1 block text-center text-center">${idx + 1}. ${q.label}</label>${ih}</div>`; }).join(''); document.getElementById('survey-modal').classList.remove('hidden'); safeCreateIcons(); }
+        function closeSurveyModal() { document.getElementById('survey-modal').classList.add('hidden'); }
+        async function handleSaveSurvey() { const btn = document.getElementById('save-survey-btn'); setBtnLoading(btn, true, "正在儲存..."); const res = await callBackend('submitSurvey', { email: currentUser.Email, name: currentUser.Name, responses: userResponses }); setBtnLoading(btn, false, "提交"); if (res?.success) { showToast("回覆已儲存！"); closeSurveyModal(); fetchSurveyStatus(); } else showToast(res.message || "通訊失敗", true); }
+        async function submitCheckin() { if (!currentEventData) return; const btn = document.getElementById('checkin-btn'); const oldH = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-12 h-12 animate-spin"></i><span class="text-xs mt-1">定位中...</span>'; safeCreateIcons(); try { const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000 })); const dist = (function (lat1, lon1, lat2, lon2) { const R = 6371e3; const f1 = lat1 * Math.PI / 180, f2 = lat2 * Math.PI / 180, df = (lat2 - lat1) * Math.PI / 180, dl = (lon2 - lon1) * Math.PI / 180; const a = Math.sin(df / 2) * Math.sin(df / 2) + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) * Math.sin(dl / 2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); })(pos.coords.latitude, pos.coords.longitude, ALLOWED_LOCATIONS[0].lat, ALLOWED_LOCATIONS[0].lng); if (dist > MAX_DISTANCE) { showToast(`距離約 ${Math.round(dist)}m，請靠近 500m 內簽到`, true); btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); return; } const res = await callBackend('submitCheckin', { email: currentUser.Email, name: currentUser.Name, section: currentUser.Section, date: currentEventData.eventDate, type: currentEventData.eventType, eventName: currentEventData.eventName, eventTimeRange: `${currentEventData.eventStart} ~ ${currentEventData.eventEnd}`, restTimeRange: `${currentEventData.restStart || ""} ~ ${currentEventData.restEnd || ""}` }); if (res?.success) { showToast("簽到成功！祝排練愉快"); currentEventData.hasCheckedIn = true; updateCheckinBtnStatus(true); setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1500); } else showToast("簽到失敗", true); } catch (e) { showToast("定位失敗：請檢查 GPS", true); btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); } }
+        async function handleRegister() { const data = { name: document.getElementById('reg-name').value.trim(), section: document.getElementById('reg-section').value, instrument: document.getElementById('reg-instrument').value, email: document.getElementById('reg-email').value.trim(), password: document.getElementById('reg-password').value.trim() }; if(!data.name || !data.section || !data.instrument || !data.email || !data.password) return showToast("欄位必填", true); const res = await callBackend('registerUser', data); if (res?.success) { showToast("註冊成功！請登入"); switchAuthMode('login'); } else showToast(res.message || "註冊失敗", true); }
+        function openEditModal(id) { editingId = id; const ev = id ? allEvents.find(e => String(e.ID) === String(id)) : null; document.getElementById('edit-name').value = ev ? ev.Name : ""; document.getElementById('edit-date').value = ev ? ev.Date : new Date().toISOString().split('T')[0]; document.getElementById('edit-start').value = ev ? ev.StartTime : "19:00"; document.getElementById('edit-end').value = ev ? ev.EndTime : "21:30"; document.getElementById('edit-rest-start').value = ev ? ev.RestStart || "" : ""; document.getElementById('edit-rest-end').value = ev ? ev.RestEnd || "" : ""; document.getElementById('edit-modal').classList.remove('hidden'); safeCreateIcons(); }
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
-        
-        async function saveEvent() { 
-            const name = document.getElementById('edit-name').value; 
-            if(!name) return showToast("名稱必填", true); 
-            const res = await callBackend('saveEvent', { 
-                id: editingId, 
-                name, 
-                date: document.getElementById('edit-date').value, 
-                startTime: document.getElementById('edit-start').value, 
-                endTime: document.getElementById('edit-end').value,
-                restStart: document.getElementById('edit-rest-start').value,
-                restEnd: document.getElementById('edit-rest-end').value
-            }); 
-            if (res?.success) { showToast("已儲存"); closeEditModal(); loadEventList(); } 
-        }
-
-        function showToast(m, e=false) { 
-            const t = document.getElementById('toast'), msg = document.getElementById('toast-msg'), icon = document.getElementById('toast-icon');
-            if (!t || !msg || !icon) return;
-            msg.innerText = m; t.className = `fixed top-12 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 border-white text-center shadow-lg ${e?'text-rose-500 border-rose-100':'text-indigo-600 border-indigo-100'}`; icon.setAttribute('data-lucide', e ? 'alert-circle' : 'check-circle');
-            t.classList.remove('hidden'); safeCreateIcons();
-            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => { t.classList.add('hidden'); t.classList.remove('opacity-0'); }, 500); }, 3000); 
-        }
-
-        function setBtnLoading(btn, isLoading, text) { 
-            if (!btn) return; 
-            btn.innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto text-center text-center"></i>' : text; 
-            btn.disabled = isLoading; btn.classList.toggle('opacity-70', isLoading); safeCreateIcons(); 
-        }
-
-        function handleLogout() { location.reload(); }
-        function switchAuthMode(mode) { 
-            const lV = document.getElementById('login-view'), rV = document.getElementById('register-view'); 
-            if (lV) lV.classList.toggle('hidden', mode === 'register'); 
-            if (rV) rV.classList.toggle('hidden', mode === 'login'); 
-        }
+        async function saveEvent() { const name = document.getElementById('edit-name').value; if (!name) return showToast("名稱必填", true); const res = await callBackend('saveEvent', { id: editingId, name, date: document.getElementById('edit-date').value, startTime: document.getElementById('edit-start').value, endTime: document.getElementById('edit-end').value, restStart: document.getElementById('edit-rest-start').value, restEnd: document.getElementById('edit-rest-end').value }); if (res?.success) { showToast("活動已儲存"); closeEditModal(); loadEventList(); } }
+        async function loadRealtimeStatus() { const list = document.getElementById('realtime-status-list'); if (!list) return; list.innerHTML = '<div class="py-10 opacity-50 text-xs font-black uppercase text-center text-center">Syncing...</div>'; const res = await callBackend('getRealtimeStatus', { role: currentUser.Role, section: currentUser.Section }); if (res?.success) { cachedMemberList = (res.data || []); document.getElementById('stat-present').innerText = res.stats.present; document.getElementById('stat-absent').innerText = res.stats.absent; renderMemberList(cachedMemberList); } }
+        async function activateEventFromList(id) { const ev = allEvents.find(e => String(e.ID) === String(id)); if (!ev) return; showToast("處理中..."); const res = await callBackend('activateEvent', { id: ev.ID, name: ev.Name, type: ev.Type, date: ev.Date, start: ev.StartTime, end: ev.EndTime, restStart: ev.RestStart, restEnd: ev.RestEnd }); if (res?.success) { showToast(`活動發布成功！`); refreshSystemStatus(); } }
+        async function saveMemberInfo() { const btn = document.getElementById('save-member-btn'); setBtnLoading(btn, true, "正在更新..."); const res = await callBackend('saveMember', { adminEmail: currentUser.Email, email: document.getElementById('edit-member-email').value, name: document.getElementById('edit-member-name').value, instrument: document.getElementById('edit-member-instrument').value, role: document.getElementById('edit-member-role').value }); if (res?.success) { showToast("設定已同步成功"); closeMemberEditModal(); loadRealtimeStatus(); } }
+        function updateInstrumentOptions() { const section = document.getElementById('reg-section')?.value, instSelect = document.getElementById('reg-instrument'); if (!instSelect) return; instSelect.innerHTML = '<option value="">樂器</option>'; if (section && orchestraData[section]) orchestraData[section].forEach(inst => { const opt = document.createElement('option'); opt.value = inst; opt.innerText = inst; instSelect.appendChild(opt); }); }
+        function applyMonitorFilters() { const sF = document.getElementById('monitor-filter-section').value, sO = document.getElementById('monitor-sort-order').value; let filtered = [...cachedMemberList]; if (sF !== "all") filtered = filtered.filter(u => u.Section === sF); if (sO === "checkin") filtered.sort((a, b) => (a.status === "已簽到" ? -1 : 1)); else if (sO === "absence") filtered.sort((a, b) => (b.absenceCount || 0) - (a.absenceCount || 0)); renderMemberList(filtered); }
+        function closeSurveyAdminModal() { document.getElementById('survey-admin-modal').classList.add('hidden'); }
+        function closeProfileModal() { document.getElementById('profile-modal').classList.add('hidden'); }
+        function closeMemberEditModal() { document.getElementById('member-edit-modal').classList.add('hidden'); }
+        async function viewMemberHistory(e, n) { const modal = document.getElementById('member-history-modal'); if (!modal) return; document.getElementById('m-history-name').innerText = n; document.getElementById('m-history-email').innerText = e; modal.classList.remove('hidden'); const res = await callBackend('getMemberHistory', { adminEmail: currentUser.Email, targetEmail: e }); if (res?.success) { document.getElementById('m-history-count').innerText = res.list.length; document.getElementById('m-history-list').innerHTML = (res.list || []).length === 0 ? '<div class="py-10 text-slate-400 font-bold text-center">查無紀錄</div>' : res.list.map(h => `<div class="bg-white p-4 rounded-[22px] border border-slate-100 flex justify-between items-center text-left shadow-sm mb-2"><div><p class="font-black text-slate-700 text-xs">${h.eventName}</p><p class="text-[9px] text-slate-400 font-bold">${h.date}</p></div><span class="text-[9px] bg-slate-50 text-indigo-600 px-3 py-1 rounded-lg font-black shadow-sm text-center">${h.duration}</span></div>`).join(''); } safeCreateIcons(); }
+        function closeMemberHistory() { document.getElementById('member-history-modal').classList.add('hidden'); }
+        async function handleUpdatePassword() { const newN = document.getElementById('profile-name-input').value.trim(), newI = document.getElementById('profile-instrument-input').value, newP = document.getElementById('profile-new-password').value.trim(); if (!newN) return showToast("姓名必填", true); const res = await callBackend('saveMember', { email: currentUser.Email, adminEmail: currentUser.Email, name: newN, instrument: newI, password: newP || undefined }); if (res?.success) { showToast("資料已更新"); currentUser.Name = newN; currentUser.Instrument = newI; setupDashboard(); closeProfileModal(); } }
+        async function activateSurveyFromList(id) { showToast("正在處理廣播..."); const res = await callBackend('activateSurvey', { id }); if (res?.success) { showToast("問卷同步成功！"); fetchSurveyStatus(); } }
     </script>
 </body>
 </html>
