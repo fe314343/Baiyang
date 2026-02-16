@@ -1,6 +1,6 @@
 /**
  * 崇正國樂團智能系統 - GAS 後端終極整合版
- * 修正項目：對齊所有 Action 名稱，補齊 getEventList 與 getSurveyList 函數，優化時數計算與問卷統計
+ * 整合功能：活動時長格式化、問卷嵌入連結支援、組員監控、權限認證、問卷姓名紀錄
  */
 
 const SS = SpreadsheetApp.getActiveSpreadsheet();
@@ -35,10 +35,10 @@ function doPost(e) {
       case 'activateEvent': result = activateEvent(data); break;
       case 'getMemberHistory': result = getMemberHistory(data); break;
 
-      // 4. 即時狀態監控 (組長權限限制邏輯位於前端，後端提供全量資料)
+      // 4. 即時狀態監控
       case 'getRealtimeStatus': result = getRealtimeStatus(data); break; 
       
-      // 5. 問卷管理系統
+      // 5. 問卷管理系統 (支援 EmbedURL 與 姓名紀錄)
       case 'getSurveyList': result = getSurveyList(); break;
       case 'saveSurveyConfig': result = saveSurveyConfig(data); break; 
       case 'getSurveyStatus': result = getSurveyStatus(data); break; 
@@ -81,46 +81,33 @@ function saveEvent(data) {
   try {
     const sheet = SS.getSheetByName("Events");
     let totalMin = calculateDiffMinutes(data.startTime, data.endTime);
-    // 扣除休息時間
     if (data.restStart && data.restEnd) {
       totalMin = Math.max(0, totalMin - calculateDiffMinutes(data.restStart, data.restEnd));
     }
     const durStr = Math.floor(totalMin / 60) + "時" + (totalMin % 60) + "分";
     const id = data.id || "EVT-" + Date.now();
     
-    // [ID, 名稱, 類型, 日期, 開始, 結束, 時長字串, 建立日期, 休息開始, 休息結束]
     const rowData = [id, data.name, data.type || "團練", data.date, data.startTime, data.endTime, durStr, new Date(), data.restStart || "", data.restEnd || ""];
-    
     const vals = sheet.getDataRange().getValues();
     let rowIdx = -1;
     for (let i = 1; i < vals.length; i++) {
       if (String(vals[i][0]) === String(id)) { rowIdx = i + 1; break; }
     }
-
-    if (rowIdx !== -1) {
-      sheet.getRange(rowIdx, 1, 1, rowData.length).setValues([rowData]);
-    } else {
-      sheet.appendRow(rowData);
-    }
+    if (rowIdx !== -1) sheet.getRange(rowIdx, 1, 1, rowData.length).setValues([rowData]);
+    else sheet.appendRow(rowData);
     return { success: true };
-  } catch (e) {
-    return { success: false, message: e.toString() };
-  }
+  } catch (e) { return { success: false, message: e.toString() }; }
 }
 
 function activateEvent(data) {
   try {
     const ev = SS.getSheetByName("Events").getDataRange().getValues().find(r => String(r[0]) === String(data.id));
     if (!ev) return { success: false, message: "找不到該活動資料" };
-    
-    // 更新 SystemConfig 
-    // 欄位：[狀態, 活動名, 類型, 開始, 結束, _, _, 日期, ID, 休始, 休止]
+    // 更新系統配置：[狀態, 活動名, 類型, 開始, 結束, _, _, 日期, ID, 休始, 休止]
     const configData = [ "on", ev[1], ev[2], ev[4], ev[5], "", "", ev[3], ev[0], ev[8], ev[9] ];
     SS.getSheetByName("SystemConfig").getRange(2, 1, 1, 11).setValues([configData]);
     return { success: true };
-  } catch (e) {
-    return { success: false, message: e.toString() };
-  }
+  } catch (e) { return { success: false, message: e.toString() }; }
 }
 
 // ==========================================
@@ -130,53 +117,88 @@ function activateEvent(data) {
 function getSurveyList() {
   try {
     const sheet = SS.getSheetByName("SurveyTemplates");
-    if (!sheet) return { success: true, data: [] };
     const vals = sheet.getDataRange().getValues();
     const activeId = SS.getSheetByName("SystemConfig").getRange(2, 12).getValue();
     const list = vals.slice(1).map(r => ({
-      ID: r[0], Title: r[1], Description: r[2], QuestionsJSON: r[3], Active: String(r[0]) === String(activeId)
+      ID: r[0], Title: r[1], Description: r[2], QuestionsJSON: r[3], Active: String(r[0]) === String(activeId), EmbedURL: r[5] || ""
     }));
     return { success: true, data: list.reverse() };
-  } catch (e) {
-    return { success: false, message: "獲取問卷庫失敗: " + e.toString() };
-  }
+  } catch (e) { return { success: false, message: e.toString() }; }
 }
 
 function saveSurveyConfig(data) {
   try {
     const sheet = SS.getSheetByName("SurveyTemplates");
     const id = data.id || "SUR-" + Date.now();
-    const rowData = [id, data.title, data.description, data.questionsJSON, new Date()];
+    // 欄位：[ID, Title, Description, QuestionsJSON, CreateDate, EmbedURL]
+    const rowData = [id, data.title, data.description, data.questionsJSON, new Date(), data.embedURL || ""];
     const vals = sheet.getDataRange().getValues();
     let rowIdx = -1;
     for (let i = 1; i < vals.length; i++) {
       if (String(vals[i][0]) === String(id)) { rowIdx = i + 1; break; }
     }
+    if (rowIdx !== -1) sheet.getRange(rowIdx, 1, 1, 6).setValues([rowData]);
+    else sheet.appendRow(rowData);
+    
+    if (data.active) SS.getSheetByName("SystemConfig").getRange(2, 12).setValue(id);
+    return { success: true };
+  } catch (e) { return { success: false, message: e.toString() }; }
+}
 
+function getSurveyStatus(data) {
+  try {
+    const activeId = SS.getSheetByName("SystemConfig").getRange(2, 12).getValue();
+    if (!activeId) return { success: true, active: false };
+
+    const template = SS.getSheetByName("SurveyTemplates").getDataRange().getValues().find(r => String(r[0]) === String(activeId));
+    if (!template) return { success: true, active: false };
+
+    const resps = SS.getSheetByName("SurveyResponses").getDataRange().getValues();
+    const email = data.email.toLowerCase();
+    const lastResp = resps.reverse().find(r => r[1].toLowerCase() === email && String(r[3]) === String(activeId));
+
+    return {
+      success: true, active: true, title: template[1], description: template[2],
+      questions: JSON.parse(template[3] || "[]"), responded: !!lastResp,
+      lastResponse: lastResp ? JSON.parse(lastResp[4] || "{}") : {},
+      embedURL: template[5] || "" 
+    };
+  } catch(e) { return { success: false }; }
+}
+
+function submitSurveyResponse(data) {
+  try {
+    const activeSurId = SS.getSheetByName("SystemConfig").getRange(2, 12).getValue();
+    const sheet = SS.getSheetByName("SurveyResponses");
+    const userEmail = data.email.toLowerCase();
+    const userName = data.name || ""; // 接收前端傳來的姓名
+    const vals = sheet.getDataRange().getValues();
+    
+    let rowIdx = -1;
+    for (let i = 1; i < vals.length; i++) {
+      // 檢查是否已填寫過此份問卷，若有則覆蓋舊紀錄
+      if (vals[i][1].toLowerCase() === userEmail && String(vals[i][3]) === String(activeSurId)) { 
+        rowIdx = i + 1; 
+        break; 
+      }
+    }
+    
+    const rowData = [new Date(), userEmail, userName, activeSurId, data.responsesJSON];
     if (rowIdx !== -1) {
       sheet.getRange(rowIdx, 1, 1, 5).setValues([rowData]);
     } else {
       sheet.appendRow(rowData);
     }
-    
-    // 如果勾選開放，更新系統目前的問卷 ID
-    if (data.active) {
-      SS.getSheetByName("SystemConfig").getRange(2, 12).setValue(id);
-    }
     return { success: true };
-  } catch (e) {
-    return { success: false, message: e.toString() };
-  }
+  } catch (e) { return { success: false, message: e.toString() }; }
 }
 
 function getSurveyResults(data) {
   try {
     const template = SS.getSheetByName("SurveyTemplates").getDataRange().getValues().find(r => String(r[0]) === String(data.id));
-    if (!template) return { success: false, message: "找不到問卷模板" };
-    
+    if (!template) return { success: false, message: "找不到問卷" };
     const questions = JSON.parse(template[3] || "[]");
     const responses = SS.getSheetByName("SurveyResponses").getDataRange().getValues();
-    
     const results = questions.map(q => {
       const stats = {};
       responses.forEach(r => {
@@ -191,13 +213,11 @@ function getSurveyResults(data) {
       return { label: q.label, stats: stats };
     });
     return { success: true, data: results };
-  } catch(e) { 
-    return { success: false, message: "統計出錯: " + e.toString() }; 
-  }
+  } catch(e) { return { success: false, message: e.toString() }; }
 }
 
 // ==========================================
-// C. 監控與統計 (Monitoring)
+// C. 監控與基礎功能 (Monitoring & Basic)
 // ==========================================
 
 function getRealtimeStatus(userData) {
@@ -211,7 +231,6 @@ function getRealtimeStatus(userData) {
     const currentEventDate = config[7] instanceof Date ? Utilities.formatDate(config[7], "GMT+8", "yyyy-MM-dd") : String(config[7]);
     const currentEventName = config[1];
 
-    // 計算歷史活動次數以統計缺席
     const now = new Date();
     const todayStr = Utilities.formatDate(now, "GMT+8", "yyyy-MM-dd");
     let pastEventsCount = 0;
@@ -226,13 +245,9 @@ function getRealtimeStatus(userData) {
       const email = String(attendance[i][3]).trim().toLowerCase();
       let attDate = attendance[i][5]; 
       if (attDate instanceof Date) attDate = Utilities.formatDate(attDate, "GMT+8", "yyyy-MM-dd");
-      
       if (!userStats[email]) userStats[email] = { count: 0, today: false };
       userStats[email].count++;
-      
-      if (isSystemOn && attDate === currentEventDate && String(attendance[i][4]) === currentEventName) {
-        userStats[email].today = true;
-      }
+      if (isSystemOn && attDate === currentEventDate && String(attendance[i][4]) === currentEventName) userStats[email].today = true;
     }
 
     const resultData = members.slice(1).map(m => {
@@ -245,30 +260,16 @@ function getRealtimeStatus(userData) {
       };
     });
 
-    return { 
-      success: true, 
-      data: resultData, 
-      stats: { present: resultData.filter(r=>r.status==="已簽到").length, absent: resultData.filter(r=>r.status==="未簽到").length } 
-    };
-  } catch (err) { 
-    return { success: false, message: "即時監控載入錯誤: " + err.toString() }; 
-  }
+    return { success: true, data: resultData, stats: { present: resultData.filter(r=>r.status==="已簽到").length, absent: resultData.filter(r=>r.status==="未簽到").length } };
+  } catch (err) { return { success: false, message: err.toString() }; }
 }
-
-// ==========================================
-// D. 基礎功能 (認證、歷史紀錄、公告)
-// ==========================================
 
 function loginUser(data) {
   const vals = SS.getSheetByName("Members").getDataRange().getValues();
-  const e = String(data.email).trim().toLowerCase();
-  const p = String(data.password).trim();
+  const e = String(data.email).trim().toLowerCase(), p = String(data.password).trim();
   for (let i = 1; i < vals.length; i++) {
     if (String(vals[i][3]).trim().toLowerCase() === e && String(vals[i][4]) === p) {
-      return { 
-        success: true, 
-        user: { Name: vals[i][1], Section: vals[i][2], Email: vals[i][3], Role: vals[i][5], Instrument: vals[i][6] } 
-      };
+      return { success: true, user: { Name: vals[i][1], Section: vals[i][2], Email: vals[i][3], Role: vals[i][5], Instrument: vals[i][6] } };
     }
   }
   return { success: false, message: "帳號或密碼錯誤" };
@@ -277,9 +278,7 @@ function loginUser(data) {
 function registerUser(data) {
   const sheet = SS.getSheetByName("Members");
   const email = String(data.email).trim().toLowerCase();
-  const vals = sheet.getDataRange().getValues();
-  if (vals.some(r => String(r[3]).trim().toLowerCase() === email)) return { success: false, message: "此帳號已註冊過" };
-  
+  if (sheet.getDataRange().getValues().some(r => String(r[3]).trim().toLowerCase() === email)) return { success: false, message: "帳號已註冊過" };
   sheet.appendRow(["MEM-" + Date.now(), data.name.trim(), data.section, email, String(data.password).trim(), "Member", data.instrument, new Date(), "系統註冊"]);
   return { success: true };
 }
@@ -287,39 +286,24 @@ function registerUser(data) {
 function submitCheckin(data) {
   try {
     const config = SS.getSheetByName("SystemConfig").getRange(2, 1, 1, 11).getValues()[0];
-    const eventStart = formatTimeValue(config[3]);
-    const eventEnd = formatTimeValue(config[4]);
-    const restStart = formatTimeValue(config[9]);
-    const restEnd = formatTimeValue(config[10]);
-
+    const eventStart = formatTimeValue(config[3]), eventEnd = formatTimeValue(config[4]);
+    const restStart = formatTimeValue(config[9]), restEnd = formatTimeValue(config[10]);
     let totalMinutes = calculateDiffMinutes(eventStart, eventEnd);
-    if (restStart && restEnd) {
-      totalMinutes -= calculateDiffMinutes(restStart, restEnd);
-    }
-    
+    if (restStart && restEnd) totalMinutes -= calculateDiffMinutes(restStart, restEnd);
     const finalDuration = Math.max(0, totalMinutes);
     const durStr = Math.floor(finalDuration / 60) + "時" + (finalDuration % 60) + "分";
-    
-    SS.getSheetByName("Attendance").appendRow([
-      new Date(), data.name, data.section, String(data.email).toLowerCase(), 
-      data.eventName, data.date, "團練", `${eventStart}~${eventEnd}`, durStr
-    ]);
+    SS.getSheetByName("Attendance").appendRow([new Date(), data.name, data.section, String(data.email).toLowerCase(), data.eventName, data.date, "團練", `${eventStart}~${eventEnd}`, durStr]);
     return { success: true };
-  } catch (err) { 
-    return { success: false, message: "簽到存儲失敗: " + err.toString() }; 
-  }
+  } catch (err) { return { success: false, message: err.toString() }; }
 }
 
 function getAttendanceHistory(data) {
   try {
     const vals = SS.getSheetByName("Attendance").getDataRange().getValues();
-    const list = []; 
-    const email = String(data.email).toLowerCase();
-    
+    const list = []; const email = String(data.email).toLowerCase();
     for (let i = vals.length - 1; i >= 1; i--) {
       if (vals[i][3].toLowerCase() === email) {
-        let d = vals[i][5];
-        if (d instanceof Date) d = Utilities.formatDate(d, "GMT+8", "yyyy-MM-dd");
+        let d = vals[i][5]; if (d instanceof Date) d = Utilities.formatDate(d, "GMT+8", "yyyy-MM-dd");
         list.push({ date: d, status: vals[i][4], duration: String(vals[i][8]) });
       }
     }
@@ -327,28 +311,11 @@ function getAttendanceHistory(data) {
   } catch(e) { return { success: false }; }
 }
 
-function getMemberHistory(data) {
-  try {
-    const vals = SS.getSheetByName("Attendance").getDataRange().getValues();
-    const list = []; 
-    const targetEmail = String(data.targetEmail).toLowerCase();
-    for (let i = vals.length - 1; i >= 1; i--) {
-      if (vals[i][3].toLowerCase() === targetEmail) {
-        let d = vals[i][5];
-        if (d instanceof Date) d = Utilities.formatDate(d, "GMT+8", "yyyy-MM-dd");
-        list.push({ date: d, eventName: vals[i][4], duration: String(vals[i][8]) });
-      }
-    }
-    return { success: true, list: list };
-  } catch(e) { return { success: false }; }
-}
-
 function getAnnouncement() {
   try {
     const data = SS.getSheetByName("Announcements").getRange(2, 1, 1, 2).getValues()[0];
-    const content = data[0] || "目前暫無公告內容。";
     const time = data[1] instanceof Date ? Utilities.formatDate(data[1], "GMT+8", "yyyy-MM-dd HH:mm") : "";
-    return { success: true, content: content, updateTime: time };
+    return { success: true, content: data[0] || "目前暫無公告。", updateTime: time };
   } catch (e) { return { success: false }; }
 }
 
@@ -372,26 +339,15 @@ function saveMember(data) {
         return { success: true };
       }
     }
-    return { success: false, message: "找不到該成員資料" };
+    return { success: false, message: "找不到成員" };
   } catch (err) { return { success: false }; }
 }
 
 function getSystemStatus(userData) {
   try {
     const config = SS.getSheetByName("SystemConfig").getRange(2, 1, 1, 12).getValues()[0];
-    let ed = config[7]; 
-    if (ed instanceof Date) ed = Utilities.formatDate(ed, "GMT+8", "yyyy-MM-dd");
-    
-    const status = {
-      success: true,
-      enabled: config[0] === "on",
-      eventName: config[1],
-      eventDate: ed,
-      eventStart: formatTimeValue(config[3]),
-      eventEnd: formatTimeValue(config[4]),
-      hasCheckedIn: false
-    };
-
+    let ed = config[7]; if (ed instanceof Date) ed = Utilities.formatDate(ed, "GMT+8", "yyyy-MM-dd");
+    const status = { success: true, enabled: config[0] === "on", eventName: config[1], eventDate: ed, eventStart: formatTimeValue(config[3]), eventEnd: formatTimeValue(config[4]), hasCheckedIn: false };
     if (status.enabled && userData?.email) {
       const att = SS.getSheetByName("Attendance").getDataRange().getValues();
       const email = userData.email.toLowerCase();
@@ -404,54 +360,8 @@ function getSystemStatus(userData) {
   } catch(e) { return { success: false }; }
 }
 
-function submitSurveyResponse(data) {
-  try {
-    const activeSurId = SS.getSheetByName("SystemConfig").getRange(2, 12).getValue();
-    if (!activeSurId) return { success: false, message: "目前無開放中的調查活動" };
-
-    const sheet = SS.getSheetByName("SurveyResponses");
-    const userEmail = data.email.toLowerCase();
-    const vals = sheet.getDataRange().getValues();
-    
-    let rowIdx = -1;
-    for (let i = 1; i < vals.length; i++) {
-      if (vals[i][1].toLowerCase() === userEmail && String(vals[i][3]) === String(activeSurId)) {
-        rowIdx = i + 1; break;
-      }
-    }
-
-    const rowData = [new Date(), userEmail, "", activeSurId, data.responsesJSON];
-    if (rowIdx !== -1) {
-      sheet.getRange(rowIdx, 1, 1, 5).setValues([rowData]);
-    } else {
-      sheet.appendRow(rowData);
-    }
-    return { success: true };
-  } catch (e) { return { success: false, message: e.toString() }; }
-}
-
-function getSurveyStatus(data) {
-  try {
-    const activeId = SS.getSheetByName("SystemConfig").getRange(2, 12).getValue();
-    if (!activeId) return { success: true, active: false };
-
-    const template = SS.getSheetByName("SurveyTemplates").getDataRange().getValues().find(r => String(r[0]) === String(activeId));
-    if (!template) return { success: true, active: false };
-
-    const resps = SS.getSheetByName("SurveyResponses").getDataRange().getValues();
-    const email = data.email.toLowerCase();
-    const lastResp = resps.reverse().find(r => r[1].toLowerCase() === email && String(r[3]) === String(activeId));
-
-    return {
-      success: true, active: true, title: template[1], description: template[2],
-      questions: JSON.parse(template[3] || "[]"), responded: !!lastResp,
-      lastResponse: lastResp ? JSON.parse(lastResp[4] || "{}") : {}
-    };
-  } catch(e) { return { success: false }; }
-}
-
 // ==========================================
-// E. 輔助與初始化工具 (Helpers)
+// D. 輔助與初始化工具 (Helpers)
 // ==========================================
 
 function calculateDiffMinutes(start, end) {
@@ -460,7 +370,7 @@ function calculateDiffMinutes(start, end) {
     const [sH, sM] = String(start).split(':').map(Number);
     const [eH, eM] = String(end).split(':').map(Number);
     let diff = (eH * 60 + eM) - (sH * 60 + sM);
-    return diff < 0 ? diff + 1440 : diff; // 跨午夜處理
+    return diff < 0 ? diff + 1440 : diff;
   } catch(e) { return 0; }
 }
 
@@ -473,7 +383,6 @@ function formatTimeValue(v) {
 function checkAndInitSheets() {
   const sheets = ["Members", "Attendance", "Events", "SystemConfig", "Announcements", "SurveyTemplates", "SurveyResponses"];
   sheets.forEach(n => { if(!SS.getSheetByName(n)) SS.insertSheet(n); });
-  
   const sysS = SS.getSheetByName("SystemConfig");
   if (sysS.getLastRow() === 0) {
     sysS.appendRow(["狀態", "活動名", "類型", "開始", "結束", "_", "_", "日期", "ID", "休始", "休止", "SurveyID"]);
