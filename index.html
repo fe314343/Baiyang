@@ -184,56 +184,56 @@
             <div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center">
                 <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white" id="profile-initial">-</div>
                 <div class="w-full space-y-2 mb-6 text-center">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">個人姓名 (限本人修改)</label>
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">個人姓名 (限本人修改)</label>
                     <input type="text" id="profile-name-input" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 shadow-inner">
                 </div>
                 <div class="w-full space-y-4">
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-1">角色/權限</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">角色/權限</label>
                         <div id="profile-role" class="w-full px-4 py-3.5 bg-slate-50 rounded-2xl text-sm font-bold text-center text-indigo-600"> Member </div>
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-1">主要樂器</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">主要樂器</label>
                         <select id="profile-instrument-input" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none shadow-sm"></select>
                     </div>
-                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px]">
-                        <span class="text-[10px] font-black text-slate-500 uppercase">組別</span>
-                        <span class="text-sm font-bold text-slate-700" id="profile-section-display">-</span>
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center">
+                        <span class="text-[10px] font-black text-slate-500 uppercase text-center">組別</span>
+                        <span class="text-sm font-bold text-slate-700 text-center" id="profile-section-display">-</span>
                     </div>
-                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px]">
-                        <span class="text-[10px] font-black text-slate-500 uppercase">帳號</span>
-                        <span class="text-sm font-bold text-slate-700" id="profile-email">-</span>
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center">
+                        <span class="text-[10px] font-black text-slate-500 uppercase text-center">帳號</span>
+                        <span class="text-sm font-bold text-slate-700 text-center" id="profile-email">-</span>
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-1">變更密碼</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">變更密碼</label>
                         <input type="password" id="profile-new-password" class="w-full px-4 py-3.5 rounded-2xl bg-slate-100 outline-none border-none text-xs font-bold text-center" placeholder="不變請留空">
                     </div>
                     <button id="update-password-btn" onclick="handleUpdatePassword()" class="w-full py-3.5 btn-premium text-white font-black rounded-2xl text-xs shadow-lg">更新資料</button>
                 </div>
-                <button onclick="closeProfileModal()" class="mt-8 text-slate-400 text-[10px] font-black uppercase">返回</button>
+                <button onclick="closeProfileModal()" class="mt-8 text-slate-400 text-[10px] font-black uppercase text-center">返回</button>
             </div>
         </div>
 
         <!-- 活動編輯 Modal -->
         <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 shadow-2xl">
-            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onclick="closeEditModal()"></div>
+            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md text-center" onclick="closeEditModal()"></div>
             <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center">
                 <h3 id="modal-title" class="text-xl font-[900] text-slate-800 mb-6 tracking-tight text-center">活動詳細設定</h3>
                 <div class="space-y-4">
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1">活動名稱</label><input type="text" id="edit-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner" placeholder="如：團練、演出"></div>
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1">日期</label><input type="date" id="edit-date" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center shadow-inner"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">活動名稱</label><input type="text" id="edit-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner" placeholder="如：團練、演出"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">日期</label><input type="date" id="edit-date" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center shadow-inner"></div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1">開始時間</label><input type="time" id="edit-start" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
-                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1">結束時間</label><input type="time" id="edit-end" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
+                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">開始時間</label><input type="time" id="edit-start" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
+                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">結束時間</label><input type="time" id="edit-end" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
                     </div>
                     <div class="pt-4 border-t border-slate-100 text-center">
                         <p class="text-[10px] font-black text-amber-500 uppercase mb-2 text-center text-center">休息/扣除時段 (不計入時數)</p>
-                        <div class="grid grid-cols-2 gap-4"><input type="time" id="edit-rest-start" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700"><input type="time" id="edit-rest-end" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700"></div>
+                        <div class="grid grid-cols-2 gap-4"><input type="time" id="edit-rest-start" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center"><input type="time" id="edit-rest-end" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center"></div>
                     </div>
                 </div>
-                <div class="flex gap-4 mt-8">
-                    <button onclick="closeEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm">取消</button>
-                    <button id="save-event-btn" onclick="saveEvent()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">儲存活動</button>
+                <div class="flex gap-4 mt-8 text-center">
+                    <button onclick="closeEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center">取消</button>
+                    <button id="save-event-btn" onclick="saveEvent()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center">儲存活動</button>
                 </div>
             </div>
         </div>
@@ -241,32 +241,32 @@
         <!-- 問卷編輯 Modal -->
         <div id="survey-admin-modal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-6 shadow-2xl">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeSurveyAdminModal()"></div>
-            <div class="bg-white w-full max-w-lg rounded-[36px] shadow-2xl p-8 relative fade-up max-h-[90vh] flex flex-col">
+            <div class="bg-white w-full max-w-lg rounded-[36px] shadow-2xl p-8 relative fade-up max-h-[90vh] flex flex-col text-center">
                 <h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2"><i data-lucide="settings-2" class="w-5 h-5 text-indigo-500"></i>問卷管理</h3>
                 <div class="flex bg-slate-100 p-1.5 rounded-2xl mb-6">
                     <button onclick="switchSurveyAdminTab('config')" id="sur-tab-config" class="flex-1 py-3 text-[10px] font-black rounded-xl bg-white text-indigo-600 shadow-sm transition-all">設計</button>
                     <button onclick="switchSurveyAdminTab('result')" id="sur-tab-result" class="flex-1 py-3 text-[10px] font-black rounded-xl text-slate-500 transition-all">統計</button>
                 </div>
-                <div id="sur-admin-config" class="space-y-4 flex-1 overflow-y-auto text-left">
-                    <div class="space-y-2"><label class="text-[10px] font-black text-slate-400 uppercase px-1">問卷標題</label><input type="text" id="sur-admin-title" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm shadow-inner"></div>
-                    <div class="space-y-2"><label class="text-[10px] font-black text-slate-400 uppercase px-1">詳細說明</label><textarea id="sur-admin-desc" class="w-full h-20 p-5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm resize-none shadow-inner"></textarea></div>
+                <div id="sur-admin-config" class="space-y-4 flex-1 overflow-y-auto text-left text-center">
+                    <div class="space-y-2 text-center"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">問卷標題</label><input type="text" id="sur-admin-title" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm text-center shadow-inner"></div>
+                    <div class="space-y-2 text-center"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">詳細說明</label><textarea id="sur-admin-desc" class="w-full h-20 p-5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm resize-none shadow-inner"></textarea></div>
                     
                     <!-- 嵌入式問卷設定 -->
                     <div class="pt-4 border-t border-slate-100">
-                        <label class="text-[10px] font-black text-indigo-500 uppercase px-1">外部嵌入模式 (如 Google 表單)</label>
-                        <input type="text" id="sur-admin-embed-url" placeholder="請貼入表單網址..." class="w-full mt-2 px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-medium text-xs shadow-inner">
-                        <p class="text-[9px] text-slate-400 mt-2 px-1 leading-relaxed">提示：填入連結後，團員將直接在此畫面填寫外部表單，下方的題目設定將被忽略。</p>
+                        <label class="text-[10px] font-black text-indigo-500 uppercase px-1 text-center">外部嵌入模式 (如 Google 表單)</label>
+                        <input type="text" id="sur-admin-embed-url" placeholder="請貼入表單網址..." class="w-full mt-2 px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-medium text-xs text-center shadow-inner">
+                        <p class="text-[9px] text-slate-400 mt-2 px-1 leading-relaxed text-center">提示：填入連結後，團員將直接在此畫面填寫外部表單，下方的題目設定將被忽略。</p>
                     </div>
 
-                    <div class="pt-4 border-t border-slate-100">
-                        <div class="flex justify-between items-center mb-3"><label class="text-[10px] font-black text-indigo-500 uppercase">內建題目清單</label><button onclick="addSurveyQuestion()" class="text-[9px] bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full font-black flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i>新增題目</button></div>
-                        <div id="sur-admin-questions-list" class="space-y-3"></div>
+                    <div class="pt-4 border-t border-slate-100 text-center">
+                        <div class="flex justify-between items-center mb-3 text-center"><label class="text-[10px] font-black text-indigo-500 uppercase text-center">內建題目清單</label><button onclick="addSurveyQuestion()" class="text-[9px] bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full font-black flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i>新增題目</button></div>
+                        <div id="sur-admin-questions-list" class="space-y-3 text-center"></div>
                     </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mt-4"><span class="text-sm font-black text-slate-700">對全員開放</span><input type="checkbox" id="sur-admin-status" class="w-6 h-6 accent-indigo-600"></div>
-                    <button onclick="handleUpdateSurveyConfig()" id="btn-save-sur-config" class="w-full py-4 btn-premium text-white rounded-2xl font-black text-sm mt-4 shadow-lg">儲存問卷設定</button>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mt-4 text-center"><span class="text-sm font-black text-slate-700 text-center">對全員開放</span><input type="checkbox" id="sur-admin-status" class="w-6 h-6 accent-indigo-600"></div>
+                    <button onclick="handleUpdateSurveyConfig()" id="btn-save-sur-config" class="w-full py-4 btn-premium text-white rounded-2xl font-black text-sm mt-4 shadow-lg text-center">儲存問卷設定</button>
                 </div>
-                <div id="sur-admin-result" class="hidden flex-1 overflow-y-auto space-y-5 py-2"></div>
-                <button onclick="closeSurveyAdminModal()" class="mt-6 text-slate-400 text-[10px] font-black uppercase text-center">返回列表</button>
+                <div id="sur-admin-result" class="hidden flex-1 overflow-y-auto space-y-5 py-2 text-center"></div>
+                <button onclick="closeSurveyAdminModal()" class="mt-6 text-slate-400 text-[10px] font-black uppercase text-center text-center">返回列表</button>
             </div>
         </div>
 
@@ -441,7 +441,7 @@
             const isLeader = currentUser.Role === 'Leader';
             const isAdmin = ['Admin', 'Officer'].includes(currentUser.Role);
             const isActuallyAdmin = currentUser.Role === 'Admin'; 
-            const isActuallyOfficer = currentUser.Role === 'Officer'; // 新增 Officer 判斷
+            const isActuallyOfficer = currentUser.Role === 'Officer'; 
             
             const btnMonitor = document.getElementById('btn-monitor');
             const btnBroadcast = document.getElementById('btn-broadcast');
@@ -450,14 +450,10 @@
             if (btnBroadcast) btnBroadcast.classList.toggle('hidden', !isAdmin);
             if (btnSurveys) btnSurveys.classList.toggle('hidden', !isAdmin);
             
-            // 廣播頁面編輯按鈕限制
             const broadcastAddBtn = document.getElementById('broadcast-add-btn');
             const broadcastAnnounceBtn = document.getElementById('broadcast-announce-btn');
             
-            // 只有 Admin 可以新增活動
             if(broadcastAddBtn) broadcastAddBtn.classList.toggle('hidden', !isActuallyAdmin);
-            
-            // Admin 和 Officer 都可以發布公告
             if(broadcastAnnounceBtn) broadcastAnnounceBtn.classList.toggle('hidden', !(isActuallyAdmin || isActuallyOfficer));
 
             const monitorTitle = document.getElementById('monitor-title');
@@ -818,7 +814,7 @@
         async function handleSaveSurvey() {
             const responses = {}; document.querySelectorAll('.survey-input').forEach(el => responses[el.dataset.label] = el.value);
             const btn = document.getElementById('save-survey-btn'); setBtnLoading(btn, true, "提交中...");
-            const res = await callBackend('submitSurveyResponse', { email: currentUser.Email, responsesJSON: JSON.stringify(responses) });
+            const res = await callBackend('submitSurveyResponse', { email: currentUser.Email, name: currentUser.Name, responsesJSON: JSON.stringify(responses) });
             setBtnLoading(btn, false, "提交回覆");
             if(res?.success) { showToast("回覆已提交"); closeSurveyModal(); fetchSurveyStatus(); }
         }
