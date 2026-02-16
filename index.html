@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>崇正國樂團智能系統</title>
+    <title>崇正國樂團簽到系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/umd/lucide.min.js"></script>
     <style>
@@ -45,7 +45,7 @@
         </div>
     </nav>
 
-    <main id="app" class="w-full max-w-md px-6 pt-6 sm:pt-10 transition-all duration-500 text-center text-center">
+    <main id="app" class="w-full max-w-md px-6 pt-6 sm:pt-10 transition-all duration-500 text-center">
         <!-- 登入視圖 -->
         <section id="login-view" class="space-y-5 fade-up text-center">
             <div class="app-icon-card mx-auto">
@@ -72,17 +72,17 @@
                     <select id="reg-section" onchange="updateInstrumentOptions()" class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center"><option value="">選擇組別</option><option value="吹管組">吹管組</option><option value="拉弦組">拉弦組</option><option value="彈撥組">彈撥組</option><option value="揚打組">揚打組</option><option value="低音組">低音組</option></select>
                     <select id="reg-instrument" class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center"><option value="">選擇樂器</option></select>
                 </div>
-                <input type="email" id="reg-email" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="常用帳號 (Email)"><input type="password" id="reg-password" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="設定登入密碼"><button id="reg-submit-btn" onclick="handleRegister()" class="w-full btn-premium text-white font-black py-4 rounded-[20px] mt-4 tracking-wide shadow-lg active:scale-95 transition-all">確認註冊</button><button onclick="switchAuthMode('login')" class="w-full text-slate-400 text-sm font-black mt-2">返回登入</button>
+                <input type="email" id="reg-email" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="常用帳號"><input type="password" id="reg-password" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="設定登入密碼"><button id="reg-submit-btn" onclick="handleRegister()" class="w-full btn-premium text-white font-black py-4 rounded-[20px] mt-4 tracking-wide shadow-lg active:scale-95 transition-all">確認註冊</button><button onclick="switchAuthMode('login')" class="w-full text-slate-400 text-sm font-black mt-2">返回登入</button>
             </div>
         </section>
 
         <!-- 儀表板主要內容區 -->
-        <section id="dashboard-view" class="hidden space-y-6 fade-up pb-24 w-full flex flex-col items-center text-center">
+        <section id="dashboard-view" class="hidden space-y-6 fade-up pb-24 w-full flex flex-col items-center">
             <!-- 全局提示區 -->
             <div id="global-alerts" class="w-full space-y-3">
                 <div id="announcement-board" class="hidden w-full glass-panel p-5 rounded-[28px] border-amber-200 bg-amber-50 shadow-md flex items-start gap-4 transition-all hover:shadow-lg text-left">
                     <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0"><i data-lucide="megaphone" class="w-6 h-6"></i></div>
-                    <div class="flex-1 overflow-hidden text-center">
+                    <div class="flex-1 overflow-hidden">
                         <p class="text-[10px] font-[900] text-amber-600/70 uppercase tracking-[0.2em] mb-1">Official Announcement</p>
                         <div id="announcement-content" class="text-sm font-bold text-slate-700 leading-relaxed whitespace-pre-wrap">正在讀取最新公告...</div>
                         <p id="announcement-time" class="text-[9px] text-slate-400 mt-2 font-bold"></p>
@@ -100,11 +100,11 @@
             </div>
 
             <!-- 分頁1: 首頁 -->
-            <div id="home-section" class="w-full space-y-6 animate-in text-center">
+            <div id="home-section" class="w-full space-y-6 animate-in">
                 <div class="flex justify-between items-center px-1">
                     <div class="text-left">
                         <h2 class="text-2xl font-[900] text-slate-800 leading-none" id="user-display">你好</h2>
-                        <p class="text-slate-400 text-xs font-bold mt-2">歡迎回到智能管理系統</p>
+                        <p class="text-slate-400 text-xs font-bold mt-2">歡迎回到簽到管理系統</p>
                     </div>
                     <button onclick="openProfileModal()" class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg font-black transition-all active:scale-90" id="user-avatar-initial">-</button>
                 </div>
@@ -120,47 +120,47 @@
             </div>
 
             <!-- 分頁2: 我的紀錄 -->
-            <div id="history-section" class="hidden w-full space-y-6 animate-in text-center">
+            <div id="history-section" class="hidden w-full space-y-6 animate-in">
                 <div class="glass-panel p-7 rounded-[36px] border-white/80 w-full shadow-xl">
                     <div class="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[32px] text-white shadow-2xl flex flex-col items-center">
                         <p class="text-[9px] opacity-50 font-black tracking-[0.3em] mb-2 uppercase text-indigo-200/50">Total Practice Record</p>
                         <div class="flex items-baseline gap-2 justify-center"><h3 id="total-duration-display" class="text-5xl font-[900] tracking-tighter leading-none">0</h3><div class="flex flex-col items-start leading-none"><span class="text-xs font-bold opacity-60 uppercase tracking-widest">Hours</span><span id="total-minutes-label" class="text-[10px] font-black text-indigo-300 mt-1 opacity-80"></span></div></div>
                     </div>
                     <div class="mt-10 flex flex-col items-center">
-                        <div class="mb-6 space-y-1 text-center"><p id="current-event-display" class="text-sm font-bold text-slate-500 tracking-tight">活動同步中...</p><p id="checkin-time-display" class="text-indigo-500 text-[11px] font-black uppercase tracking-widest opacity-0 transition-opacity">--:--</p></div>
+                        <div class="mb-6 space-y-1"><p id="current-event-display" class="text-sm font-bold text-slate-500 tracking-tight">活動同步中...</p><p id="checkin-time-display" class="text-indigo-500 text-[11px] font-black uppercase tracking-widest opacity-0 transition-opacity">--:--</p></div>
                         <div class="relative"><button id="checkin-btn" onclick="submitCheckin()" disabled class="relative z-10 w-36 h-36 bg-slate-200 rounded-full text-white font-black shadow-xl border-[10px] border-white overflow-hidden hover:scale-105 active:scale-95"><i data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span class="text-lg tracking-tight">簽到</span></button><div id="btn-pulse" class="absolute inset-0 rounded-full"></div></div>
                     </div>
                 </div>
-                <div id="attendance-list" class="space-y-3 w-full text-center"></div>
+                <div id="attendance-list" class="space-y-3 w-full"></div>
             </div>
 
             <!-- 分頁3: 組員名單 -->
-            <div id="monitor-section" class="hidden animate-in w-full text-center text-center">
+            <div id="monitor-section" class="hidden animate-in w-full">
                 <div class="glass-panel p-6 rounded-[32px] w-full shadow-lg">
                     <div class="flex justify-between items-center mb-6 px-1"><h4 class="font-[900] text-slate-800 text-lg tracking-tight" id="monitor-title">全員簽到狀態</h4><button onclick="loadRealtimeStatus()" class="w-10 h-10 bg-white shadow-sm border border-slate-100 text-indigo-600 rounded-xl flex items-center justify-center hover:rotate-180 transition-all duration-500"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button></div>
                     <div class="flex gap-3 mb-6"><select id="monitor-filter-section" onchange="applyMonitorFilters()" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 shadow-sm"><option value="all">全體成員</option><option value="吹管組">吹管組</option><option value="拉弦組">拉弦組</option><option value="彈撥組">彈撥組</option><option value="揚打組">揚打組</option><option value="低音組">低音組</option></select><select id="monitor-sort-order" onchange="applyMonitorFilters()" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 shadow-sm"><option value="default">預設排序</option><option value="checkin">簽到優先</option><option value="absence">缺席優先</option></select></div>
-                    <div class="grid grid-cols-2 gap-4 mb-6 text-center"><div class="bg-emerald-500/5 p-4 rounded-[22px] border border-emerald-100/50 flex flex-col items-center shadow-sm text-center"><p class="text-[9px] text-emerald-600 font-black mb-1">Present</p><p class="text-3xl font-[900] text-emerald-700" id="stat-present">0</p></div><div class="bg-rose-500/5 p-4 rounded-[22px] border border-rose-100/50 flex flex-col items-center shadow-sm text-center"><p class="text-[9px] text-rose-600 font-black mb-1">Absent</p><p class="text-3xl font-[900] text-rose-700" id="stat-absent">0</p></div></div>
-                    <div id="realtime-status-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scroll text-center"></div>
+                    <div class="grid grid-cols-2 gap-4 mb-6 text-center"><div class="bg-emerald-500/5 p-4 rounded-[22px] border border-emerald-100/50 flex flex-col items-center shadow-sm"><p class="text-[9px] text-emerald-600 font-black mb-1">Present</p><p class="text-3xl font-[900] text-emerald-700" id="stat-present">0</p></div><div class="bg-rose-500/5 p-4 rounded-[22px] border border-rose-100/50 flex flex-col items-center shadow-sm"><p class="text-[9px] text-rose-600 font-black mb-1">Absent</p><p class="text-3xl font-[900] text-rose-700" id="stat-absent">0</p></div></div>
+                    <div id="realtime-status-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scroll"></div>
                 </div>
             </div>
 
             <!-- 分頁4: 活動廣播 -->
-            <div id="broadcast-section" class="hidden animate-in w-full space-y-6 text-center">
+            <div id="broadcast-section" class="hidden animate-in w-full space-y-6">
                 <div class="flex items-center justify-between px-2">
                     <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600"><i data-lucide="radio" class="w-4 h-4"></i></div><h4 class="font-[900] text-slate-800 text-base tracking-tight">廣播中心</h4></div>
-                    <button onclick="openEditModal(null)" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2 active:scale-95"><i data-lucide="plus" class="w-3.5 h-3.5"></i>新增活動</button>
+                    <button id="broadcast-add-btn" onclick="openEditModal(null)" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2 active:scale-95"><i data-lucide="plus" class="w-3.5 h-3.5"></i>新增活動</button>
                 </div>
-                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40"><div id="admin-event-list" class="space-y-4 text-center"></div></div>
-                <button onclick="openAnnouncementModal()" class="bg-amber-100 text-amber-700 px-6 py-4 rounded-[22px] text-xs font-black flex items-center justify-center gap-3 border border-amber-200 active:scale-95 w-full shadow-md"><i data-lucide="megaphone" class="w-5 h-5"></i>發布全員公告</button>
+                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40"><div id="admin-event-list" class="space-y-4"></div></div>
+                <button id="broadcast-announce-btn" onclick="openAnnouncementModal()" class="bg-amber-100 text-amber-700 px-6 py-4 rounded-[22px] text-xs font-black flex items-center justify-center gap-3 border border-amber-200 active:scale-95 w-full shadow-md"><i data-lucide="megaphone" class="w-5 h-5"></i>發布全員公告</button>
             </div>
 
             <!-- 分頁5: 問卷管理 -->
-            <div id="surveys-section" class="hidden animate-in w-full space-y-6 text-center">
+            <div id="surveys-section" class="hidden animate-in w-full space-y-6">
                 <div class="flex items-center justify-between px-2">
                     <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600"><i data-lucide="files" class="w-4 h-4"></i></div><h4 class="font-[900] text-slate-800 text-base tracking-tight">問卷庫</h4></div>
                     <button onclick="openSurveyAdminModal(null)" class="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black border border-emerald-100 active:scale-95 flex items-center gap-2"><i data-lucide="plus" class="w-3.5 h-3.5"></i>建立</button>
                 </div>
-                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40"><div id="admin-survey-list" class="space-y-4 text-center"></div></div>
+                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40"><div id="admin-survey-list" class="space-y-4"></div></div>
             </div>
         </section>
     </main>
@@ -183,57 +183,57 @@
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeProfileModal()"></div>
             <div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center">
                 <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white" id="profile-initial">-</div>
-                <div class="w-full space-y-2 mb-6 text-center text-center">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">個人姓名 (限本人修改)</label>
+                <div class="w-full space-y-2 mb-6 text-center">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">個人姓名 (限本人修改)</label>
                     <input type="text" id="profile-name-input" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 shadow-inner">
                 </div>
                 <div class="w-full space-y-4">
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">角色/權限</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-1">角色/權限</label>
                         <div id="profile-role" class="w-full px-4 py-3.5 bg-slate-50 rounded-2xl text-sm font-bold text-center text-indigo-600"> Member </div>
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">主要樂器</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-1">主要樂器</label>
                         <select id="profile-instrument-input" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none shadow-sm"></select>
                     </div>
-                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase text-center">組別</span>
-                        <span class="text-sm font-bold text-slate-700 text-center" id="profile-section-display">-</span>
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px]">
+                        <span class="text-[10px] font-black text-slate-500 uppercase">組別</span>
+                        <span class="text-sm font-bold text-slate-700" id="profile-section-display">-</span>
                     </div>
-                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase text-center">帳號</span>
-                        <span class="text-sm font-bold text-slate-700 text-center" id="profile-email">-</span>
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px]">
+                        <span class="text-[10px] font-black text-slate-500 uppercase">帳號</span>
+                        <span class="text-sm font-bold text-slate-700" id="profile-email">-</span>
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">變更密碼</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-1">變更密碼</label>
                         <input type="password" id="profile-new-password" class="w-full px-4 py-3.5 rounded-2xl bg-slate-100 outline-none border-none text-xs font-bold text-center" placeholder="不變請留空">
                     </div>
                     <button id="update-password-btn" onclick="handleUpdatePassword()" class="w-full py-3.5 btn-premium text-white font-black rounded-2xl text-xs shadow-lg">更新資料</button>
                 </div>
-                <button onclick="closeProfileModal()" class="mt-8 text-slate-400 text-[10px] font-black uppercase text-center">返回</button>
+                <button onclick="closeProfileModal()" class="mt-8 text-slate-400 text-[10px] font-black uppercase">返回</button>
             </div>
         </div>
 
         <!-- 活動編輯 Modal -->
         <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 shadow-2xl">
-            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md text-center" onclick="closeEditModal()"></div>
+            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onclick="closeEditModal()"></div>
             <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center">
                 <h3 id="modal-title" class="text-xl font-[900] text-slate-800 mb-6 tracking-tight text-center">活動詳細設定</h3>
                 <div class="space-y-4">
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">活動名稱</label><input type="text" id="edit-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner" placeholder="團練、演出"></div>
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">日期</label><input type="date" id="edit-date" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center shadow-inner"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1">活動名稱</label><input type="text" id="edit-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner" placeholder="如：團練、演出"></div>
+                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1">日期</label><input type="date" id="edit-date" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center shadow-inner"></div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">開始時間</label><input type="time" id="edit-start" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
-                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">結束時間</label><input type="time" id="edit-end" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
+                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1">開始時間</label><input type="time" id="edit-start" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
+                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1">結束時間</label><input type="time" id="edit-end" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
                     </div>
                     <div class="pt-4 border-t border-slate-100 text-center">
                         <p class="text-[10px] font-black text-amber-500 uppercase mb-2 text-center text-center">休息/扣除時段 (不計入時數)</p>
-                        <div class="grid grid-cols-2 gap-4"><input type="time" id="edit-rest-start" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center"><input type="time" id="edit-rest-end" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center"></div>
+                        <div class="grid grid-cols-2 gap-4"><input type="time" id="edit-rest-start" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700"><input type="time" id="edit-rest-end" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700"></div>
                     </div>
                 </div>
-                <div class="flex gap-4 mt-8 text-center">
-                    <button onclick="closeEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center">取消</button>
-                    <button id="save-event-btn" onclick="saveEvent()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center">儲存活動</button>
+                <div class="flex gap-4 mt-8">
+                    <button onclick="closeEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm">取消</button>
+                    <button id="save-event-btn" onclick="saveEvent()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">儲存活動</button>
                 </div>
             </div>
         </div>
@@ -241,29 +241,37 @@
         <!-- 問卷編輯 Modal -->
         <div id="survey-admin-modal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-6 shadow-2xl">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeSurveyAdminModal()"></div>
-            <div class="bg-white w-full max-w-lg rounded-[36px] shadow-2xl p-8 relative fade-up max-h-[90vh] flex flex-col text-center">
+            <div class="bg-white w-full max-w-lg rounded-[36px] shadow-2xl p-8 relative fade-up max-h-[90vh] flex flex-col">
                 <h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2"><i data-lucide="settings-2" class="w-5 h-5 text-indigo-500"></i>問卷管理</h3>
                 <div class="flex bg-slate-100 p-1.5 rounded-2xl mb-6">
                     <button onclick="switchSurveyAdminTab('config')" id="sur-tab-config" class="flex-1 py-3 text-[10px] font-black rounded-xl bg-white text-indigo-600 shadow-sm transition-all">設計</button>
                     <button onclick="switchSurveyAdminTab('result')" id="sur-tab-result" class="flex-1 py-3 text-[10px] font-black rounded-xl text-slate-500 transition-all">統計</button>
                 </div>
-                <div id="sur-admin-config" class="space-y-4 flex-1 overflow-y-auto text-left text-center">
-                    <div class="space-y-2 text-center"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">問卷標題</label><input type="text" id="sur-admin-title" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm text-center shadow-inner"></div>
-                    <div class="space-y-2 text-center"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">詳細說明</label><textarea id="sur-admin-desc" class="w-full h-20 p-5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm resize-none shadow-inner"></textarea></div>
-                    <div class="pt-4 border-t border-slate-100 text-center">
-                        <div class="flex justify-between items-center mb-3 text-center"><label class="text-[10px] font-black text-indigo-500 uppercase text-center">題目清單</label><button onclick="addSurveyQuestion()" class="text-[9px] bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full font-black flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i>新增題目</button></div>
-                        <div id="sur-admin-questions-list" class="space-y-3 text-center"></div>
+                <div id="sur-admin-config" class="space-y-4 flex-1 overflow-y-auto text-left">
+                    <div class="space-y-2"><label class="text-[10px] font-black text-slate-400 uppercase px-1">問卷標題</label><input type="text" id="sur-admin-title" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm shadow-inner"></div>
+                    <div class="space-y-2"><label class="text-[10px] font-black text-slate-400 uppercase px-1">詳細說明</label><textarea id="sur-admin-desc" class="w-full h-20 p-5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm resize-none shadow-inner"></textarea></div>
+                    
+                    <!-- 嵌入式問卷設定 -->
+                    <div class="pt-4 border-t border-slate-100">
+                        <label class="text-[10px] font-black text-indigo-500 uppercase px-1">外部嵌入模式 (如 Google 表單)</label>
+                        <input type="text" id="sur-admin-embed-url" placeholder="請貼入表單網址..." class="w-full mt-2 px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-medium text-xs shadow-inner">
+                        <p class="text-[9px] text-slate-400 mt-2 px-1 leading-relaxed">提示：填入連結後，團員將直接在此畫面填寫外部表單，下方的題目設定將被忽略。</p>
                     </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mt-4 text-center"><span class="text-sm font-black text-slate-700 text-center">對全員開放</span><input type="checkbox" id="sur-admin-status" class="w-6 h-6 accent-indigo-600"></div>
-                    <button onclick="handleUpdateSurveyConfig()" id="btn-save-sur-config" class="w-full py-4 btn-premium text-white rounded-2xl font-black text-sm mt-4 shadow-lg text-center">儲存問卷模板</button>
+
+                    <div class="pt-4 border-t border-slate-100">
+                        <div class="flex justify-between items-center mb-3"><label class="text-[10px] font-black text-indigo-500 uppercase">內建題目清單</label><button onclick="addSurveyQuestion()" class="text-[9px] bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full font-black flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i>新增題目</button></div>
+                        <div id="sur-admin-questions-list" class="space-y-3"></div>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mt-4"><span class="text-sm font-black text-slate-700">對全員開放</span><input type="checkbox" id="sur-admin-status" class="w-6 h-6 accent-indigo-600"></div>
+                    <button onclick="handleUpdateSurveyConfig()" id="btn-save-sur-config" class="w-full py-4 btn-premium text-white rounded-2xl font-black text-sm mt-4 shadow-lg">儲存問卷設定</button>
                 </div>
-                <div id="sur-admin-result" class="hidden flex-1 overflow-y-auto space-y-5 py-2 text-center"></div>
-                <button onclick="closeSurveyAdminModal()" class="mt-6 text-slate-400 text-[10px] font-black uppercase text-center text-center">返回列表</button>
+                <div id="sur-admin-result" class="hidden flex-1 overflow-y-auto space-y-5 py-2"></div>
+                <button onclick="closeSurveyAdminModal()" class="mt-6 text-slate-400 text-[10px] font-black uppercase text-center">返回列表</button>
             </div>
         </div>
 
         <!-- 公告編輯 Modal -->
-        <div id="announcement-modal" class="hidden fixed inset-0 z-[140] flex items-center justify-center p-6">
+        <div id="announcement-modal" class="hidden fixed inset-0 z-[140] flex items-center justify-center p-6 shadow-2xl">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAnnouncementModal()"></div>
             <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up">
                 <h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2"><i data-lucide="megaphone" class="w-6 h-6 text-amber-500"></i>發布全員公告</h3>
@@ -278,11 +286,25 @@
         <!-- 問卷填寫 Modal -->
         <div id="survey-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-6 shadow-2xl">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeSurveyModal()"></div>
-            <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up max-h-[85vh] overflow-y-auto hide-scroll">
-                <h3 id="survey-modal-title" class="text-xl font-[900] text-slate-800 mb-2 tracking-tight text-center">調查</h3>
-                <p id="survey-modal-desc" class="text-xs text-slate-400 mb-8 text-center"></p>
-                <div id="survey-dynamic-fields" class="space-y-6"></div>
-                <div class="flex gap-4 mt-8"><button onclick="closeSurveyModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm">取消</button><button id="save-survey-btn" onclick="handleSaveSurvey()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">提交</button></div>
+            <div id="survey-modal-content" class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-0 relative fade-up flex flex-col transition-all duration-500 overflow-hidden">
+                <div class="p-8 pb-4">
+                    <h3 id="survey-modal-title" class="text-xl font-[900] text-slate-800 mb-2 tracking-tight text-center">調查</h3>
+                    <p id="survey-modal-desc" class="text-xs text-slate-400 text-center"></p>
+                </div>
+                
+                <!-- 內容區域 -->
+                <div id="survey-content-container" class="flex-1 overflow-y-auto px-8 pb-4">
+                    <div id="survey-dynamic-fields" class="space-y-6"></div>
+                    <!-- Iframe 容器 -->
+                    <div id="survey-iframe-container" class="hidden w-full h-[75vh] rounded-2xl overflow-hidden border border-slate-100 shadow-inner mt-4">
+                        <iframe id="survey-external-frame" src="" class="w-full h-full border-none"></iframe>
+                    </div>
+                </div>
+
+                <div class="p-8 pt-4 flex gap-4 bg-slate-50/50 border-t border-slate-100">
+                    <button onclick="closeSurveyModal()" class="flex-1 py-4 bg-white text-slate-500 rounded-[20px] font-black text-sm border border-slate-200">取消</button>
+                    <button id="save-survey-btn" onclick="handleSaveSurvey()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">提交回覆</button>
+                </div>
             </div>
         </div>
 
@@ -292,12 +314,12 @@
 
     <script>
         // --- 核心工具 ---
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyCfKaDVSX7VoccCPMTI8Z9UFCc50C-MxznnrbLaUWa-eoCM5UXkVbLr24R4emqB40V/exec";   
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwGqcIAdtuqQqF0lu1HeODaShs_vmfmHXAi6N_VlPK5GMKvhuRkTi3Eo_Lz0CN2_vfq/exec";   
         const MAX_DISTANCE = 500, ALLOWED_LOCATIONS = [{ name: "崇正寶宮", lat: 24.133658, lng: 120.717338 }];
         const orchestraData = { "吹管組": ["笛", "嗩", "笙", "(上)低音號"], "拉弦組": ["高胡", "二胡", "中胡"], "彈撥組": ["柳琴", "琵琶", "中阮", "大阮", "古箏"], "揚打組": ["揚琴", "打擊"], "低音組": ["大提琴", "低音提琴"] };
         
         let currentUser = null, currentEventData = null, allEvents = [], allSurveys = [], editingSurveyId = null, editingId = null, cachedMemberList = [];
-        let surveyQuestions = [], userResponses = {}, adminQuestions = [];
+        let surveyQuestions = [], userResponses = {}, adminQuestions = [], currentEmbedURL = "";
 
         function formatDateTime(isoStr, onlyDate = false) {
             if (!isoStr) return "";
@@ -312,12 +334,9 @@
             return `${y}-${m}-${d} ${hh}:${mm}`;
         }
 
-        // 格式化顯示時長字串 (強化版：處理各種 1899 Date 格式)
         function formatDurationDisplay(dur) { 
             if (!dur) return "0時0分"; 
             let s = String(dur);
-            
-            // 偵測是否為 1899 相關的日期物件字串
             if (s.includes('1899') || s.includes('Dec 30 1899') || s.includes('Dec 29 1899') || (s.includes('T') && s.includes('Z') && s.includes('1899'))) {
                 const date = new Date(s);
                 if (!isNaN(date.getTime())) {
@@ -326,7 +345,6 @@
                     return `${h}時${m}分`;
                 }
             }
-
             if (s.includes('時')) return s;
             if (/^\d{1,2}:\d{1,2}/.test(s)) { 
                 const p = s.split(':'); 
@@ -409,7 +427,6 @@
             const userDisplay = document.getElementById('user-display');
             const navInfo = document.getElementById('nav-user-info');
             const avatarBtn = document.getElementById('user-avatar-initial');
-            
             if (userDisplay) userDisplay.innerText = `你好，${uName}`;
             if (navInfo) navInfo.innerText = uName;
             if (avatarBtn) avatarBtn.innerText = (uName || "?").charAt(0);
@@ -417,41 +434,45 @@
             const sectionEl = document.getElementById('home-section-display');
             const instEl = document.getElementById('home-instrument-display');
             const roleEl = document.getElementById('home-role-display');
-            
             if (sectionEl) sectionEl.innerText = currentUser.Section || "-";
             if (instEl) instEl.innerText = currentUser.Instrument || "-";
             if (roleEl) roleEl.innerText = currentUser.Role || "Member";
             
             const isLeader = currentUser.Role === 'Leader';
             const isAdmin = ['Admin', 'Officer'].includes(currentUser.Role);
+            const isActuallyAdmin = currentUser.Role === 'Admin'; 
+            const isActuallyOfficer = currentUser.Role === 'Officer'; // 新增 Officer 判斷
             
             const btnMonitor = document.getElementById('btn-monitor');
             const btnBroadcast = document.getElementById('btn-broadcast');
             const btnSurveys = document.getElementById('btn-surveys');
-            
             if (btnMonitor) btnMonitor.classList.toggle('hidden', !isLeader && !isAdmin);
             if (btnBroadcast) btnBroadcast.classList.toggle('hidden', !isAdmin);
             if (btnSurveys) btnSurveys.classList.toggle('hidden', !isAdmin);
             
+            // 廣播頁面編輯按鈕限制
+            const broadcastAddBtn = document.getElementById('broadcast-add-btn');
+            const broadcastAnnounceBtn = document.getElementById('broadcast-announce-btn');
+            
+            // 只有 Admin 可以新增活動
+            if(broadcastAddBtn) broadcastAddBtn.classList.toggle('hidden', !isActuallyAdmin);
+            
+            // Admin 和 Officer 都可以發布公告
+            if(broadcastAnnounceBtn) broadcastAnnounceBtn.classList.toggle('hidden', !(isActuallyAdmin || isActuallyOfficer));
+
             const monitorTitle = document.getElementById('monitor-title');
             if (monitorTitle) monitorTitle.innerText = isLeader ? `${currentUser.Section} 簽到狀態` : "全員簽到狀態";
             
             const filterEl = document.getElementById('monitor-filter-section');
             if (filterEl) {
-                if (isLeader) {
-                    filterEl.value = currentUser.Section;
-                    filterEl.disabled = true;
-                } else {
-                    filterEl.disabled = false;
-                }
+                if (isLeader) { filterEl.value = currentUser.Section; filterEl.disabled = true; } 
+                else { filterEl.disabled = false; }
             }
-            
             safeCreateIcons();
         }
 
         function openProfileModal() {
             if (!currentUser) return;
-            
             const nameInput = document.getElementById('profile-name-input');
             const profileInitial = document.getElementById('profile-initial');
             const roleEl = document.getElementById('profile-role');
@@ -463,8 +484,12 @@
             if (nameInput) nameInput.value = currentUser.Name || "";
             if (profileInitial) profileInitial.innerText = (currentUser.Name || "?").charAt(0);
             if (roleEl) roleEl.innerText = currentUser.Role || "Member";
-            if (emailEl) emailEl.innerText = currentUser.Email || "";
-            if (sectionEl) sectionEl.innerText = currentUser.Section || "-";
+            
+            const pEmail = document.getElementById('profile-email');
+            if (pEmail) pEmail.innerText = currentUser.Email || "";
+            
+            const pSection = document.getElementById('profile-section-display');
+            if (pSection) pSection.innerText = currentUser.Section || "-";
             
             if (instSelect) {
                 instSelect.innerHTML = '';
@@ -476,7 +501,6 @@
                     });
                 }
             }
-            
             if (modal) modal.classList.remove('hidden');
             safeCreateIcons();
         }
@@ -487,24 +511,12 @@
         }
 
         async function handleUpdatePassword() {
-            const nameInput = document.getElementById('profile-name-input');
-            const instSelect = document.getElementById('profile-instrument-input');
-            const pwdInput = document.getElementById('profile-new-password');
-            
-            const name = nameInput ? nameInput.value : currentUser.Name;
-            const inst = instSelect ? instSelect.value : currentUser.Instrument;
-            const pwd = pwdInput ? pwdInput.value : "";
-
+            const name = document.getElementById('profile-name-input')?.value || currentUser.Name;
+            const inst = document.getElementById('profile-instrument-input')?.value || currentUser.Instrument;
+            const pwd = document.getElementById('profile-new-password')?.value || "";
             const res = await callBackend('saveMember', { email: currentUser.Email, name, instrument: inst, password: pwd });
-            if(res?.success) { 
-                showToast("已更新資料"); 
-                closeProfileModal(); 
-                currentUser.Name = name; 
-                currentUser.Instrument = inst; 
-                setupDashboard(); 
-            } else {
-                showToast("更新失敗", true);
-            }
+            if(res?.success) { showToast("已更新資料"); closeProfileModal(); currentUser.Name = name; currentUser.Instrument = inst; setupDashboard(); } 
+            else showToast("更新失敗", true);
         }
 
         async function refreshSystemStatus() {
@@ -527,8 +539,7 @@
             const btn = document.getElementById('checkin-btn'), pulse = document.getElementById('btn-pulse');
             if (!btn || !pulse) return;
             if (hasCheckedIn) {
-                btn.disabled = true; 
-                btn.className = "relative z-10 w-36 h-36 bg-emerald-500 rounded-full text-white font-black shadow-xl border-[10px] border-white flex flex-col items-center justify-center transition-all duration-700";
+                btn.disabled = true; btn.className = "relative z-10 w-36 h-36 bg-emerald-500 rounded-full text-white font-black shadow-xl border-[10px] border-white flex flex-col items-center justify-center transition-all duration-700";
                 btn.innerHTML = '<i data-lucide="check-circle" class="w-12 h-12 mb-1"></i><span class="text-[10px] font-black uppercase">簽到完成</span>';
                 pulse.classList.remove('pulse-effect');
             } else {
@@ -553,12 +564,7 @@
                     const displayDate = formatDateTime(h.date, true);
                     const match = dur.match(/(\d+)時(\d+)分/);
                     if (match) totalMin += (parseInt(match[1]) * 60 + parseInt(match[2]));
-                    return `
-                        <div class="glass-panel p-4 rounded-2xl flex justify-between items-center text-left">
-                            <div><p class="font-black text-slate-700 text-xs">${h.status}</p><p class="text-[9px] text-slate-400 font-bold uppercase">${displayDate}</p></div>
-                            <span class="bg-indigo-500 text-white px-3 py-1.5 rounded-xl font-black text-[10px] shadow-lg">${dur}</span>
-                        </div>
-                    `;
+                    return `<div class="glass-panel p-4 rounded-2xl flex justify-between items-center text-left"><div><p class="font-black text-slate-700 text-xs">${h.status}</p><p class="text-[9px] text-slate-400 font-bold uppercase">${displayDate}</p></div><span class="bg-indigo-500 text-white px-3 py-1.5 rounded-xl font-black text-[10px] shadow-lg">${dur}</span></div>`;
                 }).join('');
                 const totalDurEl = document.getElementById('total-duration-display');
                 const totalMinEl = document.getElementById('total-minutes-label');
@@ -570,10 +576,8 @@
 
         async function submitCheckin() { 
             if (!currentEventData) return; 
-            const btn = document.getElementById('checkin-btn'); 
-            if(!btn) return;
-            const oldH = btn.innerHTML; 
-            btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-12 h-12 animate-spin"></i><span class="text-[10px] mt-1">定位中...</span>'; safeCreateIcons(); 
+            const btn = document.getElementById('checkin-btn'); if(!btn) return;
+            const oldH = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-12 h-12 animate-spin"></i><span class="text-[10px] mt-1">定位中...</span>'; safeCreateIcons(); 
             try { 
                 const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000 })); 
                 const dist = (function(lat1, lon1, lat2, lon2){ const R = 6371e3; const f1 = lat1 * Math.PI/180, f2 = lat2 * Math.PI/180; const df = (lat2-lat1)*Math.PI/180, dl = (lon2-lon1)*Math.PI/180; const a = Math.sin(df/2)*Math.sin(df/2) + Math.cos(f1) * Math.cos(f2) * Math.sin(dl/2) * Math.sin(dl/2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); })(pos.coords.latitude, pos.coords.longitude, ALLOWED_LOCATIONS[0].lat, ALLOWED_LOCATIONS[0].lng); 
@@ -589,8 +593,7 @@
             const board = document.getElementById('announcement-board');
             if (res?.success && res.content) {
                 if(board) board.classList.remove('hidden');
-                const contentEl = document.getElementById('announcement-content');
-                const timeEl = document.getElementById('announcement-time');
+                const contentEl = document.getElementById('announcement-content'), timeEl = document.getElementById('announcement-time');
                 if(contentEl) contentEl.innerText = res.content;
                 const formattedTime = formatDateTime(res.updateTime);
                 if(timeEl) timeEl.innerText = formattedTime ? `最後更新: ${formattedTime}` : "";
@@ -598,27 +601,15 @@
         }
 
         async function handleSaveAnnouncement() {
-            const inputEl = document.getElementById('announcement-edit-input');
-            const content = inputEl ? inputEl.value.trim() : "";
+            const content = document.getElementById('announcement-edit-input')?.value.trim() || "";
             if (!content) return showToast("內容不可為空", true);
-            
-            const btn = document.getElementById('save-announcement-btn'); 
-            setBtnLoading(btn, true, "發布中...");
-            
+            const btn = document.getElementById('save-announcement-btn'); setBtnLoading(btn, true, "發布中...");
             try {
                 const res = await callBackend('saveAnnouncement', { content }); 
-                if (res?.success) { 
-                    showToast("公告發布成功"); 
-                    closeAnnouncementModal(); 
-                    fetchAnnouncement(); 
-                } else {
-                    showToast("發布失敗: " + (res?.message || "伺服器錯誤"), true);
-                }
-            } catch (e) {
-                showToast("連線異常，請稍後再試", true);
-            } finally {
-                setBtnLoading(btn, false, "發布公告");
-            }
+                if (res?.success) { showToast("公告發布成功"); closeAnnouncementModal(); fetchAnnouncement(); }
+                else showToast("發布失敗", true);
+            } catch(e) { showToast("連線異常", true); }
+            finally { setBtnLoading(btn, false, "發布公告"); }
         }
 
         async function loadEventList() {
@@ -629,25 +620,20 @@
                 const res = await callBackend('getEventList', {});
                 if (res?.success) {
                     allEvents = res.data || [];
-                    if (allEvents.length === 0) {
-                        listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前無活動資料</div>';
-                    } else {
+                    const isActuallyAdmin = currentUser && currentUser.Role === 'Admin';
+                    if (allEvents.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前無活動資料</div>';
+                    else {
                         listEl.innerHTML = allEvents.map(ev => `
                             <div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm flex flex-col gap-3">
-                                <div class="text-left text-center"><p class="font-[900] text-slate-800 text-sm mb-1">${ev.Name}</p><p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">${ev.Date} • ${ev.StartTime} - ${ev.EndTime}</p></div>
+                                <div class="text-left"><p class="font-[900] text-slate-800 text-sm mb-1">${ev.Name}</p><p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">${ev.Date} • ${ev.StartTime} - ${ev.EndTime}</p></div>
                                 <div class="flex gap-2">
                                     <button onclick="activateEventFromList('${ev.ID}')" class="flex-1 py-3 bg-amber-50 text-amber-600 rounded-2xl active:scale-95 text-[10px] font-black">廣播</button>
-                                    <button onclick="openEditModal('${ev.ID}')" class="flex-1 py-3 bg-indigo-50 rounded-2xl text-indigo-600 active:scale-95 text-[10px] font-black">編輯</button>
+                                    ${isActuallyAdmin ? `<button onclick="openEditModal('${ev.ID}')" class="flex-1 py-3 bg-indigo-50 rounded-2xl text-indigo-600 active:scale-95 text-[10px] font-black">編輯</button>` : ''}
                                 </div>
-                            </div>
-                        `).join('');
+                            </div>`).join('');
                     }
-                } else {
-                    listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">載入失敗: ${res?.message || '未知錯誤'}</div>`;
-                }
-            } catch (e) {
-                listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">連線錯誤</div>';
-            }
+                } else listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">載入失敗: ${res?.message || '未知錯誤'}</div>`;
+            } catch (e) { listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">連線錯誤</div>'; }
             safeCreateIcons();
         }
 
@@ -658,56 +644,38 @@
 
         function openEditModal(id) { 
             editingId = id; const ev = id ? allEvents.find(e => String(e.ID) === String(id)) : null;
-            const titleEl = document.getElementById('modal-title');
-            if(titleEl) titleEl.innerText = id ? "編輯活動" : "新增活動";
-            const nameEl = document.getElementById('edit-name');
-            const dateEl = document.getElementById('edit-date');
-            const startEl = document.getElementById('edit-start');
-            const endEl = document.getElementById('edit-end');
-            const restStartEl = document.getElementById('edit-rest-start');
-            const restEndEl = document.getElementById('edit-rest-end');
-
-            if(nameEl) nameEl.value = ev ? ev.Name : ""; 
-            if(dateEl) dateEl.value = ev ? ev.Date : new Date().toISOString().split('T')[0]; 
-            if(startEl) startEl.value = ev ? ev.StartTime : "19:00"; 
-            if(endEl) endEl.value = ev ? ev.EndTime : "21:30";
-            if(restStartEl) restStartEl.value = ev ? (ev.RestStart || "") : "";
-            if(restEndEl) restEndEl.value = ev ? (ev.RestEnd || "") : "";
-            
-            const modal = document.getElementById('edit-modal');
-            if(modal) modal.classList.remove('hidden'); 
+            const modalTitle = document.getElementById('modal-title');
+            if(modalTitle) modalTitle.innerText = id ? "編輯活動" : "新增活動";
+            const fields = { 'edit-name': 'Name', 'edit-date': 'Date', 'edit-start': 'StartTime', 'edit-end': 'EndTime', 'edit-rest-start': 'RestStart', 'edit-rest-end': 'RestEnd' };
+            for (let id in fields) {
+                const el = document.getElementById(id);
+                if(el) el.value = ev ? (ev[fields[id]] || "") : (id === 'edit-date' ? new Date().toISOString().split('T')[0] : (id === 'edit-start' ? "19:00" : (id === 'edit-end' ? "21:30" : "")));
+            }
+            document.getElementById('edit-modal')?.classList.remove('hidden'); 
         }
 
         async function saveEvent() { 
-            const nameEl = document.getElementById('edit-name');
-            const name = nameEl ? nameEl.value.trim() : "";
+            const name = document.getElementById('edit-name')?.value.trim() || "";
             if (!name) return showToast("名稱必填", true); 
-            const btn = document.getElementById('save-event-btn'); 
-            setBtnLoading(btn, true, "儲存中...");
+            const btn = document.getElementById('save-event-btn'); setBtnLoading(btn, true, "儲存中...");
             const res = await callBackend('saveEvent', { id: editingId, name, date: document.getElementById('edit-date').value, startTime: document.getElementById('edit-start').value, endTime: document.getElementById('edit-end').value, restStart: document.getElementById('edit-rest-start').value, restEnd: document.getElementById('edit-rest-end').value }); 
             setBtnLoading(btn, false, "儲存活動");
             if (res?.success) { showToast("活動已儲存"); closeEditModal(); loadEventList(); } 
         }
 
         async function loadRealtimeStatus() {
-            const listEl = document.getElementById('realtime-status-list');
-            if(!listEl) return;
+            const listEl = document.getElementById('realtime-status-list'); if(!listEl) return;
             listEl.innerHTML = '<div class="py-10 text-[10px] font-black uppercase text-center">資料同步中...</div>';
             try {
                 const res = await callBackend('getRealtimeStatus', { section: currentUser.Section, role: currentUser.Role });
                 if (res && res.success) {
                     cachedMemberList = res.data || [];
-                    const presentEl = document.getElementById('stat-present');
-                    const absentEl = document.getElementById('stat-absent');
+                    const presentEl = document.getElementById('stat-present'), absentEl = document.getElementById('stat-absent');
                     if(presentEl) presentEl.innerText = res.stats?.present || 0;
                     if(absentEl) absentEl.innerText = res.stats?.absent || 0;
                     applyMonitorFilters();
-                } else {
-                    listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">同步失敗: ${res?.message || '未知錯誤'}</div>`;
-                }
-            } catch (e) {
-                listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">連線伺服器異常</div>';
-            }
+                } else listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">同步失敗: ${res?.message || '未知錯誤'}</div>`;
+            } catch (e) { listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">伺服器異常</div>'; }
         }
 
         function getAbsenceColorClass(count) {
@@ -721,134 +689,68 @@
             const isLeader = currentUser.Role === 'Leader';
             const filterEl = document.getElementById('monitor-filter-section');
             if (filterEl && isLeader) filterEl.value = currentUser.Section;
-
             const section = filterEl ? filterEl.value : 'all';
-            const sortOrderEl = document.getElementById('monitor-sort-order');
-            const sort = sortOrderEl ? sortOrderEl.value : 'default';
+            const sort = document.getElementById('monitor-sort-order')?.value || 'default';
             const listEl = document.getElementById('realtime-status-list');
-            
-            if (!cachedMemberList || cachedMemberList.length === 0) {
-                if(listEl) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前無成員資料</div>';
-                return;
-            }
-
+            if (!cachedMemberList || cachedMemberList.length === 0) { if(listEl) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前無成員資料</div>'; return; }
             let list = [...cachedMemberList];
             if(section !== 'all') list = list.filter(m => m.Section === section);
-            if(sort === 'checkin') list.sort((a,b) => (a.status === '已簽到' ? -1 : 1));
+            if(sort === 'checkin') list.sort((a,b) => (a.status === '檢視簽到' || a.status === '已簽到' ? -1 : 1));
             else if(sort === 'absence') list.sort((a,b) => (b.absenceCount || 0) - (a.absenceCount || 0));
-            
-            if(listEl) {
-                listEl.innerHTML = list.map(m => {
-                    const abs = m.absenceCount || 0;
-                    return `
-                    <div class="bg-white/70 p-4 rounded-2xl flex justify-between items-center text-left">
-                        <div class="flex flex-col gap-1">
-                            <p class="font-black text-slate-800 text-xs text-center">${m.Name} <span class="text-[9px] text-slate-400">(${m.Instrument})</span></p>
-                            <p class="text-[10px] font-black ${getAbsenceColorClass(abs)}">缺 ${abs}</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-xs font-black ${m.status==='已簽到'?'text-emerald-500':'text-rose-400'}">${m.status}</span>
-                        </div>
-                    </div>
-                `}).join('');
-            }
+            if(listEl) listEl.innerHTML = list.map(m => {
+                const abs = m.absenceCount || 0;
+                return `<div class="bg-white/70 p-4 rounded-2xl flex justify-between items-center text-left"><div class="flex flex-col gap-1"><p class="font-black text-slate-800 text-xs">${m.Name} <span class="text-[9px] text-slate-400">(${m.Instrument})</span></p><p class="text-[10px] font-black ${getAbsenceColorClass(abs)}">缺 ${abs}</p></div><div class="text-right"><span class="text-xs font-black ${m.status==='已簽到'?'text-emerald-500':'text-rose-400'}">${m.status}</span></div></div>`
+            }).join('');
             safeCreateIcons();
         }
 
         async function loadSurveyList() {
-            const listEl = document.getElementById('admin-survey-list');
-            if(!listEl) return;
+            const listEl = document.getElementById('admin-survey-list'); if(!listEl) return;
             listEl.innerHTML = '<div class="py-10 text-[10px] font-black uppercase text-center">Syncing...</div>';
             try {
                 const res = await callBackend('getSurveyList', {});
                 if (res?.success) {
                     allSurveys = res.data || [];
-                    if (allSurveys.length === 0) {
-                        listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前問卷庫為空</div>';
-                    } else {
-                        listEl.innerHTML = allSurveys.map(s => `
-                            <div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm flex flex-col gap-3">
-                                <div class="text-left text-center"><p class="font-[900] text-slate-800 text-sm mb-1">${s.Title}</p><p class="text-[9px] ${s.Active?'text-emerald-500':'text-slate-400'} font-black uppercase">${s.Active?'開放中':'已關閉'}</p></div>
-                                <button onclick="openSurveyAdminModal('${s.ID}')" class="w-full py-3 bg-indigo-50 rounded-2xl text-indigo-600 active:scale-95 text-[10px] font-black">管理與統計</button>
-                            </div>
-                        `).join('');
-                    }
-                } else {
-                    listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">載入失敗: ${res?.message || '未知錯誤'}</div>`;
-                }
-            } catch (e) {
-                listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">伺服器連線異常</div>';
-            }
+                    if (allSurveys.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前問卷庫為空</div>';
+                    else listEl.innerHTML = allSurveys.map(s => `<div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm flex flex-col gap-3"><div class="text-left"><p class="font-[900] text-slate-800 text-sm mb-1">${s.Title}</p><p class="text-[9px] ${s.Active?'text-emerald-500':'text-slate-400'} font-black uppercase">${s.Active?'開放中':'已關閉'}</p></div><button onclick="openSurveyAdminModal('${s.ID}')" class="w-full py-3 bg-indigo-50 rounded-2xl text-indigo-600 active:scale-95 text-[10px] font-black">管理與統計</button></div>`).join('');
+                } else listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">載入失敗: ${res?.message || '未知錯誤'}</div>`;
+            } catch (e) { listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">伺服器異常</div>'; }
             safeCreateIcons();
         }
 
         function openSurveyAdminModal(id) {
             editingSurveyId = id;
             const sur = id ? allSurveys.find(s => String(s.ID) === String(id)) : null;
-            const titleEl = document.getElementById('sur-admin-title');
-            const descEl = document.getElementById('sur-admin-desc');
-            const statusEl = document.getElementById('sur-admin-status');
-            if(titleEl) titleEl.value = sur ? sur.Title : "";
-            if(descEl) descEl.value = sur ? sur.Description : "";
-            if(statusEl) statusEl.checked = sur ? sur.Active : false;
-            adminQuestions = [];
-            if (sur && sur.QuestionsJSON) {
-                try { adminQuestions = JSON.parse(sur.QuestionsJSON); } catch (e) { adminQuestions = []; }
-            }
-            renderAdminQuestions();
-            switchSurveyAdminTab('config');
-            const modal = document.getElementById('survey-admin-modal');
-            if(modal) modal.classList.remove('hidden');
+            const fields = { 'sur-admin-title': 'Title', 'sur-admin-desc': 'Description', 'sur-admin-embed-url': 'EmbedURL' };
+            for(let id in fields) { const el = document.getElementById(id); if(el) el.value = sur ? (sur[fields[id]] || "") : ""; }
+            const statusEl = document.getElementById('sur-admin-status'); if(statusEl) statusEl.checked = sur ? sur.Active : false;
+            adminQuestions = []; if (sur && sur.QuestionsJSON) try { adminQuestions = JSON.parse(sur.QuestionsJSON); } catch (e) { adminQuestions = []; }
+            renderAdminQuestions(); switchSurveyAdminTab('config');
+            document.getElementById('survey-admin-modal')?.classList.remove('hidden');
             safeCreateIcons();
         }
 
         function switchSurveyAdminTab(tab) {
-            const configS = document.getElementById('sur-admin-config');
-            const resultS = document.getElementById('sur-admin-result');
-            const configT = document.getElementById('sur-tab-config');
-            const resultT = document.getElementById('sur-tab-result');
-            
-            if(configS) configS.classList.toggle('hidden', tab !== 'config');
-            if(resultS) resultS.classList.toggle('hidden', tab !== 'result');
-            
-            if(configT) {
-                if(tab === 'config') configT.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
-                else configT.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
-            }
-            if(resultT) {
-                if(tab === 'result') resultT.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
-                else resultT.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
-            }
-
+            const sections = ['config', 'result'];
+            sections.forEach(s => {
+                const el = document.getElementById(`sur-admin-${s}`); if(el) el.classList.toggle('hidden', s !== tab);
+                const btn = document.getElementById(`sur-tab-${s}`); if(btn) { if(s === tab) btn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm'); else btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm'); }
+            });
             if(tab === 'result') loadSurveyResults();
         }
 
         function renderAdminQuestions() {
-            const list = document.getElementById('sur-admin-questions-list');
-            if(!list) return;
-            list.innerHTML = adminQuestions.map((q, i) => `
-                <div class="bg-slate-50 p-4 rounded-xl space-y-2 relative">
-                    <button onclick="removeAdminQuestion(${i})" class="absolute top-2 right-2 text-rose-400 hover:text-rose-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    <input type="text" placeholder="題目名稱" value="${q.label}" oninput="adminQuestions[${i}].label=this.value" class="w-full bg-white px-3 py-2 rounded-lg text-xs font-bold border-none outline-none">
-                    <div class="flex gap-2">
-                        <select onchange="adminQuestions[${i}].type=this.value; renderAdminQuestions()" class="flex-1 bg-white px-3 py-2 rounded-lg text-[10px] font-black border-none outline-none">
-                            <option value="text" ${q.type==='text'?'selected':''}>文字</option>
-                            <option value="select" ${q.type==='select'?'selected':''}>單選</option>
-                        </select>
-                        ${q.type==='select' ? `<input type="text" placeholder="選項 (以半形逗號隔開)" value="${q.options||''}" oninput="adminQuestions[${i}].options=this.value" class="flex-[2] bg-white px-3 py-2 rounded-lg text-[10px] font-medium border-none outline-none">` : ''}
-                    </div>
-                </div>
-            `).join('');
+            const list = document.getElementById('sur-admin-questions-list'); if(!list) return;
+            list.innerHTML = adminQuestions.map((q, i) => `<div class="bg-slate-50 p-4 rounded-xl space-y-2 relative"><button onclick="removeAdminQuestion(${i})" class="absolute top-2 right-2 text-rose-400 hover:text-rose-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button><input type="text" placeholder="題目名稱" value="${q.label}" oninput="adminQuestions[${i}].label=this.value" class="w-full bg-white px-3 py-2 rounded-lg text-xs font-bold border-none outline-none"><div class="flex gap-2"><select onchange="adminQuestions[${i}].type=this.value; renderAdminQuestions()" class="flex-1 bg-white px-3 py-2 rounded-lg text-[10px] font-black border-none outline-none"><option value="text" ${q.type==='text'?'selected':''}>文字</option><option value="select" ${q.type==='select'?'selected':''}>單選</option></select>${q.type==='select' ? `<input type="text" placeholder="選項 (以半形逗號隔開)" value="${q.options||''}" oninput="adminQuestions[${i}].options=this.value" class="flex-[2] bg-white px-3 py-2 rounded-lg text-[10px] font-medium border-none outline-none">` : ''}</div></div>`).join('');
             safeCreateIcons();
         }
 
         async function handleUpdateSurveyConfig() {
-            const titleEl = document.getElementById('sur-admin-title');
-            const title = titleEl ? titleEl.value.trim() : "";
+            const title = document.getElementById('sur-admin-title')?.value.trim() || "";
             if(!title) return showToast("標題必填", true);
             const btn = document.getElementById('btn-save-sur-config'); setBtnLoading(btn, true, "儲存中...");
-            const res = await callBackend('saveSurveyConfig', { id: editingSurveyId, title, description: document.getElementById('sur-admin-desc').value, questionsJSON: JSON.stringify(adminQuestions), active: document.getElementById('sur-admin-status').checked });
-            setBtnLoading(btn, false, "儲存問卷模板");
+            const res = await callBackend('saveSurveyConfig', { id: editingSurveyId, title, description: document.getElementById('sur-admin-desc').value, embedURL: document.getElementById('sur-admin-embed-url').value, questionsJSON: JSON.stringify(adminQuestions), active: document.getElementById('sur-admin-status').checked });
+            setBtnLoading(btn, false, "儲存問卷設定");
             if(res?.success) { showToast("問卷模板已儲存"); closeSurveyAdminModal(); loadSurveyList(); }
         }
 
@@ -857,18 +759,8 @@
             const listEl = document.getElementById('sur-admin-result');
             if(res?.success && listEl) {
                 const results = res.data || [];
-                if (results.length === 0) {
-                    listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前尚無回覆資料</div>';
-                } else {
-                    listEl.innerHTML = results.map(r => `
-                        <div class="p-4 bg-slate-50 rounded-xl space-y-2">
-                            <p class="text-xs font-black text-slate-700">${r.label}</p>
-                            <div class="space-y-1">
-                                ${Object.entries(r.stats || {}).map(([k, v]) => `<div class="flex justify-between text-[10px] font-bold text-slate-500"><span>${k}</span><span>${v} 票</span></div>`).join('')}
-                            </div>
-                        </div>
-                    `).join('');
-                }
+                if (results.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前尚無回覆資料</div>';
+                else listEl.innerHTML = results.map(r => `<div class="p-4 bg-slate-50 rounded-xl space-y-2"><p class="text-xs font-black text-slate-700">${r.label}</p><div class="space-y-1">${Object.entries(r.stats || {}).map(([k, v]) => `<div class="flex justify-between text-[10px] font-bold text-slate-500"><span>${k}</span><span>${v} 票</span></div>`).join('')}</div></div>`).join('');
             }
         }
 
@@ -878,10 +770,9 @@
             const board = document.getElementById('survey-board');
             if (res?.success && res.active) {
                 if(board) board.classList.remove('hidden');
-                const titleEl = document.getElementById('survey-display-title');
-                const descEl = document.getElementById('survey-display-desc');
-                if(titleEl) titleEl.innerText = res.title;
-                if(descEl) descEl.innerText = res.description || "";
+                document.getElementById('survey-display-title').innerText = res.title;
+                document.getElementById('survey-display-desc').innerText = res.description || "";
+                currentEmbedURL = res.embedURL || ""; 
                 const badge = document.getElementById('survey-status-badge');
                 if (badge) {
                     if (res.responded) { badge.innerText = "已提交"; badge.className = "text-[8px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600"; }
@@ -893,78 +784,65 @@
         }
 
         function openSurveyModal() {
-            const title = document.getElementById('survey-display-title');
-            const desc = document.getElementById('survey-display-desc');
-            if(title) document.getElementById('survey-modal-title').innerText = title.innerText;
-            if(desc) document.getElementById('survey-modal-desc').innerText = desc.innerText;
+            const title = document.getElementById('survey-display-title')?.innerText || "";
+            const desc = document.getElementById('survey-display-desc')?.innerText || "";
+            if(document.getElementById('survey-modal-title')) document.getElementById('survey-modal-title').innerText = title;
+            if(document.getElementById('survey-modal-desc')) document.getElementById('survey-modal-desc').innerText = desc;
             
             const fieldsEl = document.getElementById('survey-dynamic-fields');
-            if(fieldsEl) {
-                fieldsEl.innerHTML = (surveyQuestions || []).map(q => `
-                    <div class="space-y-2 text-left">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-1">${q.label}</label>
-                        ${q.type==='select' ? `
-                            <select data-label="${q.label}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm">
-                                <option value="">請選擇</option>
-                                ${(q.options || "").split(',').map(o => `<option value="${o.trim()}" ${userResponses[q.label]===o.trim()?'selected':''}>${o.trim()}</option>`).join('')}
-                            </select>
-                        ` : `
-                            <input type="text" data-label="${q.label}" value="${userResponses[q.label]||''}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm">
-                        `}
-                    </div>
-                `).join('');
+            const iframeContainer = document.getElementById('survey-iframe-container');
+            const externalFrame = document.getElementById('survey-external-frame');
+            const saveBtn = document.getElementById('save-survey-btn');
+            const modalContent = document.getElementById('survey-modal-content');
+
+            if (currentEmbedURL && currentEmbedURL.trim() !== "") {
+                if(modalContent) modalContent.classList.replace('max-w-sm', 'max-w-3xl');
+                if(fieldsEl) fieldsEl.classList.add('hidden');
+                if(iframeContainer) iframeContainer.classList.remove('hidden');
+                if(externalFrame) externalFrame.src = currentEmbedURL;
+                if(saveBtn) saveBtn.classList.add('hidden'); 
+            } else {
+                if(modalContent) modalContent.classList.replace('max-w-3xl', 'max-w-sm');
+                if(fieldsEl) {
+                    fieldsEl.classList.remove('hidden');
+                    fieldsEl.innerHTML = (surveyQuestions || []).map(q => `<div class="space-y-2 text-left"><label class="text-[10px] font-black text-slate-400 uppercase px-1">${q.label}</label>${q.type==='select' ? `<select data-label="${q.label}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm"><option value="">請選擇</option>${(q.options || "").split(',').map(o => `<option value="${o.trim()}" ${userResponses[q.label]===o.trim()?'selected':''}>${o.trim()}</option>`).join('')}</select>` : `<input type="text" data-label="${q.label}" value="${userResponses[q.label]||''}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm">`}</div>`).join('');
+                }
+                if(iframeContainer) iframeContainer.classList.add('hidden');
+                if(saveBtn) saveBtn.classList.remove('hidden');
             }
-            const modal = document.getElementById('survey-modal');
-            if(modal) modal.classList.remove('hidden');
+            document.getElementById('survey-modal')?.classList.remove('hidden');
             safeCreateIcons();
         }
 
-        function closeSurveyModal() {
-            const modal = document.getElementById('survey-modal');
-            if(modal) modal.classList.add('hidden');
-        }
-
+        function closeSurveyModal() { document.getElementById('survey-modal')?.classList.add('hidden'); }
         async function handleSaveSurvey() {
-            const responses = {};
-            document.querySelectorAll('.survey-input').forEach(el => responses[el.dataset.label] = el.value);
+            const responses = {}; document.querySelectorAll('.survey-input').forEach(el => responses[el.dataset.label] = el.value);
             const btn = document.getElementById('save-survey-btn'); setBtnLoading(btn, true, "提交中...");
             const res = await callBackend('submitSurveyResponse', { email: currentUser.Email, responsesJSON: JSON.stringify(responses) });
-            setBtnLoading(btn, false, "提交");
+            setBtnLoading(btn, false, "提交回覆");
             if(res?.success) { showToast("回覆已提交"); closeSurveyModal(); fetchSurveyStatus(); }
         }
 
         function updateInstrumentOptions() {
-            const sectionEl = document.getElementById('reg-section');
-            if(!sectionEl) return;
-            const section = sectionEl.value;
-            const instSelect = document.getElementById('reg-instrument');
-            if(!instSelect) return;
+            const section = document.getElementById('reg-section')?.value;
+            const instSelect = document.getElementById('reg-instrument'); if(!instSelect) return;
             instSelect.innerHTML = '<option value="">選擇樂器</option>';
-            if (section && orchestraData[section]) {
-                orchestraData[section].forEach(i => instSelect.add(new Option(i, i)));
-            }
+            if (section && orchestraData[section]) orchestraData[section].forEach(i => instSelect.add(new Option(i, i)));
         }
 
         async function handleRegister() {
-            const nameEl = document.getElementById('reg-name');
-            const sectionEl = document.getElementById('reg-section');
-            const instrumentEl = document.getElementById('reg-instrument');
-            const emailEl = document.getElementById('reg-email');
-            const passwordEl = document.getElementById('reg-password');
-            if(!nameEl || !sectionEl || !instrumentEl || !emailEl || !passwordEl) return;
-            const data = { name: nameEl.value, section: sectionEl.value, instrument: instrumentEl.value, email: emailEl.value, password: passwordEl.value };
+            const data = { name: document.getElementById('reg-name')?.value, section: document.getElementById('reg-section')?.value, instrument: document.getElementById('reg-instrument')?.value, email: document.getElementById('reg-email')?.value, password: document.getElementById('reg-password')?.value };
             if(!Object.values(data).every(v => v)) return showToast("全部必填", true);
             const btn = document.getElementById('reg-submit-btn'); setBtnLoading(btn, true, "處理中...");
-            const res = await callBackend('registerUser', data);
-            setBtnLoading(btn, false, "確認加入");
+            const res = await callBackend('registerUser', data); setBtnLoading(btn, false, "確認加入");
             if(res?.success) { showToast("註冊成功"); switchAuthMode('login'); } else showToast(res.message || "註冊失敗", true);
         }
 
         function handleLogout() { location.reload(); }
-        function closeEditModal() { const m = document.getElementById('edit-modal'); if(m) m.classList.add('hidden'); }
-        function openAnnouncementModal() { const m = document.getElementById('announcement-modal'); if(m) m.classList.remove('hidden'); safeCreateIcons(); }
-        function closeAnnouncementModal() { const m = document.getElementById('announcement-modal'); if(m) m.classList.add('hidden'); }
-        function closeSurveyAdminModal() { const m = document.getElementById('survey-admin-modal'); if(m) m.classList.add('hidden'); }
+        function closeEditModal() { document.getElementById('edit-modal')?.classList.add('hidden'); }
+        function openAnnouncementModal() { document.getElementById('announcement-modal')?.classList.remove('hidden'); safeCreateIcons(); }
+        function closeAnnouncementModal() { document.getElementById('announcement-modal')?.classList.add('hidden'); }
+        function closeSurveyAdminModal() { document.getElementById('survey-admin-modal')?.classList.add('hidden'); }
         function addSurveyQuestion() { adminQuestions.push({ label: "新題目", type: "text", options: "" }); renderAdminQuestions(); }
         function removeAdminQuestion(i) { adminQuestions.splice(i, 1); renderAdminQuestions(); }
         
