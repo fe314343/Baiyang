@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,38 +9,182 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/umd/lucide.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
-        :root { --primary: #6366f1; --primary-dark: #4338ca; --accent: #f43f5e; --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.5); }
-        body { font-family: 'Noto Sans TC', sans-serif; background: linear-gradient(135deg, #f8faff 0%, #ffffff 50%, #f1f5ff 100%); min-height: 100vh; color: #1e293b; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(#6366f1 0.5px, transparent 0.5px); background-size: 30px 30px; opacity: 0.04; z-index: -1; }
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.1); }
-        .btn-premium { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); box-shadow: 0 12px 24px -8px rgba(99, 102, 241, 0.5); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .btn-premium:active { transform: scale(0.96); box-shadow: 0 4px 8px -2px rgba(99, 102, 241, 0.4); }
-        @keyframes ripple { 0% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(1.4); opacity: 0; } }
-        .pulse-effect::after { content: ''; position: absolute; inset: 0; background: var(--primary); border-radius: 9999px; z-index: -1; animation: ripple 2s infinite ease-out; }
-        .tab-btn { transition: all 0.4s ease; }
-        .tab-btn.tab-active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08); transform: translateY(-1px); }
-        .fade-up { animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .app-icon-card { width: 85px; height: 85px; background: #ffffff; border-radius: 26px; box-shadow: 10px 10px 25px #d1d9e6, -8px -8px 20px #ffffff; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.8); }
-        .app-icon-card img { width: 70%; height: 70%; object-fit: contain; z-index: 2; }
-        input, select, textarea { border: 1px solid rgba(0, 0, 0, 0.03) !important; transition: all 0.3s ease; }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary) !important; background: #ffffff !important; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08) !important; }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4338ca;
+            --accent: #f43f5e;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #f8faff 0%, #ffffff 50%, #f1f5ff 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#6366f1 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+            opacity: 0.04;
+            z-index: -1;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.1);
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 12px 24px -8px rgba(99, 102, 241, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-premium:active {
+            transform: scale(0.96);
+            box-shadow: 0 4px 8px -2px rgba(99, 102, 241, 0.4);
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        .pulse-effect::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary);
+            border-radius: 9999px;
+            z-index: -1;
+            animation: ripple 2s infinite ease-out;
+        }
+
+        .tab-btn {
+            transition: all 0.4s ease;
+        }
+
+        .tab-btn.tab-active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .fade-up {
+            animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .app-icon-card {
+            width: 85px;
+            height: 85px;
+            background: #ffffff;
+            border-radius: 26px;
+            box-shadow: 10px 10px 25px #d1d9e6, -8px -8px 20px #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.8rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .app-icon-card img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            z-index: 2;
+        }
+
+        input,
+        select,
+        textarea {
+            border: 1px solid rgba(0, 0, 0, 0.03) !important;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary) !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08) !important;
+        }
+
+        /* 跳題動畫 */
+        .survey-question-wrap {
+            overflow: hidden;
+            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease, transform 0.35s ease;
+            max-height: 400px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .survey-question-wrap.sq-hidden {
+            max-height: 0 !important;
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+        }
     </style>
 </head>
+
 <body class="pb-10">
 
     <!-- 頂部導覽列 -->
     <nav id="nav-bar" class="hidden fixed top-0 w-full max-w-md z-50 p-4 flex justify-center text-center">
-        <div class="glass-panel rounded-[22px] p-2 flex justify-between items-center px-4 border-white/60 w-full shadow-lg">
+        <div
+            class="glass-panel rounded-[22px] p-2 flex justify-between items-center px-4 border-white/60 w-full shadow-lg">
             <div class="flex items-center gap-3">
                 <div class="relative flex items-center justify-center">
-                    <div id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                    <div id="status-dot"
+                        class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                     <div class="absolute w-4 h-4 rounded-full border border-emerald-400 animate-ping opacity-20"></div>
                 </div>
                 <span id="nav-user-info" class="text-sm font-bold text-slate-700 tracking-tight">載入中...</span>
             </div>
-            <button onclick="handleLogout()" class="bg-slate-50 text-slate-500 px-4 py-2 rounded-xl text-[11px] font-black hover:bg-rose-50 hover:text-rose-500 transition-all flex items-center gap-2 border border-slate-100 hover:border-rose-100 shadow-sm">
+            <button onclick="handleLogout()"
+                class="bg-slate-50 text-slate-500 px-4 py-2 rounded-xl text-[11px] font-black hover:bg-rose-50 hover:text-rose-500 transition-all flex items-center gap-2 border border-slate-100 hover:border-rose-100 shadow-sm">
                 <i data-lucide="power" class="w-3.5 h-3.5"></i>登出
             </button>
         </div>
@@ -49,17 +194,34 @@
         <!-- 登入視圖 -->
         <section id="login-view" class="space-y-5 fade-up text-center">
             <div class="app-icon-card mx-auto">
-                <img src="Baiyang.png" alt="Logo" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=CY&backgroundColor=6366f1';">
+                <img src="Baiyang.png" alt="Logo"
+                    onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=CY&backgroundColor=6366f1';">
             </div>
             <h1 class="text-2xl font-[900] text-slate-800 tracking-tighter mb-1">崇正國樂團</h1>
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 mx-auto shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span><p class="text-indigo-600 text-[9px] font-black uppercase tracking-widest">Smart System</p></div>
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 mx-auto shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                <p class="text-indigo-600 text-[9px] font-black uppercase tracking-widest">Smart System</p>
+            </div>
             <div class="glass-panel p-7 rounded-[32px] space-y-5 shadow-xl">
                 <div class="space-y-3">
-                    <div class="group relative"><i data-lucide="mail" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i><input type="text" id="login-email" class="w-full pl-12 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center" placeholder="帳號 / Email"></div>
-                    <div class="group relative"><i data-lucide="key-round" class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i><input type="password" id="login-password" class="w-full pl-12 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center" placeholder="密碼"></div>
+                    <div class="group relative"><i data-lucide="mail"
+                            class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i><input
+                            type="text" id="login-email"
+                            class="w-full pl-12 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center"
+                            placeholder="帳號 / Email"></div>
+                    <div class="group relative"><i data-lucide="key-round"
+                            class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i><input
+                            type="password" id="login-password"
+                            class="w-full pl-12 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center"
+                            placeholder="密碼"></div>
                 </div>
-                <button id="login-submit-btn" onclick="handleLogin()" class="relative w-full btn-premium text-white font-black py-4 rounded-[20px] text-lg tracking-wide shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">立即登入 <i data-lucide="arrow-right" class="w-5 h-5"></i></button>
-                <div class="text-center pt-1"><button onclick="switchAuthMode('register')" class="text-slate-400 text-xs font-bold hover:text-indigo-600 underline decoration-indigo-200 underline-offset-4">註冊新成員</button></div>
+                <button id="login-submit-btn" onclick="handleLogin()"
+                    class="relative w-full btn-premium text-white font-black py-4 rounded-[20px] text-lg tracking-wide shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">立即登入
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i></button>
+                <div class="text-center pt-1"><button onclick="switchAuthMode('register')"
+                        class="text-slate-400 text-xs font-bold hover:text-indigo-600 underline decoration-indigo-200 underline-offset-4">註冊新成員</button>
+                </div>
             </div>
         </section>
 
@@ -67,12 +229,32 @@
         <section id="register-view" class="hidden space-y-6 fade-up text-center">
             <h2 class="text-2xl font-[900] text-slate-800 tracking-tight">成員註冊加入</h2>
             <div class="glass-panel p-8 rounded-[32px] space-y-4 shadow-xl">
-                <input type="text" id="reg-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-bold text-center" placeholder="真實姓名">
+                <input type="text" id="reg-name"
+                    class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-bold text-center"
+                    placeholder="真實姓名">
                 <div class="grid grid-cols-2 gap-4">
-                    <select id="reg-section" onchange="updateInstrumentOptions()" class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center"><option value="">選擇組別</option><option value="吹管組">吹管組</option><option value="拉弦組">拉弦組</option><option value="彈撥組">彈撥組</option><option value="揚打組">揚打組</option><option value="低音組">低音組</option></select>
-                    <select id="reg-instrument" class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center"><option value="">選擇樂器</option></select>
+                    <select id="reg-section" onchange="updateInstrumentOptions()"
+                        class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center">
+                        <option value="">選擇組別</option>
+                        <option value="吹管組">吹管組</option>
+                        <option value="拉弦組">拉弦組</option>
+                        <option value="彈撥組">彈撥組</option>
+                        <option value="揚打組">揚打組</option>
+                        <option value="低音組">低音組</option>
+                    </select>
+                    <select id="reg-instrument"
+                        class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center">
+                        <option value="">選擇樂器</option>
+                    </select>
                 </div>
-                <input type="email" id="reg-email" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="常用帳號"><input type="password" id="reg-password" class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center" placeholder="設定登入密碼"><button id="reg-submit-btn" onclick="handleRegister()" class="w-full btn-premium text-white font-black py-4 rounded-[20px] mt-4 tracking-wide shadow-lg active:scale-95 transition-all">確認註冊</button><button onclick="switchAuthMode('login')" class="w-full text-slate-400 text-sm font-black mt-2">返回登入</button>
+                <input type="email" id="reg-email"
+                    class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center"
+                    placeholder="常用帳號"><input type="password" id="reg-password"
+                    class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center"
+                    placeholder="設定登入密碼"><button id="reg-submit-btn" onclick="handleRegister()"
+                    class="w-full btn-premium text-white font-black py-4 rounded-[20px] mt-4 tracking-wide shadow-lg active:scale-95 transition-all">確認註冊</button><button
+                    onclick="switchAuthMode('login')"
+                    class="w-full text-slate-400 text-sm font-black mt-2">返回登入</button>
             </div>
         </section>
 
@@ -80,21 +262,38 @@
         <section id="dashboard-view" class="hidden space-y-6 fade-up pb-24 w-full flex flex-col items-center">
             <!-- 全局提示區 -->
             <div id="global-alerts" class="w-full space-y-3">
-                <div id="announcement-board" class="hidden w-full glass-panel p-5 rounded-[28px] border-amber-200 bg-amber-50 shadow-md flex items-start gap-4 transition-all hover:shadow-lg text-left">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0"><i data-lucide="megaphone" class="w-6 h-6"></i></div>
+                <div id="announcement-board"
+                    class="hidden w-full glass-panel p-5 rounded-[28px] border-amber-200 bg-amber-50 shadow-md flex items-start gap-4 transition-all hover:shadow-lg text-left">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+                        <i data-lucide="megaphone" class="w-6 h-6"></i>
+                    </div>
                     <div class="flex-1 overflow-hidden">
-                        <p class="text-[10px] font-[900] text-amber-600/70 uppercase tracking-[0.2em] mb-1">Official Announcement</p>
-                        <div id="announcement-content" class="text-sm font-bold text-slate-700 leading-relaxed whitespace-pre-wrap">正在讀取最新公告...</div>
+                        <p class="text-[10px] font-[900] text-amber-600/70 uppercase tracking-[0.2em] mb-1">Official
+                            Announcement</p>
+                        <div id="announcement-content"
+                            class="text-sm font-bold text-slate-700 leading-relaxed whitespace-pre-wrap">正在讀取最新公告...
+                        </div>
                         <p id="announcement-time" class="text-[9px] text-slate-400 mt-2 font-bold"></p>
                     </div>
                 </div>
-                <div id="survey-board" class="hidden w-full glass-panel p-5 rounded-[28px] border-indigo-200 bg-indigo-50/50 shadow-md flex items-start gap-4 transition-all hover:shadow-lg text-left">
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0"><i data-lucide="clipboard-check" class="w-6 h-6"></i></div>
+                <div id="survey-board"
+                    class="hidden w-full glass-panel p-5 rounded-[28px] border-indigo-200 bg-indigo-50/50 shadow-md flex items-start gap-4 transition-all hover:shadow-lg text-left">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0">
+                        <i data-lucide="clipboard-check" class="w-6 h-6"></i>
+                    </div>
                     <div class="flex-1">
-                        <div class="flex justify-between items-start mb-1"><p class="text-[10px] font-[900] text-indigo-600/70 uppercase tracking-[0.2em]">Active Survey</p><span id="survey-status-badge" class="text-[8px] font-black px-2 py-0.5 rounded-full"></span></div>
-                        <h4 id="survey-display-title" class="text-sm font-black text-slate-800 mb-1 leading-tight">演出意願調查</h4>
+                        <div class="flex justify-between items-start mb-1">
+                            <p class="text-[10px] font-[900] text-indigo-600/70 uppercase tracking-[0.2em]">Active
+                                Survey</p><span id="survey-status-badge"
+                                class="text-[8px] font-black px-2 py-0.5 rounded-full"></span>
+                        </div>
+                        <h4 id="survey-display-title" class="text-sm font-black text-slate-800 mb-1 leading-tight">
+                            演出意願調查</h4>
                         <p id="survey-display-desc" class="text-xs text-slate-500 line-clamp-1"></p>
-                        <button onclick="openSurveyModal()" class="mt-3 text-xs font-black text-indigo-600 underline underline-offset-4 hover:text-indigo-800">填寫/修改回覆</button>
+                        <button onclick="openSurveyModal()"
+                            class="mt-3 text-xs font-black text-indigo-600 underline underline-offset-4 hover:text-indigo-800">填寫/修改回覆</button>
                     </div>
                 </div>
             </div>
@@ -106,29 +305,69 @@
                         <h2 class="text-2xl font-[900] text-slate-800 leading-none" id="user-display">你好</h2>
                         <p class="text-slate-400 text-xs font-bold mt-2">歡迎回到簽到管理系統</p>
                     </div>
-                    <button onclick="openProfileModal()" class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg font-black transition-all active:scale-90" id="user-avatar-initial">-</button>
+                    <button onclick="openProfileModal()"
+                        class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg font-black transition-all active:scale-90"
+                        id="user-avatar-initial">-</button>
                 </div>
                 <div class="glass-panel p-6 rounded-[32px] w-full shadow-lg border-white/60 text-left">
-                    <div class="flex items-center gap-2 mb-4"><div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600"><i data-lucide="user-round" class="w-4 h-4"></i></div><h4 class="font-[900] text-slate-800 text-sm tracking-tight">團員檔案</h4></div>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-slate-50"><span class="text-[10px] font-black text-slate-400 uppercase">目前組別</span><span class="text-sm font-black text-slate-700" id="home-section-display">-</span></div>
-                        <div class="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-slate-50"><span class="text-[10px] font-black text-slate-400 uppercase">主要樂器</span><span class="text-sm font-black text-slate-700" id="home-instrument-display">-</span></div>
-                        <div class="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-slate-50"><span class="text-[10px] font-black text-slate-400 uppercase">權限角色</span><span class="text-sm font-black text-indigo-600" id="home-role-display">-</span></div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600"><i
+                                data-lucide="user-round" class="w-4 h-4"></i></div>
+                        <h4 class="font-[900] text-slate-800 text-sm tracking-tight">團員檔案</h4>
                     </div>
-                    <button onclick="openProfileModal()" class="w-full mt-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i> 修改資料</button>
+                    <div class="space-y-3">
+                        <div
+                            class="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-slate-50">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">目前組別</span><span
+                                class="text-sm font-black text-slate-700" id="home-section-display">-</span>
+                        </div>
+                        <div
+                            class="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-slate-50">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">主要樂器</span><span
+                                class="text-sm font-black text-slate-700" id="home-instrument-display">-</span>
+                        </div>
+                        <div
+                            class="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-slate-50">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">權限角色</span><span
+                                class="text-sm font-black text-indigo-600" id="home-role-display">-</span>
+                        </div>
+                    </div>
+                    <button onclick="openProfileModal()"
+                        class="w-full mt-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"><i
+                            data-lucide="edit-3" class="w-3.5 h-3.5"></i> 修改資料</button>
                 </div>
             </div>
 
             <!-- 分頁2: 我的紀錄 -->
             <div id="history-section" class="hidden w-full space-y-6 animate-in">
                 <div class="glass-panel p-7 rounded-[36px] border-white/80 w-full shadow-xl">
-                    <div class="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[32px] text-white shadow-2xl flex flex-col items-center">
-                        <p class="text-[9px] opacity-50 font-black tracking-[0.3em] mb-2 uppercase text-indigo-200/50">Total Practice Record</p>
-                        <div class="flex items-baseline gap-2 justify-center"><h3 id="total-duration-display" class="text-5xl font-[900] tracking-tighter leading-none">0</h3><div class="flex flex-col items-start leading-none"><span class="text-xs font-bold opacity-60 uppercase tracking-widest">Hours</span><span id="total-minutes-label" class="text-[10px] font-black text-indigo-300 mt-1 opacity-80"></span></div></div>
+                    <div
+                        class="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[32px] text-white shadow-2xl flex flex-col items-center">
+                        <p class="text-[9px] opacity-50 font-black tracking-[0.3em] mb-2 uppercase text-indigo-200/50">
+                            Total Practice Record</p>
+                        <div class="flex items-baseline gap-2 justify-center">
+                            <h3 id="total-duration-display" class="text-5xl font-[900] tracking-tighter leading-none">0
+                            </h3>
+                            <div class="flex flex-col items-start leading-none"><span
+                                    class="text-xs font-bold opacity-60 uppercase tracking-widest">Hours</span><span
+                                    id="total-minutes-label"
+                                    class="text-[10px] font-black text-indigo-300 mt-1 opacity-80"></span></div>
+                        </div>
                     </div>
                     <div class="mt-10 flex flex-col items-center">
-                        <div class="mb-6 space-y-1"><p id="current-event-display" class="text-sm font-bold text-slate-500 tracking-tight">活動同步中...</p><p id="checkin-time-display" class="text-indigo-500 text-[11px] font-black uppercase tracking-widest opacity-0 transition-opacity">--:--</p></div>
-                        <div class="relative"><button id="checkin-btn" onclick="submitCheckin()" disabled class="relative z-10 w-36 h-36 bg-slate-200 rounded-full text-white font-black shadow-xl border-[10px] border-white overflow-hidden hover:scale-105 active:scale-95"><i data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span class="text-lg tracking-tight">簽到</span></button><div id="btn-pulse" class="absolute inset-0 rounded-full"></div></div>
+                        <div class="mb-6 space-y-1">
+                            <p id="current-event-display" class="text-sm font-bold text-slate-500 tracking-tight">
+                                活動同步中...</p>
+                            <p id="checkin-time-display"
+                                class="text-indigo-500 text-[11px] font-black uppercase tracking-widest opacity-0 transition-opacity">
+                                --:--</p>
+                        </div>
+                        <div class="relative"><button id="checkin-btn" onclick="submitCheckin()" disabled
+                                class="relative z-10 w-36 h-36 bg-slate-200 rounded-full text-white font-black shadow-xl border-[10px] border-white overflow-hidden hover:scale-105 active:scale-95"><i
+                                    data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span
+                                    class="text-lg tracking-tight">簽到</span></button>
+                            <div id="btn-pulse" class="absolute inset-0 rounded-full"></div>
+                        </div>
                     </div>
                 </div>
                 <div id="attendance-list" class="space-y-3 w-full"></div>
@@ -137,9 +376,38 @@
             <!-- 分頁3: 組員名單 -->
             <div id="monitor-section" class="hidden animate-in w-full">
                 <div class="glass-panel p-6 rounded-[32px] w-full shadow-lg">
-                    <div class="flex justify-between items-center mb-6 px-1"><h4 class="font-[900] text-slate-800 text-lg tracking-tight" id="monitor-title">全員簽到狀態</h4><button onclick="loadRealtimeStatus()" class="w-10 h-10 bg-white shadow-sm border border-slate-100 text-indigo-600 rounded-xl flex items-center justify-center hover:rotate-180 transition-all duration-500"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button></div>
-                    <div class="flex gap-3 mb-6"><select id="monitor-filter-section" onchange="applyMonitorFilters()" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 shadow-sm"><option value="all">全體成員</option><option value="吹管組">吹管組</option><option value="拉弦組">拉弦組</option><option value="彈撥組">彈撥組</option><option value="揚打組">揚打組</option><option value="低音組">低音組</option></select><select id="monitor-sort-order" onchange="applyMonitorFilters()" class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 shadow-sm"><option value="default">預設排序</option><option value="checkin">簽到優先</option><option value="absence">缺席優先</option></select></div>
-                    <div class="grid grid-cols-2 gap-4 mb-6 text-center"><div class="bg-emerald-500/5 p-4 rounded-[22px] border border-emerald-100/50 flex flex-col items-center shadow-sm"><p class="text-[9px] text-emerald-600 font-black mb-1">Present</p><p class="text-3xl font-[900] text-emerald-700" id="stat-present">0</p></div><div class="bg-rose-500/5 p-4 rounded-[22px] border border-rose-100/50 flex flex-col items-center shadow-sm"><p class="text-[9px] text-rose-600 font-black mb-1">Absent</p><p class="text-3xl font-[900] text-rose-700" id="stat-absent">0</p></div></div>
+                    <div class="flex justify-between items-center mb-6 px-1">
+                        <h4 class="font-[900] text-slate-800 text-lg tracking-tight" id="monitor-title">全員簽到狀態</h4>
+                        <button onclick="loadRealtimeStatus()"
+                            class="w-10 h-10 bg-white shadow-sm border border-slate-100 text-indigo-600 rounded-xl flex items-center justify-center hover:rotate-180 transition-all duration-500"><i
+                                data-lucide="refresh-cw" class="w-5 h-5"></i></button>
+                    </div>
+                    <div class="flex gap-3 mb-6"><select id="monitor-filter-section" onchange="applyMonitorFilters()"
+                            class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 shadow-sm">
+                            <option value="all">全體成員</option>
+                            <option value="吹管組">吹管組</option>
+                            <option value="拉弦組">拉弦組</option>
+                            <option value="彈撥組">彈撥組</option>
+                            <option value="揚打組">揚打組</option>
+                            <option value="低音組">低音組</option>
+                        </select><select id="monitor-sort-order" onchange="applyMonitorFilters()"
+                            class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 shadow-sm">
+                            <option value="default">預設排序</option>
+                            <option value="checkin">簽到優先</option>
+                            <option value="absence">缺席優先</option>
+                        </select></div>
+                    <div class="grid grid-cols-2 gap-4 mb-6 text-center">
+                        <div
+                            class="bg-emerald-500/5 p-4 rounded-[22px] border border-emerald-100/50 flex flex-col items-center shadow-sm">
+                            <p class="text-[9px] text-emerald-600 font-black mb-1">Present</p>
+                            <p class="text-3xl font-[900] text-emerald-700" id="stat-present">0</p>
+                        </div>
+                        <div
+                            class="bg-rose-500/5 p-4 rounded-[22px] border border-rose-100/50 flex flex-col items-center shadow-sm">
+                            <p class="text-[9px] text-rose-600 font-black mb-1">Absent</p>
+                            <p class="text-3xl font-[900] text-rose-700" id="stat-absent">0</p>
+                        </div>
+                    </div>
                     <div id="realtime-status-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scroll"></div>
                 </div>
             </div>
@@ -147,32 +415,64 @@
             <!-- 分頁4: 活動廣播 -->
             <div id="broadcast-section" class="hidden animate-in w-full space-y-6">
                 <div class="flex items-center justify-between px-2">
-                    <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600"><i data-lucide="radio" class="w-4 h-4"></i></div><h4 class="font-[900] text-slate-800 text-base tracking-tight">廣播中心</h4></div>
-                    <button id="broadcast-add-btn" onclick="openEditModal(null)" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2 active:scale-95"><i data-lucide="plus" class="w-3.5 h-3.5"></i>新增活動</button>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+                            <i data-lucide="radio" class="w-4 h-4"></i>
+                        </div>
+                        <h4 class="font-[900] text-slate-800 text-base tracking-tight">廣播中心</h4>
+                    </div>
+                    <button id="broadcast-add-btn" onclick="openEditModal(null)"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2 active:scale-95"><i
+                            data-lucide="plus" class="w-3.5 h-3.5"></i>新增活動</button>
                 </div>
-                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40"><div id="admin-event-list" class="space-y-4"></div></div>
-                <button id="broadcast-announce-btn" onclick="openAnnouncementModal()" class="bg-amber-100 text-amber-700 px-6 py-4 rounded-[22px] text-xs font-black flex items-center justify-center gap-3 border border-amber-200 active:scale-95 w-full shadow-md"><i data-lucide="megaphone" class="w-5 h-5"></i>發布全員公告</button>
+                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40">
+                    <div id="admin-event-list" class="space-y-4"></div>
+                </div>
+                <button id="broadcast-announce-btn" onclick="openAnnouncementModal()"
+                    class="bg-amber-100 text-amber-700 px-6 py-4 rounded-[22px] text-xs font-black flex items-center justify-center gap-3 border border-amber-200 active:scale-95 w-full shadow-md"><i
+                        data-lucide="megaphone" class="w-5 h-5"></i>發布全員公告</button>
             </div>
 
             <!-- 分頁5: 問卷管理 -->
             <div id="surveys-section" class="hidden animate-in w-full space-y-6">
                 <div class="flex items-center justify-between px-2">
-                    <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600"><i data-lucide="files" class="w-4 h-4"></i></div><h4 class="font-[900] text-slate-800 text-base tracking-tight">問卷庫</h4></div>
-                    <button onclick="openSurveyAdminModal(null)" class="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black border border-emerald-100 active:scale-95 flex items-center gap-2"><i data-lucide="plus" class="w-3.5 h-3.5"></i>建立</button>
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
+                            <i data-lucide="files" class="w-4 h-4"></i>
+                        </div>
+                        <h4 class="font-[900] text-slate-800 text-base tracking-tight">問卷庫</h4>
+                    </div>
+                    <button onclick="openSurveyAdminModal(null)"
+                        class="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black border border-emerald-100 active:scale-95 flex items-center gap-2"><i
+                            data-lucide="plus" class="w-3.5 h-3.5"></i>建立</button>
                 </div>
-                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40"><div id="admin-survey-list" class="space-y-4"></div></div>
+                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40">
+                    <div id="admin-survey-list" class="space-y-4"></div>
+                </div>
             </div>
         </section>
     </main>
 
     <!-- 底部導覽列 -->
     <nav id="tab-nav-container" class="hidden fixed bottom-0 w-full max-w-md z-40 p-4 pt-0">
-        <div id="tab-nav" class="flex bg-slate-900/90 backdrop-blur-xl p-2 rounded-[28px] border border-white/10 shadow-2xl w-full">
-            <button onclick="switchTab('home')" id="btn-home" class="flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn tab-active flex flex-col items-center justify-center text-indigo-400"><i data-lucide="home" class="w-5 h-5 mb-1"></i>首頁</button>
-            <button onclick="switchTab('history')" id="btn-history" class="flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i data-lucide="clipboard-list" class="w-5 h-5 mb-1"></i>紀錄</button>
-            <button onclick="switchTab('monitor')" id="btn-monitor" class="hidden flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i data-lucide="users" class="w-5 h-5 mb-1"></i>組員</button>
-            <button onclick="switchTab('broadcast')" id="btn-broadcast" class="hidden flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i data-lucide="radio" class="w-5 h-5 mb-1"></i>廣播</button>
-            <button onclick="switchTab('surveys')" id="btn-surveys" class="hidden flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i data-lucide="files" class="w-5 h-5 mb-1"></i>問卷庫</button>
+        <div id="tab-nav"
+            class="flex bg-slate-900/90 backdrop-blur-xl p-2 rounded-[28px] border border-white/10 shadow-2xl w-full">
+            <button onclick="switchTab('home')" id="btn-home"
+                class="flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn tab-active flex flex-col items-center justify-center text-indigo-400"><i
+                    data-lucide="home" class="w-5 h-5 mb-1"></i>首頁</button>
+            <button onclick="switchTab('history')" id="btn-history"
+                class="flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i
+                    data-lucide="clipboard-list" class="w-5 h-5 mb-1"></i>紀錄</button>
+            <button onclick="switchTab('monitor')" id="btn-monitor"
+                class="hidden flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i
+                    data-lucide="users" class="w-5 h-5 mb-1"></i>組員</button>
+            <button onclick="switchTab('broadcast')" id="btn-broadcast"
+                class="hidden flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i
+                    data-lucide="radio" class="w-5 h-5 mb-1"></i>廣播</button>
+            <button onclick="switchTab('surveys')" id="btn-surveys"
+                class="hidden flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i
+                    data-lucide="files" class="w-5 h-5 mb-1"></i>問卷庫</button>
         </div>
     </nav>
 
@@ -181,20 +481,27 @@
         <!-- 個人資料編輯 Modal -->
         <div id="profile-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-6 shadow-2xl">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeProfileModal()"></div>
-            <div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center">
-                <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white" id="profile-initial">-</div>
+            <div
+                class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center">
+                <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white"
+                    id="profile-initial">-</div>
                 <div class="w-full space-y-2 mb-6 text-center">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">個人姓名 (限本人修改)</label>
-                    <input type="text" id="profile-name-input" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 shadow-inner">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">個人姓名
+                        (限本人修改)</label>
+                    <input type="text" id="profile-name-input"
+                        class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 shadow-inner">
                 </div>
                 <div class="w-full space-y-4">
                     <div class="space-y-1">
                         <label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">角色/權限</label>
-                        <div id="profile-role" class="w-full px-4 py-3.5 bg-slate-50 rounded-2xl text-sm font-bold text-center text-indigo-600"> Member </div>
+                        <div id="profile-role"
+                            class="w-full px-4 py-3.5 bg-slate-50 rounded-2xl text-sm font-bold text-center text-indigo-600">
+                            Member </div>
                     </div>
                     <div class="space-y-1">
                         <label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">主要樂器</label>
-                        <select id="profile-instrument-input" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none shadow-sm"></select>
+                        <select id="profile-instrument-input"
+                            class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none shadow-sm"></select>
                     </div>
                     <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center">
                         <span class="text-[10px] font-black text-slate-500 uppercase text-center">組別</span>
@@ -206,11 +513,15 @@
                     </div>
                     <div class="space-y-1">
                         <label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">變更密碼</label>
-                        <input type="password" id="profile-new-password" class="w-full px-4 py-3.5 rounded-2xl bg-slate-100 outline-none border-none text-xs font-bold text-center" placeholder="不變請留空">
+                        <input type="password" id="profile-new-password"
+                            class="w-full px-4 py-3.5 rounded-2xl bg-slate-100 outline-none border-none text-xs font-bold text-center"
+                            placeholder="不變請留空">
                     </div>
-                    <button id="update-password-btn" onclick="handleUpdatePassword()" class="w-full py-3.5 btn-premium text-white font-black rounded-2xl text-xs shadow-lg">更新資料</button>
+                    <button id="update-password-btn" onclick="handleUpdatePassword()"
+                        class="w-full py-3.5 btn-premium text-white font-black rounded-2xl text-xs shadow-lg">更新資料</button>
                 </div>
-                <button onclick="closeProfileModal()" class="mt-8 text-slate-400 text-[10px] font-black uppercase text-center">返回</button>
+                <button onclick="closeProfileModal()"
+                    class="mt-8 text-slate-400 text-[10px] font-black uppercase text-center">返回</button>
             </div>
         </div>
 
@@ -218,67 +529,131 @@
         <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 shadow-2xl">
             <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md text-center" onclick="closeEditModal()"></div>
             <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center">
-                <h3 id="modal-title" class="text-xl font-[900] text-slate-800 mb-6 tracking-tight text-center">活動詳細設定</h3>
+                <h3 id="modal-title" class="text-xl font-[900] text-slate-800 mb-6 tracking-tight text-center">活動詳細設定
+                </h3>
                 <div class="space-y-4">
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">活動名稱</label><input type="text" id="edit-name" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner" placeholder="如：團練、演出"></div>
-                    <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">日期</label><input type="date" id="edit-date" class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center shadow-inner"></div>
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">活動名稱</label><input
+                            type="text" id="edit-name"
+                            class="w-full px-6 py-4 rounded-[18px] bg-slate-50 outline-none border-none font-bold text-center shadow-inner"
+                            placeholder="如：團練、演出"></div>
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">日期</label><input
+                            type="date" id="edit-date"
+                            class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center shadow-inner">
+                    </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">開始時間</label><input type="time" id="edit-start" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
-                        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">結束時間</label><input type="time" id="edit-end" class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center"></div>
+                        <div class="space-y-1"><label
+                                class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">開始時間</label><input
+                                type="time" id="edit-start"
+                                class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center">
+                        </div>
+                        <div class="space-y-1"><label
+                                class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">結束時間</label><input
+                                type="time" id="edit-end"
+                                class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none outline-none font-bold text-center">
+                        </div>
                     </div>
                     <div class="pt-4 border-t border-slate-100 text-center">
-                        <p class="text-[10px] font-black text-amber-500 uppercase mb-2 text-center text-center">休息/扣除時段 (不計入時數)</p>
-                        <div class="grid grid-cols-2 gap-4"><input type="time" id="edit-rest-start" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center"><input type="time" id="edit-rest-end" class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center"></div>
+                        <p class="text-[10px] font-black text-amber-500 uppercase mb-2 text-center text-center">休息/扣除時段
+                            (不計入時數)</p>
+                        <div class="grid grid-cols-2 gap-4"><input type="time" id="edit-rest-start"
+                                class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center"><input
+                                type="time" id="edit-rest-end"
+                                class="w-full px-4 py-3 rounded-[18px] bg-amber-50/50 border-none outline-none font-bold text-center text-amber-700 text-center">
+                        </div>
                     </div>
                 </div>
                 <div class="flex gap-4 mt-8 text-center">
-                    <button onclick="closeEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center">取消</button>
-                    <button id="save-event-btn" onclick="saveEvent()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center">儲存活動</button>
+                    <button onclick="closeEditModal()"
+                        class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm text-center">取消</button>
+                    <button id="save-event-btn" onclick="saveEvent()"
+                        class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg text-center">儲存活動</button>
                 </div>
             </div>
         </div>
 
         <!-- 問卷編輯 Modal -->
-        <div id="survey-admin-modal" class="hidden fixed inset-0 z-[160] flex items-center justify-center p-6 shadow-2xl">
+        <div id="survey-admin-modal"
+            class="hidden fixed inset-0 z-[160] flex items-center justify-center p-6 shadow-2xl">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeSurveyAdminModal()"></div>
-            <div class="bg-white w-full max-w-lg rounded-[36px] shadow-2xl p-8 relative fade-up max-h-[90vh] flex flex-col text-center">
-                <h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2"><i data-lucide="settings-2" class="w-5 h-5 text-indigo-500"></i>問卷管理</h3>
+            <div
+                class="bg-white w-full max-w-lg rounded-[36px] shadow-2xl p-8 relative fade-up max-h-[90vh] flex flex-col text-center">
+                <h3
+                    class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2">
+                    <i data-lucide="settings-2" class="w-5 h-5 text-indigo-500"></i>問卷管理
+                </h3>
                 <div class="flex bg-slate-100 p-1.5 rounded-2xl mb-6">
-                    <button onclick="switchSurveyAdminTab('config')" id="sur-tab-config" class="flex-1 py-3 text-[10px] font-black rounded-xl bg-white text-indigo-600 shadow-sm transition-all">設計</button>
-                    <button onclick="switchSurveyAdminTab('result')" id="sur-tab-result" class="flex-1 py-3 text-[10px] font-black rounded-xl text-slate-500 transition-all">統計</button>
+                    <button onclick="switchSurveyAdminTab('config')" id="sur-tab-config"
+                        class="flex-1 py-3 text-[10px] font-black rounded-xl bg-white text-indigo-600 shadow-sm transition-all">設計</button>
+                    <button onclick="switchSurveyAdminTab('result')" id="sur-tab-result"
+                        class="flex-1 py-3 text-[10px] font-black rounded-xl text-slate-500 transition-all">統計</button>
                 </div>
                 <div id="sur-admin-config" class="space-y-4 flex-1 overflow-y-auto text-left text-center">
-                    <div class="space-y-2 text-center"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">問卷標題</label><input type="text" id="sur-admin-title" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm text-center shadow-inner"></div>
-                    <div class="space-y-2 text-center"><label class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">詳細說明</label><textarea id="sur-admin-desc" class="w-full h-20 p-5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm resize-none shadow-inner"></textarea></div>
-                    
+                    <div class="space-y-2 text-center"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">問卷標題</label><input
+                            type="text" id="sur-admin-title"
+                            class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm text-center shadow-inner">
+                    </div>
+                    <div class="space-y-2 text-center"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">詳細說明</label><textarea
+                            id="sur-admin-desc"
+                            class="w-full h-20 p-5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm resize-none shadow-inner"></textarea>
+                    </div>
+
                     <!-- 嵌入式問卷設定 -->
                     <div class="pt-4 border-t border-slate-100">
-                        <label class="text-[10px] font-black text-indigo-500 uppercase px-1 text-center">外部嵌入模式 (如 Google 表單)</label>
-                        <input type="text" id="sur-admin-embed-url" placeholder="請貼入表單網址..." class="w-full mt-2 px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-medium text-xs text-center shadow-inner">
-                        <p class="text-[9px] text-slate-400 mt-2 px-1 leading-relaxed text-center">提示：填入連結後，團員將直接在此畫面填寫外部表單，下方的題目設定將被忽略。</p>
+                        <label class="text-[10px] font-black text-indigo-500 uppercase px-1 text-center">外部嵌入模式 (如
+                            Google 表單)</label>
+                        <input type="text" id="sur-admin-embed-url" placeholder="請貼入表單網址..."
+                            class="w-full mt-2 px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-medium text-xs text-center shadow-inner">
+                        <p class="text-[9px] text-slate-400 mt-2 px-1 leading-relaxed text-center">
+                            提示：填入連結後，團員將直接在此畫面填寫外部表單，下方的題目設定將被忽略。</p>
                     </div>
 
                     <div class="pt-4 border-t border-slate-100 text-center">
-                        <div class="flex justify-between items-center mb-3 text-center"><label class="text-[10px] font-black text-indigo-500 uppercase text-center">內建題目清單</label><button onclick="addSurveyQuestion()" class="text-[9px] bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full font-black flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i>新增題目</button></div>
+                        <div class="flex justify-between items-center mb-3 text-center">
+                            <label class="text-[10px] font-black text-indigo-500 uppercase text-center">內建題目清單</label>
+                            <div class="flex gap-2">
+                                <button onclick="addSurveySection()"
+                                    class="text-[9px] bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full font-black flex items-center gap-1"><i
+                                        data-lucide="layout-panel-top" class="w-3 h-3"></i>新增區段</button>
+                                <button onclick="addSurveyQuestion()"
+                                    class="text-[9px] bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full font-black flex items-center gap-1"><i
+                                        data-lucide="plus" class="w-3 h-3"></i>新增題目</button>
+                            </div>
+                        </div>
                         <div id="sur-admin-questions-list" class="space-y-3 text-center"></div>
                     </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mt-4 text-center"><span class="text-sm font-black text-slate-700 text-center">對全員開放</span><input type="checkbox" id="sur-admin-status" class="w-6 h-6 accent-indigo-600"></div>
-                    <button onclick="handleUpdateSurveyConfig()" id="btn-save-sur-config" class="w-full py-4 btn-premium text-white rounded-2xl font-black text-sm mt-4 shadow-lg text-center">儲存問卷設定</button>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mt-4 text-center"><span
+                            class="text-sm font-black text-slate-700 text-center">對全員開放</span><input type="checkbox"
+                            id="sur-admin-status" class="w-6 h-6 accent-indigo-600"></div>
+                    <button onclick="handleUpdateSurveyConfig()" id="btn-save-sur-config"
+                        class="w-full py-4 btn-premium text-white rounded-2xl font-black text-sm mt-4 shadow-lg text-center">儲存問卷設定</button>
                 </div>
                 <div id="sur-admin-result" class="hidden flex-1 overflow-y-auto space-y-5 py-2 text-center"></div>
-                <button onclick="closeSurveyAdminModal()" class="mt-6 text-slate-400 text-[10px] font-black uppercase text-center text-center">返回列表</button>
+                <button onclick="closeSurveyAdminModal()"
+                    class="mt-6 text-slate-400 text-[10px] font-black uppercase text-center text-center">返回列表</button>
             </div>
         </div>
 
         <!-- 公告編輯 Modal -->
-        <div id="announcement-modal" class="hidden fixed inset-0 z-[140] flex items-center justify-center p-6 shadow-2xl">
+        <div id="announcement-modal"
+            class="hidden fixed inset-0 z-[140] flex items-center justify-center p-6 shadow-2xl">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAnnouncementModal()"></div>
             <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up">
-                <h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2"><i data-lucide="megaphone" class="w-6 h-6 text-amber-500"></i>發布全員公告</h3>
-                <textarea id="announcement-edit-input" class="w-full h-40 px-6 py-5 rounded-[22px] bg-slate-50 border-none outline-none font-bold text-sm text-slate-700 shadow-inner resize-none mb-6" placeholder="請輸入公告內容..."></textarea>
+                <h3
+                    class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2">
+                    <i data-lucide="megaphone" class="w-6 h-6 text-amber-500"></i>發布全員公告
+                </h3>
+                <textarea id="announcement-edit-input"
+                    class="w-full h-40 px-6 py-5 rounded-[22px] bg-slate-50 border-none outline-none font-bold text-sm text-slate-700 shadow-inner resize-none mb-6"
+                    placeholder="請輸入公告內容..."></textarea>
                 <div class="flex gap-4">
-                    <button onclick="closeAnnouncementModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm">取消</button>
-                    <button id="save-announcement-btn" onclick="handleSaveAnnouncement()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">發布公告</button>
+                    <button onclick="closeAnnouncementModal()"
+                        class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm">取消</button>
+                    <button id="save-announcement-btn" onclick="handleSaveAnnouncement()"
+                        class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">發布公告</button>
                 </div>
             </div>
         </div>
@@ -286,40 +661,59 @@
         <!-- 問卷填寫 Modal -->
         <div id="survey-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-6 shadow-2xl">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeSurveyModal()"></div>
-            <div id="survey-modal-content" class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-0 relative fade-up flex flex-col transition-all duration-500 overflow-hidden">
-                <div class="p-8 pb-4">
-                    <h3 id="survey-modal-title" class="text-xl font-[900] text-slate-800 mb-2 tracking-tight text-center">調查</h3>
+            <div id="survey-modal-content"
+                class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-0 relative fade-up flex flex-col transition-all duration-500 overflow-hidden max-h-[90vh]">
+                <div class="p-8 pb-3">
+                    <h3 id="survey-modal-title"
+                        class="text-xl font-[900] text-slate-800 mb-1 tracking-tight text-center">調查</h3>
                     <p id="survey-modal-desc" class="text-xs text-slate-400 text-center"></p>
+                    <!-- 區段進度指示 -->
+                    <div id="survey-section-indicator" class="hidden mt-3">
+                        <p id="survey-section-label"
+                            class="text-[10px] font-black text-indigo-500 uppercase tracking-widest text-center mb-2">
+                        </p>
+                        <div id="survey-section-dots" class="flex justify-center gap-1.5"></div>
+                    </div>
                 </div>
-                
                 <!-- 內容區域 -->
                 <div id="survey-content-container" class="flex-1 overflow-y-auto px-8 pb-4">
-                    <div id="survey-dynamic-fields" class="space-y-6"></div>
-                    <!-- Iframe 容器 -->
-                    <div id="survey-iframe-container" class="hidden w-full h-[75vh] rounded-2xl overflow-hidden border border-slate-100 shadow-inner mt-4">
+                    <div id="survey-dynamic-fields" class="space-y-5"></div>
+                    <div id="survey-iframe-container"
+                        class="hidden w-full h-[65vh] rounded-2xl overflow-hidden border border-slate-100 shadow-inner mt-4">
                         <iframe id="survey-external-frame" src="" class="w-full h-full border-none"></iframe>
                     </div>
                 </div>
-
-                <div class="p-8 pt-4 flex gap-4 bg-slate-50/50 border-t border-slate-100">
-                    <button onclick="closeSurveyModal()" class="flex-1 py-4 bg-white text-slate-500 rounded-[20px] font-black text-sm border border-slate-200">取消</button>
-                    <button id="save-survey-btn" onclick="handleSaveSurvey()" class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">提交回覆</button>
+                <div class="p-6 pt-4 flex gap-3 bg-slate-50/50 border-t border-slate-100">
+                    <button id="survey-cancel-btn" onclick="closeSurveyModal()"
+                        class="py-4 px-5 bg-white text-slate-500 rounded-[20px] font-black text-sm border border-slate-200">取消</button>
+                    <button id="survey-prev-btn" onclick="surveyGoPrev()"
+                        class="hidden py-4 px-5 bg-slate-100 text-slate-600 rounded-[20px] font-black text-sm">上一步</button>
+                    <button id="survey-next-btn" onclick="surveyGoNext()"
+                        class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">下一步
+                        →</button>
+                    <button id="save-survey-btn" onclick="handleSaveSurvey()"
+                        class="hidden flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">提交回覆</button>
                 </div>
             </div>
         </div>
 
         <!-- Toast 通知 -->
-        <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 hidden flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 border-white text-center shadow-lg"><i id="toast-icon" data-lucide="info"></i><span id="toast-msg" class="font-black text-sm"></span></div>
+        <div id="toast"
+            class="fixed top-12 left-1/2 -translate-x-1/2 hidden flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 border-white text-center shadow-lg">
+            <i id="toast-icon" data-lucide="info"></i><span id="toast-msg" class="font-black text-sm"></span>
+        </div>
     </div>
 
     <script>
         // --- 核心工具 ---
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwGqcIAdtuqQqF0lu1HeODaShs_vmfmHXAi6N_VlPK5GMKvhuRkTi3Eo_Lz0CN2_vfq/exec";   
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwoVDdmQGZ4hgkhMedz2xju8VU_KUf3kSJrfILU0fsK61kzGi-_rrT4DPf_zRpGnLWw/exec";
         const MAX_DISTANCE = 500, ALLOWED_LOCATIONS = [{ name: "崇正寶宮", lat: 24.133658, lng: 120.717338 }];
         const orchestraData = { "吹管組": ["笛", "嗩", "笙", "(上)低音號"], "拉弦組": ["高胡", "二胡", "中胡"], "彈撥組": ["柳琴", "琵琶", "中阮", "大阮", "古箏"], "揚打組": ["揚琴", "打擊"], "低音組": ["大提琴", "低音提琴"] };
-        
+
         let currentUser = null, currentEventData = null, allEvents = [], allSurveys = [], editingSurveyId = null, editingId = null, cachedMemberList = [];
         let surveyQuestions = [], userResponses = {}, adminQuestions = [], currentEmbedURL = "";
+        // 區段導覽狀態
+        let surveySections = [], currentSectionIdx = 0, sectionHistory = [], allSurveyResponses = {};
 
         function formatDateTime(isoStr, onlyDate = false) {
             if (!isoStr) return "";
@@ -334,8 +728,8 @@
             return `${y}-${m}-${d} ${hh}:${mm}`;
         }
 
-        function formatDurationDisplay(dur) { 
-            if (!dur) return "0時0分"; 
+        function formatDurationDisplay(dur) {
+            if (!dur) return "0時0分";
             let s = String(dur);
             if (s.includes('1899') || s.includes('Dec 30 1899') || s.includes('Dec 29 1899') || (s.includes('T') && s.includes('Z') && s.includes('1899'))) {
                 const date = new Date(s);
@@ -346,77 +740,77 @@
                 }
             }
             if (s.includes('時')) return s;
-            if (/^\d{1,2}:\d{1,2}/.test(s)) { 
-                const p = s.split(':'); 
-                return `${parseInt(p[0])}時${parseInt(p[1])}分`; 
+            if (/^\d{1,2}:\d{1,2}/.test(s)) {
+                const p = s.split(':');
+                return `${parseInt(p[0])}時${parseInt(p[1])}分`;
             }
-            return s; 
+            return s;
         }
 
-        function showToast(m, e = false) { 
-            const t = document.getElementById('toast'), msg = document.getElementById('toast-msg'), icon = document.getElementById('toast-icon'); 
-            if (!t || !msg || !icon) return; 
-            msg.innerText = m; 
-            t.className = `fixed top-12 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 border-white text-center shadow-lg ${e ? 'text-rose-500 border-rose-100' : 'text-indigo-600 border-indigo-100'}`; 
-            icon.setAttribute('data-lucide', e ? 'alert-circle' : 'check-circle'); 
-            t.classList.remove('hidden', 'opacity-0'); 
-            safeCreateIcons(); 
-            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => { t.classList.add('hidden'); }, 500); }, 3000); 
+        function showToast(m, e = false) {
+            const t = document.getElementById('toast'), msg = document.getElementById('toast-msg'), icon = document.getElementById('toast-icon');
+            if (!t || !msg || !icon) return;
+            msg.innerText = m;
+            t.className = `fixed top-12 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 border-white text-center shadow-lg ${e ? 'text-rose-500 border-rose-100' : 'text-indigo-600 border-indigo-100'}`;
+            icon.setAttribute('data-lucide', e ? 'alert-circle' : 'check-circle');
+            t.classList.remove('hidden', 'opacity-0');
+            safeCreateIcons();
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => { t.classList.add('hidden'); }, 500); }, 3000);
         }
 
-        async function callBackend(action, data) { 
-            try { 
-                const response = await fetch(GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action, data }) }); 
-                const text = await response.text(); 
-                try { return JSON.parse(text); } catch (e) { return { success: false, message: "解析失敗" }; } 
-            } catch (e) { return { success: false, message: "通訊異常" }; } 
+        async function callBackend(action, data) {
+            try {
+                const response = await fetch(GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action, data }) });
+                const text = await response.text();
+                try { return JSON.parse(text); } catch (e) { return { success: false, message: "解析失敗" }; }
+            } catch (e) { return { success: false, message: "通訊異常" }; }
         }
 
         function safeCreateIcons() { if (typeof lucide !== 'undefined') lucide.createIcons(); }
-        function setBtnLoading(btn, isLoading, text) { 
-            if (!btn) return; 
-            btn.innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto"></i>' : text; 
-            btn.disabled = isLoading; 
-            btn.classList.toggle('opacity-70', isLoading); 
-            safeCreateIcons(); 
+        function setBtnLoading(btn, isLoading, text) {
+            if (!btn) return;
+            btn.innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto"></i>' : text;
+            btn.disabled = isLoading;
+            btn.classList.toggle('opacity-70', isLoading);
+            safeCreateIcons();
         }
 
         function switchAuthMode(mode) { document.getElementById('login-view').classList.toggle('hidden', mode === 'register'); document.getElementById('register-view').classList.toggle('hidden', mode === 'login'); }
-        function switchView(id) { 
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); 
-            const t = document.getElementById(id); if (t) t.classList.remove('hidden'); 
+        function switchView(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            const t = document.getElementById(id); if (t) t.classList.remove('hidden');
             const isDash = (id === 'dashboard-view');
             const navBar = document.getElementById('nav-bar');
             const tabNav = document.getElementById('tab-nav-container');
-            if (navBar) navBar.classList.toggle('hidden', !isDash); 
+            if (navBar) navBar.classList.toggle('hidden', !isDash);
             if (tabNav) tabNav.classList.toggle('hidden', !isDash);
-            const app = document.getElementById('app'); 
+            const app = document.getElementById('app');
             if (app) {
-                if (isDash) { app.classList.replace('pt-6', 'pt-24'); app.classList.replace('sm:pt-10', 'sm:pt-28'); } 
-                else { app.classList.replace('pt-24', 'pt-6'); app.classList.replace('sm:pt-28', 'sm:pt-10'); } 
+                if (isDash) { app.classList.replace('pt-6', 'pt-24'); app.classList.replace('sm:pt-10', 'sm:pt-28'); }
+                else { app.classList.replace('pt-24', 'pt-6'); app.classList.replace('sm:pt-28', 'sm:pt-10'); }
             }
         }
-        
-        function switchTab(t) { 
-            document.querySelectorAll('#tab-nav .tab-btn').forEach(b => { b.classList.remove('tab-active', 'text-indigo-400'); b.classList.add('text-slate-400'); }); 
-            const b = document.getElementById(`btn-${t}`); 
-            if (b) { b.classList.add('tab-active', 'text-indigo-400'); b.classList.remove('text-slate-400'); } 
-            ['home', 'history', 'monitor', 'broadcast', 'surveys'].forEach(s => { const el = document.getElementById(`${s}-section`); if (el) el.classList.toggle('hidden', s !== t); }); 
+
+        function switchTab(t) {
+            document.querySelectorAll('#tab-nav .tab-btn').forEach(b => { b.classList.remove('tab-active', 'text-indigo-400'); b.classList.add('text-slate-400'); });
+            const b = document.getElementById(`btn-${t}`);
+            if (b) { b.classList.add('tab-active', 'text-indigo-400'); b.classList.remove('text-slate-400'); }
+            ['home', 'history', 'monitor', 'broadcast', 'surveys'].forEach(s => { const el = document.getElementById(`${s}-section`); if (el) el.classList.toggle('hidden', s !== t); });
             if (t === 'home') { fetchAnnouncement(); fetchSurveyStatus(); }
-            if (t === 'monitor') loadRealtimeStatus(); 
-            if (t === 'broadcast') loadEventList(); 
-            if (t === 'surveys') loadSurveyList(); 
+            if (t === 'monitor') loadRealtimeStatus();
+            if (t === 'broadcast') loadEventList();
+            if (t === 'surveys') loadSurveyList();
             safeCreateIcons();
         }
 
         async function handleLogin() {
             const emailEl = document.getElementById('login-email'), pwdEl = document.getElementById('login-password');
-            if(!emailEl.value || !pwdEl.value) return showToast("帳密必填", true);
+            if (!emailEl.value || !pwdEl.value) return showToast("帳密必填", true);
             const btn = document.getElementById('login-submit-btn'); setBtnLoading(btn, true, "驗證中...");
             const res = await callBackend('loginUser', { email: emailEl.value.trim(), password: pwdEl.value.trim() });
             setBtnLoading(btn, false, "立即登入");
-            if (res?.success) { 
-                currentUser = res.user; setupDashboard(); switchView('dashboard-view'); 
+            if (res?.success) {
+                currentUser = res.user; setupDashboard(); switchView('dashboard-view');
                 switchTab('home'); refreshSystemStatus(); loadAttendanceHistory();
             } else showToast(res?.message || "登入失敗", true);
         }
@@ -430,38 +824,38 @@
             if (userDisplay) userDisplay.innerText = `你好，${uName}`;
             if (navInfo) navInfo.innerText = uName;
             if (avatarBtn) avatarBtn.innerText = (uName || "?").charAt(0);
-            
+
             const sectionEl = document.getElementById('home-section-display');
             const instEl = document.getElementById('home-instrument-display');
             const roleEl = document.getElementById('home-role-display');
             if (sectionEl) sectionEl.innerText = currentUser.Section || "-";
             if (instEl) instEl.innerText = currentUser.Instrument || "-";
             if (roleEl) roleEl.innerText = currentUser.Role || "Member";
-            
+
             const isLeader = currentUser.Role === 'Leader';
             const isAdmin = ['Admin', 'Officer'].includes(currentUser.Role);
-            const isActuallyAdmin = currentUser.Role === 'Admin'; 
-            const isActuallyOfficer = currentUser.Role === 'Officer'; 
-            
+            const isActuallyAdmin = currentUser.Role === 'Admin';
+            const isActuallyOfficer = currentUser.Role === 'Officer';
+
             const btnMonitor = document.getElementById('btn-monitor');
             const btnBroadcast = document.getElementById('btn-broadcast');
             const btnSurveys = document.getElementById('btn-surveys');
             if (btnMonitor) btnMonitor.classList.toggle('hidden', !isLeader && !isAdmin);
             if (btnBroadcast) btnBroadcast.classList.toggle('hidden', !isAdmin);
             if (btnSurveys) btnSurveys.classList.toggle('hidden', !isAdmin);
-            
+
             const broadcastAddBtn = document.getElementById('broadcast-add-btn');
             const broadcastAnnounceBtn = document.getElementById('broadcast-announce-btn');
-            
-            if(broadcastAddBtn) broadcastAddBtn.classList.toggle('hidden', !isActuallyAdmin);
-            if(broadcastAnnounceBtn) broadcastAnnounceBtn.classList.toggle('hidden', !(isActuallyAdmin || isActuallyOfficer));
+
+            if (broadcastAddBtn) broadcastAddBtn.classList.toggle('hidden', !isActuallyAdmin);
+            if (broadcastAnnounceBtn) broadcastAnnounceBtn.classList.toggle('hidden', !(isActuallyAdmin || isActuallyOfficer));
 
             const monitorTitle = document.getElementById('monitor-title');
             if (monitorTitle) monitorTitle.innerText = isLeader ? `${currentUser.Section} 簽到狀態` : "全員簽到狀態";
-            
+
             const filterEl = document.getElementById('monitor-filter-section');
             if (filterEl) {
-                if (isLeader) { filterEl.value = currentUser.Section; filterEl.disabled = true; } 
+                if (isLeader) { filterEl.value = currentUser.Section; filterEl.disabled = true; }
                 else { filterEl.disabled = false; }
             }
             safeCreateIcons();
@@ -480,13 +874,13 @@
             if (nameInput) nameInput.value = currentUser.Name || "";
             if (profileInitial) profileInitial.innerText = (currentUser.Name || "?").charAt(0);
             if (roleEl) roleEl.innerText = currentUser.Role || "Member";
-            
+
             const pEmail = document.getElementById('profile-email');
             if (pEmail) pEmail.innerText = currentUser.Email || "";
-            
+
             const pSection = document.getElementById('profile-section-display');
             if (pSection) pSection.innerText = currentUser.Section || "-";
-            
+
             if (instSelect) {
                 instSelect.innerHTML = '';
                 if (orchestraData[currentUser.Section]) {
@@ -503,7 +897,7 @@
 
         function closeProfileModal() {
             const modal = document.getElementById('profile-modal');
-            if(modal) modal.classList.add('hidden');
+            if (modal) modal.classList.add('hidden');
         }
 
         async function handleUpdatePassword() {
@@ -511,23 +905,23 @@
             const inst = document.getElementById('profile-instrument-input')?.value || currentUser.Instrument;
             const pwd = document.getElementById('profile-new-password')?.value || "";
             const res = await callBackend('saveMember', { email: currentUser.Email, name, instrument: inst, password: pwd });
-            if(res?.success) { showToast("已更新資料"); closeProfileModal(); currentUser.Name = name; currentUser.Instrument = inst; setupDashboard(); } 
+            if (res?.success) { showToast("已更新資料"); closeProfileModal(); currentUser.Name = name; currentUser.Instrument = inst; setupDashboard(); }
             else showToast("更新失敗", true);
         }
 
         async function refreshSystemStatus() {
             if (!currentUser) return;
             const res = await callBackend('getSystemStatus', { email: currentUser.Email });
-            if (res?.success) { 
-                currentEventData = res; 
-                updateCheckinBtnStatus(res.hasCheckedIn); 
+            if (res?.success) {
+                currentEventData = res;
+                updateCheckinBtnStatus(res.hasCheckedIn);
                 const eventDisplay = document.getElementById('current-event-display');
-                if(eventDisplay) eventDisplay.innerText = res.enabled ? res.eventName : "目前暫無團練活動"; 
-                const ti = document.getElementById('checkin-time-display'); 
-                if(ti) { 
-                    ti.innerText = res.enabled ? `${res.eventStart} ~ ${res.eventEnd}` : "--:--"; 
-                    ti.classList.toggle('opacity-100', res.enabled); 
-                } 
+                if (eventDisplay) eventDisplay.innerText = res.enabled ? res.eventName : "目前暫無團練活動";
+                const ti = document.getElementById('checkin-time-display');
+                if (ti) {
+                    ti.innerText = res.enabled ? `${res.eventStart} ~ ${res.eventEnd}` : "--:--";
+                    ti.classList.toggle('opacity-100', res.enabled);
+                }
             }
         }
 
@@ -543,7 +937,7 @@
                 btn.disabled = !isEnabled;
                 btn.innerHTML = isEnabled ? '<i data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span class="text-lg">簽到</span>' : '<i data-lucide="clock" class="w-10 h-10 mb-2 opacity-30"></i><span class="text-[10px]">尚未開放</span>';
                 btn.className = isEnabled ? "relative z-10 w-36 h-36 btn-premium rounded-full text-white font-black shadow-2xl border-[10px] border-white flex flex-col items-center justify-center" : "relative z-10 w-36 h-36 bg-slate-200 rounded-full text-slate-400 font-black border-[10px] border-white flex flex-col items-center justify-center cursor-not-allowed";
-                if(isEnabled) pulse.classList.add('pulse-effect'); else pulse.classList.remove('pulse-effect');
+                if (isEnabled) pulse.classList.add('pulse-effect'); else pulse.classList.remove('pulse-effect');
             }
             safeCreateIcons();
         }
@@ -553,7 +947,7 @@
             const res = await callBackend('getAttendanceHistory', { email: currentUser.Email });
             if (res?.success) {
                 const listEl = document.getElementById('attendance-list');
-                if(!listEl) return;
+                if (!listEl) return;
                 let totalMin = 0;
                 listEl.innerHTML = (res.list || []).map(h => {
                     const dur = formatDurationDisplay(h.duration);
@@ -564,36 +958,36 @@
                 }).join('');
                 const totalDurEl = document.getElementById('total-duration-display');
                 const totalMinEl = document.getElementById('total-minutes-label');
-                if(totalDurEl) totalDurEl.innerText = Math.floor(totalMin / 60);
-                if(totalMinEl) totalMinEl.innerText = `${totalMin % 60} Minutes`;
+                if (totalDurEl) totalDurEl.innerText = Math.floor(totalMin / 60);
+                if (totalMinEl) totalMinEl.innerText = `${totalMin % 60} Minutes`;
             }
             safeCreateIcons();
         }
 
-        async function submitCheckin() { 
-            if (!currentEventData) return; 
-            const btn = document.getElementById('checkin-btn'); if(!btn) return;
-            const oldH = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-12 h-12 animate-spin"></i><span class="text-[10px] mt-1">定位中...</span>'; safeCreateIcons(); 
-            try { 
-                const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000 })); 
-                const dist = (function(lat1, lon1, lat2, lon2){ const R = 6371e3; const f1 = lat1 * Math.PI/180, f2 = lat2 * Math.PI/180; const df = (lat2-lat1)*Math.PI/180, dl = (lon2-lon1)*Math.PI/180; const a = Math.sin(df/2)*Math.sin(df/2) + Math.cos(f1) * Math.cos(f2) * Math.sin(dl/2) * Math.sin(dl/2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); })(pos.coords.latitude, pos.coords.longitude, ALLOWED_LOCATIONS[0].lat, ALLOWED_LOCATIONS[0].lng); 
-                if (dist > MAX_DISTANCE) { showToast(`距離崇正寶宮約 ${Math.round(dist)}m，請靠近 500m 內再簽到`, true); btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); return; } 
-                const res = await callBackend('submitCheckin', { email: currentUser.Email, name: currentUser.Name, section: currentUser.Section, date: currentEventData.eventDate, eventName: currentEventData.eventName, eventTimeRange: `${currentEventData.eventStart} ~ ${currentEventData.eventEnd}` }); 
-                if (res?.success) { showToast("簽到成功！排練愉快"); currentEventData.hasCheckedIn = true; updateCheckinBtnStatus(true); setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1500); } 
-                else showToast(res.message || "簽到失敗", true); 
-            } catch (e) { showToast("定位失敗", true); btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); } 
+        async function submitCheckin() {
+            if (!currentEventData) return;
+            const btn = document.getElementById('checkin-btn'); if (!btn) return;
+            const oldH = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-12 h-12 animate-spin"></i><span class="text-[10px] mt-1">定位中...</span>'; safeCreateIcons();
+            try {
+                const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000 }));
+                const dist = (function (lat1, lon1, lat2, lon2) { const R = 6371e3; const f1 = lat1 * Math.PI / 180, f2 = lat2 * Math.PI / 180; const df = (lat2 - lat1) * Math.PI / 180, dl = (lon2 - lon1) * Math.PI / 180; const a = Math.sin(df / 2) * Math.sin(df / 2) + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) * Math.sin(dl / 2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); })(pos.coords.latitude, pos.coords.longitude, ALLOWED_LOCATIONS[0].lat, ALLOWED_LOCATIONS[0].lng);
+                if (dist > MAX_DISTANCE) { showToast(`距離崇正寶宮約 ${Math.round(dist)}m，請靠近 500m 內再簽到`, true); btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); return; }
+                const res = await callBackend('submitCheckin', { email: currentUser.Email, name: currentUser.Name, section: currentUser.Section, date: currentEventData.eventDate, eventName: currentEventData.eventName, eventTimeRange: `${currentEventData.eventStart} ~ ${currentEventData.eventEnd}` });
+                if (res?.success) { showToast("簽到成功！排練愉快"); currentEventData.hasCheckedIn = true; updateCheckinBtnStatus(true); setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1500); }
+                else showToast(res.message || "簽到失敗", true);
+            } catch (e) { showToast("定位失敗", true); btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); }
         }
 
         async function fetchAnnouncement() {
             const res = await callBackend('getAnnouncement', {});
             const board = document.getElementById('announcement-board');
             if (res?.success && res.content) {
-                if(board) board.classList.remove('hidden');
+                if (board) board.classList.remove('hidden');
                 const contentEl = document.getElementById('announcement-content'), timeEl = document.getElementById('announcement-time');
-                if(contentEl) contentEl.innerText = res.content;
+                if (contentEl) contentEl.innerText = res.content;
                 const formattedTime = formatDateTime(res.updateTime);
-                if(timeEl) timeEl.innerText = formattedTime ? `最後更新: ${formattedTime}` : "";
-            } else { if(board) board.classList.add('hidden'); }
+                if (timeEl) timeEl.innerText = formattedTime ? `最後更新: ${formattedTime}` : "";
+            } else { if (board) board.classList.add('hidden'); }
         }
 
         async function handleSaveAnnouncement() {
@@ -601,16 +995,16 @@
             if (!content) return showToast("內容不可為空", true);
             const btn = document.getElementById('save-announcement-btn'); setBtnLoading(btn, true, "發布中...");
             try {
-                const res = await callBackend('saveAnnouncement', { content }); 
+                const res = await callBackend('saveAnnouncement', { content });
                 if (res?.success) { showToast("公告發布成功"); closeAnnouncementModal(); fetchAnnouncement(); }
                 else showToast("發布失敗", true);
-            } catch(e) { showToast("連線異常", true); }
+            } catch (e) { showToast("連線異常", true); }
             finally { setBtnLoading(btn, false, "發布公告"); }
         }
 
         async function loadEventList() {
             const listEl = document.getElementById('admin-event-list');
-            if(!listEl) return;
+            if (!listEl) return;
             listEl.innerHTML = '<div class="py-10 text-[10px] font-black uppercase text-center">Syncing...</div>';
             try {
                 const res = await callBackend('getEventList', {});
@@ -635,40 +1029,40 @@
 
         async function activateEventFromList(id) {
             const res = await callBackend('activateEvent', { id });
-            if(res?.success) { showToast("活動已開始廣播"); refreshSystemStatus(); }
+            if (res?.success) { showToast("活動已開始廣播"); refreshSystemStatus(); }
         }
 
-        function openEditModal(id) { 
+        function openEditModal(id) {
             editingId = id; const ev = id ? allEvents.find(e => String(e.ID) === String(id)) : null;
             const modalTitle = document.getElementById('modal-title');
-            if(modalTitle) modalTitle.innerText = id ? "編輯活動" : "新增活動";
+            if (modalTitle) modalTitle.innerText = id ? "編輯活動" : "新增活動";
             const fields = { 'edit-name': 'Name', 'edit-date': 'Date', 'edit-start': 'StartTime', 'edit-end': 'EndTime', 'edit-rest-start': 'RestStart', 'edit-rest-end': 'RestEnd' };
             for (let id in fields) {
                 const el = document.getElementById(id);
-                if(el) el.value = ev ? (ev[fields[id]] || "") : (id === 'edit-date' ? new Date().toISOString().split('T')[0] : (id === 'edit-start' ? "19:00" : (id === 'edit-end' ? "21:30" : "")));
+                if (el) el.value = ev ? (ev[fields[id]] || "") : (id === 'edit-date' ? new Date().toISOString().split('T')[0] : (id === 'edit-start' ? "19:00" : (id === 'edit-end' ? "21:30" : "")));
             }
-            document.getElementById('edit-modal')?.classList.remove('hidden'); 
+            document.getElementById('edit-modal')?.classList.remove('hidden');
         }
 
-        async function saveEvent() { 
+        async function saveEvent() {
             const name = document.getElementById('edit-name')?.value.trim() || "";
-            if (!name) return showToast("名稱必填", true); 
+            if (!name) return showToast("名稱必填", true);
             const btn = document.getElementById('save-event-btn'); setBtnLoading(btn, true, "儲存中...");
-            const res = await callBackend('saveEvent', { id: editingId, name, date: document.getElementById('edit-date').value, startTime: document.getElementById('edit-start').value, endTime: document.getElementById('edit-end').value, restStart: document.getElementById('edit-rest-start').value, restEnd: document.getElementById('edit-rest-end').value }); 
+            const res = await callBackend('saveEvent', { id: editingId, name, date: document.getElementById('edit-date').value, startTime: document.getElementById('edit-start').value, endTime: document.getElementById('edit-end').value, restStart: document.getElementById('edit-rest-start').value, restEnd: document.getElementById('edit-rest-end').value });
             setBtnLoading(btn, false, "儲存活動");
-            if (res?.success) { showToast("活動已儲存"); closeEditModal(); loadEventList(); } 
+            if (res?.success) { showToast("活動已儲存"); closeEditModal(); loadEventList(); }
         }
 
         async function loadRealtimeStatus() {
-            const listEl = document.getElementById('realtime-status-list'); if(!listEl) return;
+            const listEl = document.getElementById('realtime-status-list'); if (!listEl) return;
             listEl.innerHTML = '<div class="py-10 text-[10px] font-black uppercase text-center">資料同步中...</div>';
             try {
                 const res = await callBackend('getRealtimeStatus', { section: currentUser.Section, role: currentUser.Role });
                 if (res && res.success) {
                     cachedMemberList = res.data || [];
                     const presentEl = document.getElementById('stat-present'), absentEl = document.getElementById('stat-absent');
-                    if(presentEl) presentEl.innerText = res.stats?.present || 0;
-                    if(absentEl) absentEl.innerText = res.stats?.absent || 0;
+                    if (presentEl) presentEl.innerText = res.stats?.present || 0;
+                    if (absentEl) absentEl.innerText = res.stats?.absent || 0;
                     applyMonitorFilters();
                 } else listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">同步失敗: ${res?.message || '未知錯誤'}</div>`;
             } catch (e) { listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">伺服器異常</div>'; }
@@ -688,27 +1082,27 @@
             const section = filterEl ? filterEl.value : 'all';
             const sort = document.getElementById('monitor-sort-order')?.value || 'default';
             const listEl = document.getElementById('realtime-status-list');
-            if (!cachedMemberList || cachedMemberList.length === 0) { if(listEl) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前無成員資料</div>'; return; }
+            if (!cachedMemberList || cachedMemberList.length === 0) { if (listEl) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前無成員資料</div>'; return; }
             let list = [...cachedMemberList];
-            if(section !== 'all') list = list.filter(m => m.Section === section);
-            if(sort === 'checkin') list.sort((a,b) => (a.status === '檢視簽到' || a.status === '已簽到' ? -1 : 1));
-            else if(sort === 'absence') list.sort((a,b) => (b.absenceCount || 0) - (a.absenceCount || 0));
-            if(listEl) listEl.innerHTML = list.map(m => {
+            if (section !== 'all') list = list.filter(m => m.Section === section);
+            if (sort === 'checkin') list.sort((a, b) => (a.status === '檢視簽到' || a.status === '已簽到' ? -1 : 1));
+            else if (sort === 'absence') list.sort((a, b) => (b.absenceCount || 0) - (a.absenceCount || 0));
+            if (listEl) listEl.innerHTML = list.map(m => {
                 const abs = m.absenceCount || 0;
-                return `<div class="bg-white/70 p-4 rounded-2xl flex justify-between items-center text-left"><div class="flex flex-col gap-1"><p class="font-black text-slate-800 text-xs">${m.Name} <span class="text-[9px] text-slate-400">(${m.Instrument})</span></p><p class="text-[10px] font-black ${getAbsenceColorClass(abs)}">缺 ${abs}</p></div><div class="text-right"><span class="text-xs font-black ${m.status==='已簽到'?'text-emerald-500':'text-rose-400'}">${m.status}</span></div></div>`
+                return `<div class="bg-white/70 p-4 rounded-2xl flex justify-between items-center text-left"><div class="flex flex-col gap-1"><p class="font-black text-slate-800 text-xs">${m.Name} <span class="text-[9px] text-slate-400">(${m.Instrument})</span></p><p class="text-[10px] font-black ${getAbsenceColorClass(abs)}">缺 ${abs}</p></div><div class="text-right"><span class="text-xs font-black ${m.status === '已簽到' ? 'text-emerald-500' : 'text-rose-400'}">${m.status}</span></div></div>`
             }).join('');
             safeCreateIcons();
         }
 
         async function loadSurveyList() {
-            const listEl = document.getElementById('admin-survey-list'); if(!listEl) return;
+            const listEl = document.getElementById('admin-survey-list'); if (!listEl) return;
             listEl.innerHTML = '<div class="py-10 text-[10px] font-black uppercase text-center">Syncing...</div>';
             try {
                 const res = await callBackend('getSurveyList', {});
                 if (res?.success) {
                     allSurveys = res.data || [];
                     if (allSurveys.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前問卷庫為空</div>';
-                    else listEl.innerHTML = allSurveys.map(s => `<div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm flex flex-col gap-3"><div class="text-left"><p class="font-[900] text-slate-800 text-sm mb-1">${s.Title}</p><p class="text-[9px] ${s.Active?'text-emerald-500':'text-slate-400'} font-black uppercase">${s.Active?'開放中':'已關閉'}</p></div><button onclick="openSurveyAdminModal('${s.ID}')" class="w-full py-3 bg-indigo-50 rounded-2xl text-indigo-600 active:scale-95 text-[10px] font-black">管理與統計</button></div>`).join('');
+                    else listEl.innerHTML = allSurveys.map(s => `<div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm flex flex-col gap-3"><div class="text-left"><p class="font-[900] text-slate-800 text-sm mb-1">${s.Title}</p><p class="text-[9px] ${s.Active ? 'text-emerald-500' : 'text-slate-400'} font-black uppercase">${s.Active ? '開放中' : '已關閉'}</p></div><button onclick="openSurveyAdminModal('${s.ID}')" class="w-full py-3 bg-indigo-50 rounded-2xl text-indigo-600 active:scale-95 text-[10px] font-black">管理與統計</button></div>`).join('');
                 } else listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">載入失敗: ${res?.message || '未知錯誤'}</div>`;
             } catch (e) { listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">伺服器異常</div>'; }
             safeCreateIcons();
@@ -718,8 +1112,8 @@
             editingSurveyId = id;
             const sur = id ? allSurveys.find(s => String(s.ID) === String(id)) : null;
             const fields = { 'sur-admin-title': 'Title', 'sur-admin-desc': 'Description', 'sur-admin-embed-url': 'EmbedURL' };
-            for(let id in fields) { const el = document.getElementById(id); if(el) el.value = sur ? (sur[fields[id]] || "") : ""; }
-            const statusEl = document.getElementById('sur-admin-status'); if(statusEl) statusEl.checked = sur ? sur.Active : false;
+            for (let id in fields) { const el = document.getElementById(id); if (el) el.value = sur ? (sur[fields[id]] || "") : ""; }
+            const statusEl = document.getElementById('sur-admin-status'); if (statusEl) statusEl.checked = sur ? sur.Active : false;
             adminQuestions = []; if (sur && sur.QuestionsJSON) try { adminQuestions = JSON.parse(sur.QuestionsJSON); } catch (e) { adminQuestions = []; }
             renderAdminQuestions(); switchSurveyAdminTab('config');
             document.getElementById('survey-admin-modal')?.classList.remove('hidden');
@@ -729,31 +1123,123 @@
         function switchSurveyAdminTab(tab) {
             const sections = ['config', 'result'];
             sections.forEach(s => {
-                const el = document.getElementById(`sur-admin-${s}`); if(el) el.classList.toggle('hidden', s !== tab);
-                const btn = document.getElementById(`sur-tab-${s}`); if(btn) { if(s === tab) btn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm'); else btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm'); }
+                const el = document.getElementById(`sur-admin-${s}`); if (el) el.classList.toggle('hidden', s !== tab);
+                const btn = document.getElementById(`sur-tab-${s}`); if (btn) { if (s === tab) btn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm'); else btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm'); }
             });
-            if(tab === 'result') loadSurveyResults();
+            if (tab === 'result') loadSurveyResults();
         }
 
         function renderAdminQuestions() {
-            const list = document.getElementById('sur-admin-questions-list'); if(!list) return;
-            list.innerHTML = adminQuestions.map((q, i) => `<div class="bg-slate-50 p-4 rounded-xl space-y-2 relative"><button onclick="removeAdminQuestion(${i})" class="absolute top-2 right-2 text-rose-400 hover:text-rose-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button><input type="text" placeholder="題目名稱" value="${q.label}" oninput="adminQuestions[${i}].label=this.value" class="w-full bg-white px-3 py-2 rounded-lg text-xs font-bold border-none outline-none"><div class="flex gap-2"><select onchange="adminQuestions[${i}].type=this.value; renderAdminQuestions()" class="flex-1 bg-white px-3 py-2 rounded-lg text-[10px] font-black border-none outline-none"><option value="text" ${q.type==='text'?'selected':''}>文字</option><option value="select" ${q.type==='select'?'selected':''}>單選</option></select>${q.type==='select' ? `<input type="text" placeholder="選項 (以半形逗號隔開)" value="${q.options||''}" oninput="adminQuestions[${i}].options=this.value" class="flex-[2] bg-white px-3 py-2 rounded-lg text-[10px] font-medium border-none outline-none">` : ''}</div></div>`).join('');
+            const list = document.getElementById('sur-admin-questions-list'); if (!list) return;
+            adminQuestions.forEach((q, i) => { if (!q.id) q.id = 'q' + (Date.now() + i); });
+            // 可作條件/跳轉來源的選擇題
+            const condSources = adminQuestions.filter(q => q.type === 'select' || q.type === 'yesno');
+            // 可跳轉的區段（section 題型）
+            const sections = adminQuestions.filter(q => q.type === 'section');
+            const branchTargetOptions = `<option value="__next__">下一區段（預設）</option><option value="__end__">提交問卷</option>` +
+                sections.map(s => `<option value="${s.id}">${s.label || '未命名區段'}</option>`).join('');
+
+            list.innerHTML = adminQuestions.map((q, i) => {
+                if (q.type === 'section') {
+                    return `<div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl relative">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-1">
+                                <button onclick="moveAdminQuestion(${i},-1)" ${i === 0 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-indigo-100 text-indigo-600 text-[9px] font-black disabled:opacity-30 hover:bg-indigo-200 transition-all active:scale-95"><i data-lucide="arrow-up" class="w-3 h-3"></i>上移</button>
+                                <button onclick="moveAdminQuestion(${i},1)" ${i === adminQuestions.length - 1 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-indigo-100 text-indigo-600 text-[9px] font-black disabled:opacity-30 hover:bg-indigo-200 transition-all active:scale-95"><i data-lucide="arrow-down" class="w-3 h-3"></i>下移</button>
+                                <span class="text-[9px] font-black text-indigo-500 uppercase flex items-center gap-1 ml-1"><i data-lucide="layout-panel-top" class="w-3 h-3"></i> 區段分頁</span>
+                            </div>
+                            <button onclick="removeAdminQuestion(${i})" class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-rose-100 text-rose-500 text-[9px] font-black hover:bg-rose-200 transition-all active:scale-95"><i data-lucide="trash-2" class="w-3 h-3"></i>刪除</button>
+                        </div>
+                        <input type="text" placeholder="區段標題（如：基本資料）" value="${q.label}" oninput="adminQuestions[${i}].label=this.value" class="w-full bg-white px-3 py-2.5 rounded-lg text-xs font-black border-none outline-none shadow-sm text-indigo-700">
+                    </div>`;
+                }
+                // ── 條件顯示來源選項 ──
+                const condSrc2 = condSources.filter(s => s.id !== q.id);
+                const condOptions = condSrc2.map(s => {
+                    const opts = (s.type === 'yesno') ? ['是', '否'] : (s.options || '').split(',').map(o => o.trim()).filter(Boolean);
+                    return `<optgroup label="${s.label || '題目'}">` + opts.map(o =>
+                        `<option value="${s.id}|${o}" ${(q.condition && q.condition.questionId === s.id && q.condition.answer === o) ? 'selected' : ''}>${s.label}: ${o}</option>`
+                    ).join('') + '</optgroup>';
+                }).join('');
+                const hasCondition = q.condition && q.condition.questionId;
+                // ── 每個選項的跳轉設定（單選/是否） ──
+                let branchHtml = '';
+                if (q.type === 'select' || q.type === 'yesno') {
+                    const opts2 = (q.type === 'yesno') ? ['是', '否'] : (q.options || '').split(',').map(o => o.trim()).filter(Boolean);
+                    if (opts2.length > 0 && sections.length > 0) {
+                        branchHtml = `<div class="pt-2 border-t border-slate-200">
+                            <label class="text-[9px] font-black text-amber-500 uppercase mb-1 block flex items-center gap-1"><i data-lucide="git-branch" class="w-3 h-3"></i> 前往區段（選填）</label>` +
+                            opts2.map(o => {
+                                const curBranch = (q.branches && q.branches[o]) || '__next__';
+                                return `<div class="flex items-center gap-2 mb-1.5">
+                                    <span class="text-[9px] font-black text-slate-500 min-w-[36px]">${o}：</span>
+                                    <select onchange="setQuestionBranch(${i},'${o}',this.value)" class="flex-1 bg-white px-2 py-1.5 rounded-lg text-[9px] font-black border-none outline-none shadow-sm">${branchTargetOptions.replace(`value="${curBranch}"`, `value="${curBranch}" selected`)}</select>
+                                </div>`;
+                            }).join('') + '</div>';
+                    }
+                }
+                return `<div class="bg-slate-50 p-4 rounded-xl space-y-2.5 relative border border-slate-100">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="flex items-center gap-1">
+                            <button onclick="moveAdminQuestion(${i},-1)" ${i === 0 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-slate-200 text-slate-600 text-[9px] font-black disabled:opacity-30 hover:bg-slate-300 transition-all active:scale-95"><i data-lucide="arrow-up" class="w-3 h-3"></i>上移</button>
+                            <button onclick="moveAdminQuestion(${i},1)" ${i === adminQuestions.length - 1 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-slate-200 text-slate-600 text-[9px] font-black disabled:opacity-30 hover:bg-slate-300 transition-all active:scale-95"><i data-lucide="arrow-down" class="w-3 h-3"></i>下移</button>
+                            <span class="text-[9px] font-black text-slate-400 uppercase ml-1">Q${i + 1}</span>
+                        </div>
+                        <button onclick="removeAdminQuestion(${i})" class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-rose-100 text-rose-500 text-[9px] font-black hover:bg-rose-200 transition-all active:scale-95"><i data-lucide="trash-2" class="w-3 h-3"></i>刪除</button>
+                    </div>
+                    <input type="text" placeholder="題目文字" value="${q.label}" oninput="adminQuestions[${i}].label=this.value" class="w-full bg-white px-3 py-2.5 rounded-lg text-xs font-bold border-none outline-none shadow-sm">
+                    <div class="flex gap-2">
+                        <select onchange="adminQuestions[${i}].type=this.value; renderAdminQuestions()" class="flex-1 bg-white px-3 py-2.5 rounded-lg text-[10px] font-black border-none outline-none shadow-sm">
+                            <option value="text" ${q.type === 'text' ? 'selected' : ''}>文字輸入</option>
+                            <option value="date" ${q.type === 'date' ? 'selected' : ''}>日期</option>
+                            <option value="yesno" ${q.type === 'yesno' ? 'selected' : ''}>是 / 否</option>
+                            <option value="select" ${q.type === 'select' ? 'selected' : ''}>單選</option>
+                            <option value="multiselect" ${q.type === 'multiselect' ? 'selected' : ''}>多選</option>
+                        </select>
+                        <label class="flex items-center gap-1 text-[10px] font-black text-slate-500 bg-white px-3 rounded-lg shadow-sm cursor-pointer">
+                            <input type="checkbox" ${q.required ? 'checked' : ''} onchange="adminQuestions[${i}].required=this.checked" class="accent-indigo-600 w-3.5 h-3.5"> 必填
+                        </label>
+                    </div>
+                    ${(q.type === 'select' || q.type === 'multiselect') ? `<input type="text" placeholder="選項（逗號分隔），如：是,否,未定" value="${q.options || ""}" oninput="adminQuestions[${i}].options=this.value" class="w-full bg-white px-3 py-2.5 rounded-lg text-[10px] font-medium border-none outline-none shadow-sm">` : ''}
+                    ${branchHtml}
+                    <div class="pt-2 border-t border-slate-200">
+                        <label class="text-[9px] font-black text-indigo-500 uppercase mb-1 block">條件顯示（選填）</label>
+                        <select onchange="setQuestionCondition(${i}, this.value)" class="w-full bg-white px-3 py-2.5 rounded-lg text-[10px] font-black border-none outline-none shadow-sm">
+                            <option value="">永遠顯示（無條件）</option>
+                            ${condOptions}
+                        </select>
+                        ${hasCondition ? `<p class="text-[9px] text-indigo-400 mt-1 font-bold">▶ 當「${adminQuestions.find(s => s.id === q.condition.questionId)?.label || ''}」選「${q.condition.answer}」時才顯示</p>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
             safeCreateIcons();
+        }
+
+        function setQuestionCondition(i, value) {
+            if (!value) { adminQuestions[i].condition = null; }
+            else { const [qId, answer] = value.split('|'); adminQuestions[i].condition = { questionId: qId, answer }; }
+            renderAdminQuestions();
+        }
+
+        function setQuestionBranch(i, option, target) {
+            if (!adminQuestions[i].branches) adminQuestions[i].branches = {};
+            adminQuestions[i].branches[option] = target;
+            renderAdminQuestions();
         }
 
         async function handleUpdateSurveyConfig() {
             const title = document.getElementById('sur-admin-title')?.value.trim() || "";
-            if(!title) return showToast("標題必填", true);
+            if (!title) return showToast("標題必填", true);
             const btn = document.getElementById('btn-save-sur-config'); setBtnLoading(btn, true, "儲存中...");
             const res = await callBackend('saveSurveyConfig', { id: editingSurveyId, title, description: document.getElementById('sur-admin-desc').value, embedURL: document.getElementById('sur-admin-embed-url').value, questionsJSON: JSON.stringify(adminQuestions), active: document.getElementById('sur-admin-status').checked });
             setBtnLoading(btn, false, "儲存問卷設定");
-            if(res?.success) { showToast("問卷模板已儲存"); closeSurveyAdminModal(); loadSurveyList(); }
+            if (res?.success) { showToast("問卷模板已儲存"); closeSurveyAdminModal(); loadSurveyList(); }
         }
 
         async function loadSurveyResults() {
             const res = await callBackend('getSurveyResults', { id: editingSurveyId });
             const listEl = document.getElementById('sur-admin-result');
-            if(res?.success && listEl) {
+            if (res?.success && listEl) {
                 const results = res.data || [];
                 if (results.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前尚無回覆資料</div>';
                 else listEl.innerHTML = results.map(r => `<div class="p-4 bg-slate-50 rounded-xl space-y-2"><p class="text-xs font-black text-slate-700">${r.label}</p><div class="space-y-1">${Object.entries(r.stats || {}).map(([k, v]) => `<div class="flex justify-between text-[10px] font-bold text-slate-500"><span>${k}</span><span>${v} 票</span></div>`).join('')}</div></div>`).join('');
@@ -765,73 +1251,249 @@
             const res = await callBackend('getSurveyStatus', { email: currentUser.Email });
             const board = document.getElementById('survey-board');
             if (res?.success && res.active) {
-                if(board) board.classList.remove('hidden');
+                if (board) board.classList.remove('hidden');
                 document.getElementById('survey-display-title').innerText = res.title;
                 document.getElementById('survey-display-desc').innerText = res.description || "";
-                currentEmbedURL = res.embedURL || ""; 
+                currentEmbedURL = res.embedURL || "";
                 const badge = document.getElementById('survey-status-badge');
                 if (badge) {
                     if (res.responded) { badge.innerText = "已提交"; badge.className = "text-[8px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600"; }
                     else { badge.innerText = "待填寫"; badge.className = "text-[8px] font-black px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-600"; }
                 }
                 surveyQuestions = res.questions || []; userResponses = res.lastResponse || {};
-            } else { if(board) board.classList.add('hidden'); }
+            } else { if (board) board.classList.add('hidden'); }
             safeCreateIcons();
+        }
+
+        // ─── 問卷區段邏輯 ───
+        function buildSurveySections(questions) {
+            const result = [];
+            let cur = { id: '__s0__', title: '', questions: [] };
+            for (const q of questions) {
+                if (q.type === 'section') { result.push(cur); cur = { id: q.id, title: q.label || '區段', questions: [] }; }
+                else { cur.questions.push(q); }
+            }
+            result.push(cur);
+            return result.filter(s => s.questions.length > 0);
+        }
+
+        function renderQInput(q, prevVal) {
+            const qId = q.id || q.label;
+            if (q.type === 'date') {
+                return `<input type="date" data-qid="${qId}" data-label="${q.label}" value="${prevVal}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm" onchange="evaluateSurveyConditions()">`;
+            } else if (q.type === 'yesno') {
+                return `<div class="flex gap-3">
+                    <button type="button" onclick="setYesNo(this,'${qId}','${q.label}','是')" data-qid="${qId}" data-label="${q.label}" data-value="是" class="yesno-btn flex-1 py-4 rounded-2xl font-black text-sm transition-all ${prevVal === '是' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 text-slate-600 hover:bg-indigo-50'}">✓ 是</button>
+                    <button type="button" onclick="setYesNo(this,'${qId}','${q.label}','否')" data-qid="${qId}" data-label="${q.label}" data-value="否" class="yesno-btn flex-1 py-4 rounded-2xl font-black text-sm transition-all ${prevVal === '否' ? 'bg-rose-500 text-white shadow-lg' : 'bg-slate-100 text-slate-600 hover:bg-rose-50'}">✗ 否</button>
+                </div>
+                <input type="hidden" data-qid="${qId}" data-label="${q.label}" value="${prevVal}" class="survey-input yesno-hidden">`;
+            } else if (q.type === 'select') {
+                return `<select data-qid="${qId}" data-label="${q.label}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm" onchange="evaluateSurveyConditions()">
+                    <option value="">請選擇...</option>
+                    ${(q.options || '').split(',').map(o => `<option value="${o.trim()}" ${prevVal === o.trim() ? 'selected' : ''}>${o.trim()}</option>`).join('')}
+                </select>`;
+            } else if (q.type === 'multiselect') {
+                const prevArr = prevVal ? prevVal.split(',').map(s => s.trim()) : [];
+                return `<div class="space-y-2">${(q.options || '').split(',').map(o => o.trim()).filter(Boolean).map(o =>
+                    `<label class="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-2xl cursor-pointer hover:bg-indigo-50 transition-all">
+                        <input type="checkbox" data-qid="${qId}" data-label="${q.label}" value="${o}" ${prevArr.includes(o) ? 'checked' : ''} class="survey-input accent-indigo-600 w-4 h-4" onchange="evaluateSurveyConditions()">
+                        <span class="text-sm font-bold text-slate-700">${o}</span>
+                    </label>`).join('')}</div>`;
+            } else {
+                return `<input type="text" data-qid="${qId}" data-label="${q.label}" value="${prevVal}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm" oninput="evaluateSurveyConditions()">`;
+            }
+        }
+
+        function setYesNo(btn, qId, label, value) {
+            const wrap = btn.closest('.survey-question-wrap');
+            wrap.querySelectorAll('.yesno-btn').forEach(b => {
+                const isYes = b.dataset.value === '是';
+                const active = b.dataset.value === value;
+                b.className = `yesno-btn flex-1 py-4 rounded-2xl font-black text-sm transition-all ${active ? (isYes ? 'bg-indigo-600 text-white shadow-lg' : 'bg-rose-500 text-white shadow-lg') : 'bg-slate-100 text-slate-600'}`;
+            });
+            const hidden = wrap.querySelector('.yesno-hidden');
+            if (hidden) { hidden.value = value; hidden.dataset.label = label; }
+            evaluateSurveyConditions();
+        }
+
+        function evaluateSurveyConditions() {
+            const currentAnswers = {};
+            document.querySelectorAll('.survey-question-wrap').forEach(wrap => {
+                const qId = wrap.dataset.qid;
+                const checkboxes = wrap.querySelectorAll('input[type="checkbox"].survey-input');
+                if (checkboxes.length > 0) { currentAnswers[qId] = [...checkboxes].filter(c => c.checked).map(c => c.value).join(','); }
+                else { const el = wrap.querySelector('.survey-input'); if (el) currentAnswers[qId] = el.value; }
+            });
+            document.querySelectorAll('.survey-question-wrap').forEach(wrap => {
+                const condStr = wrap.dataset.condition;
+                if (!condStr) return;
+                try {
+                    const cond = JSON.parse(condStr);
+                    const match = (currentAnswers[cond.questionId] || '').split(',').map(s => s.trim()).includes(cond.answer);
+                    wrap.classList.toggle('sq-hidden', !match);
+                } catch (e) { }
+            });
+        }
+
+        function renderSectionUI() {
+            const indicator = document.getElementById('survey-section-indicator');
+            const label = document.getElementById('survey-section-label');
+            const dots = document.getElementById('survey-section-dots');
+            const prevBtn = document.getElementById('survey-prev-btn');
+            const nextBtn = document.getElementById('survey-next-btn');
+            const saveBtn = document.getElementById('save-survey-btn');
+            const isLast = currentSectionIdx === surveySections.length - 1;
+            if (surveySections.length > 1) {
+                indicator.classList.remove('hidden');
+                const sec = surveySections[currentSectionIdx];
+                label.innerText = sec.title || `區段 ${currentSectionIdx + 1} / ${surveySections.length}`;
+                dots.innerHTML = surveySections.map((_, i) =>
+                    `<div class="w-2 h-2 rounded-full transition-all ${i === currentSectionIdx ? 'bg-indigo-600 w-4' : 'bg-slate-300'}"></div>`
+                ).join('');
+            } else { indicator.classList.add('hidden'); }
+            prevBtn.classList.toggle('hidden', sectionHistory.length === 0);
+            nextBtn.classList.toggle('hidden', isLast);
+            saveBtn.classList.toggle('hidden', !isLast);
+        }
+
+        function renderCurrentSection() {
+            const sec = surveySections[currentSectionIdx];
+            if (!sec) return;
+            const fieldsEl = document.getElementById('survey-dynamic-fields');
+            fieldsEl.innerHTML = sec.questions.map(q => {
+                const condAttr = q.condition ? `data-condition='${JSON.stringify(q.condition)}'` : '';
+                const qId = q.id || q.label;
+                const prevVal = allSurveyResponses[q.label] || userResponses[q.label] || '';
+                const reqMark = q.required ? '<span class="text-rose-500 ml-0.5">*</span>' : '';
+                return `<div class="survey-question-wrap" data-qid="${qId}" ${condAttr}>
+                    <div class="space-y-2 text-left">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-1">${q.label}${reqMark}</label>
+                        ${renderQInput(q, prevVal)}
+                    </div>
+                </div>`;
+            }).join('');
+            setTimeout(() => evaluateSurveyConditions(), 50);
+            renderSectionUI();
+            safeCreateIcons();
+        }
+
+        function collectCurrentSectionAnswers() {
+            const sec = surveySections[currentSectionIdx];
+            if (!sec) return {};
+            const answers = {};
+            sec.questions.forEach(q => {
+                const qId = q.id || q.label;
+                const wrap = document.querySelector(`.survey-question-wrap[data-qid="${qId}"]`);
+                if (!wrap || wrap.classList.contains('sq-hidden')) return;
+                const checkboxes = wrap.querySelectorAll('input[type="checkbox"].survey-input');
+                if (checkboxes.length > 0) { answers[q.label] = [...checkboxes].filter(c => c.checked).map(c => c.value).join(','); }
+                else { const el = wrap.querySelector('.survey-input'); if (el) answers[q.label] = el.value; }
+            });
+            return answers;
+        }
+
+        function surveyGoNext() {
+            const sec = surveySections[currentSectionIdx];
+            const answers = collectCurrentSectionAnswers();
+            // 必填檢查
+            const missing = (sec?.questions || []).find(q => {
+                if (!q.required) return false;
+                const wrap = document.querySelector(`.survey-question-wrap[data-qid="${q.id || q.label}"]`);
+                if (!wrap || wrap.classList.contains('sq-hidden')) return false;
+                return !answers[q.label] || answers[q.label].trim() === '';
+            });
+            if (missing) { showToast(`「${missing.label}」為必填項目`, true); return; }
+            Object.assign(allSurveyResponses, answers);
+            sectionHistory.push(currentSectionIdx);
+            // 判斷跳轉
+            let nextIdx = currentSectionIdx + 1;
+            // 找有分支設定的題目
+            for (const q of (sec?.questions || [])) {
+                if (!q.branches) continue;
+                const ans = answers[q.label];
+                const target = q.branches[ans];
+                if (!target || target === '__next__') break;
+                if (target === '__end__') { handleSaveSurvey(); return; }
+                const idx = surveySections.findIndex(s => s.id === target);
+                if (idx !== -1) { nextIdx = idx; break; }
+            }
+            if (nextIdx < surveySections.length) {
+                currentSectionIdx = nextIdx;
+                renderCurrentSection();
+                document.getElementById('survey-content-container').scrollTop = 0;
+            } else { handleSaveSurvey(); }
+        }
+
+        function surveyGoPrev() {
+            if (sectionHistory.length === 0) return;
+            currentSectionIdx = sectionHistory.pop();
+            renderCurrentSection();
+            document.getElementById('survey-content-container').scrollTop = 0;
         }
 
         function openSurveyModal() {
             const title = document.getElementById('survey-display-title')?.innerText || "";
             const desc = document.getElementById('survey-display-desc')?.innerText || "";
-            if(document.getElementById('survey-modal-title')) document.getElementById('survey-modal-title').innerText = title;
-            if(document.getElementById('survey-modal-desc')) document.getElementById('survey-modal-desc').innerText = desc;
-            
-            const fieldsEl = document.getElementById('survey-dynamic-fields');
-            const iframeContainer = document.getElementById('survey-iframe-container');
-            const externalFrame = document.getElementById('survey-external-frame');
-            const saveBtn = document.getElementById('save-survey-btn');
+            document.getElementById('survey-modal-title').innerText = title;
+            document.getElementById('survey-modal-desc').innerText = desc;
             const modalContent = document.getElementById('survey-modal-content');
-
             if (currentEmbedURL && currentEmbedURL.trim() !== "") {
-                if(modalContent) modalContent.classList.replace('max-w-sm', 'max-w-3xl');
-                if(fieldsEl) fieldsEl.classList.add('hidden');
-                if(iframeContainer) iframeContainer.classList.remove('hidden');
-                if(externalFrame) externalFrame.src = currentEmbedURL;
-                if(saveBtn) saveBtn.classList.add('hidden'); 
+                modalContent.classList.replace('max-w-sm', 'max-w-3xl');
+                document.getElementById('survey-dynamic-fields').classList.add('hidden');
+                document.getElementById('survey-iframe-container').classList.remove('hidden');
+                document.getElementById('survey-external-frame').src = currentEmbedURL;
+                document.getElementById('survey-next-btn').classList.add('hidden');
+                document.getElementById('save-survey-btn').classList.remove('hidden');
+                document.getElementById('survey-section-indicator').classList.add('hidden');
             } else {
-                if(modalContent) modalContent.classList.replace('max-w-3xl', 'max-w-sm');
-                if(fieldsEl) {
-                    fieldsEl.classList.remove('hidden');
-                    fieldsEl.innerHTML = (surveyQuestions || []).map(q => `<div class="space-y-2 text-left"><label class="text-[10px] font-black text-slate-400 uppercase px-1">${q.label}</label>${q.type==='select' ? `<select data-label="${q.label}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm"><option value="">請選擇</option>${(q.options || "").split(',').map(o => `<option value="${o.trim()}" ${userResponses[q.label]===o.trim()?'selected':''}>${o.trim()}</option>`).join('')}</select>` : `<input type="text" data-label="${q.label}" value="${userResponses[q.label]||''}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm">`}</div>`).join('');
-                }
-                if(iframeContainer) iframeContainer.classList.add('hidden');
-                if(saveBtn) saveBtn.classList.remove('hidden');
+                modalContent.classList.replace('max-w-3xl', 'max-w-sm');
+                document.getElementById('survey-iframe-container').classList.add('hidden');
+                document.getElementById('survey-dynamic-fields').classList.remove('hidden');
+                // 初始化多區段狀態
+                allSurveyResponses = {};
+                sectionHistory = [];
+                currentSectionIdx = 0;
+                surveySections = buildSurveySections(surveyQuestions || []);
+                if (surveySections.length === 0) surveySections = [{ id: '__s0__', title: '', questions: surveyQuestions || [] }];
+                renderCurrentSection();
             }
-            document.getElementById('survey-modal')?.classList.remove('hidden');
+            document.getElementById('survey-modal').classList.remove('hidden');
             safeCreateIcons();
         }
 
         function closeSurveyModal() { document.getElementById('survey-modal')?.classList.add('hidden'); }
         async function handleSaveSurvey() {
-            const responses = {}; document.querySelectorAll('.survey-input').forEach(el => responses[el.dataset.label] = el.value);
+            // 收集最後一個區段的答案
+            const lastAnswers = collectCurrentSectionAnswers ? collectCurrentSectionAnswers() : {};
+            Object.assign(allSurveyResponses, lastAnswers);
+            // 必填檢查（最後一頁）
+            const sec = surveySections[currentSectionIdx];
+            const missing = (sec?.questions || []).find(q => {
+                if (!q.required) return false;
+                const wrap = document.querySelector(`.survey-question-wrap[data-qid="${q.id || q.label}"]`);
+                if (!wrap || wrap.classList.contains('sq-hidden')) return false;
+                return !allSurveyResponses[q.label] || allSurveyResponses[q.label].trim() === '';
+            });
+            if (missing) return showToast(`「${missing.label}」為必填項目`, true);
             const btn = document.getElementById('save-survey-btn'); setBtnLoading(btn, true, "提交中...");
-            const res = await callBackend('submitSurveyResponse', { email: currentUser.Email, name: currentUser.Name, responsesJSON: JSON.stringify(responses) });
+            const res = await callBackend('submitSurveyResponse', { email: currentUser.Email, name: currentUser.Name, responsesJSON: JSON.stringify(allSurveyResponses) });
             setBtnLoading(btn, false, "提交回覆");
-            if(res?.success) { showToast("回覆已提交"); closeSurveyModal(); fetchSurveyStatus(); }
+            if (res?.success) { showToast("回覆已提交"); closeSurveyModal(); fetchSurveyStatus(); }
         }
 
         function updateInstrumentOptions() {
             const section = document.getElementById('reg-section')?.value;
-            const instSelect = document.getElementById('reg-instrument'); if(!instSelect) return;
+            const instSelect = document.getElementById('reg-instrument'); if (!instSelect) return;
             instSelect.innerHTML = '<option value="">選擇樂器</option>';
             if (section && orchestraData[section]) orchestraData[section].forEach(i => instSelect.add(new Option(i, i)));
         }
 
         async function handleRegister() {
             const data = { name: document.getElementById('reg-name')?.value, section: document.getElementById('reg-section')?.value, instrument: document.getElementById('reg-instrument')?.value, email: document.getElementById('reg-email')?.value, password: document.getElementById('reg-password')?.value };
-            if(!Object.values(data).every(v => v)) return showToast("全部必填", true);
+            if (!Object.values(data).every(v => v)) return showToast("全部必填", true);
             const btn = document.getElementById('reg-submit-btn'); setBtnLoading(btn, true, "處理中...");
             const res = await callBackend('registerUser', data); setBtnLoading(btn, false, "確認加入");
-            if(res?.success) { showToast("註冊成功"); switchAuthMode('login'); } else showToast(res.message || "註冊失敗", true);
+            if (res?.success) { showToast("註冊成功"); switchAuthMode('login'); } else showToast(res.message || "註冊失敗", true);
         }
 
         function handleLogout() { location.reload(); }
@@ -839,10 +1501,13 @@
         function openAnnouncementModal() { document.getElementById('announcement-modal')?.classList.remove('hidden'); safeCreateIcons(); }
         function closeAnnouncementModal() { document.getElementById('announcement-modal')?.classList.add('hidden'); }
         function closeSurveyAdminModal() { document.getElementById('survey-admin-modal')?.classList.add('hidden'); }
-        function addSurveyQuestion() { adminQuestions.push({ label: "新題目", type: "text", options: "" }); renderAdminQuestions(); }
+        function addSurveyQuestion() { adminQuestions.push({ id: 'q' + Date.now(), label: "新題目", type: "text", options: "", required: false, condition: null, branches: {} }); renderAdminQuestions(); }
+        function addSurveySection() { adminQuestions.push({ id: 's' + Date.now(), label: "新區段", type: "section" }); renderAdminQuestions(); }
+        function moveAdminQuestion(i, dir) { const j = i + dir; if (j < 0 || j >= adminQuestions.length) return;[adminQuestions[i], adminQuestions[j]] = [adminQuestions[j], adminQuestions[i]]; renderAdminQuestions(); }
         function removeAdminQuestion(i) { adminQuestions.splice(i, 1); renderAdminQuestions(); }
-        
+
         window.onload = () => { safeCreateIcons(); };
     </script>
 </body>
+
 </html>
