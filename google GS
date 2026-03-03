@@ -1,10 +1,8 @@
 /**
- * 崇正國樂團智能系統 - GAS 後端終極整合版
- * 整合功能：活動時長格式化、問卷嵌入連結支援、組員監控、權限認證、問卷姓名紀錄
+ * 崇正國樂團智能系統 - GAS 後端終極分區版
+ * 整合功能：一問卷一分頁、動態表頭、活動長度計算、EmbedURL 支援
  */
-
 const SS = SpreadsheetApp.getActiveSpreadsheet();
-
 // --- API 進入點 ---
 function doPost(e) {
   let result;
@@ -12,43 +10,29 @@ function doPost(e) {
     const requestData = JSON.parse(e.postData.contents);
     const action = requestData.action;
     const data = requestData.data;
-
-    // 確保所有必要的工作表都已建立並初始化
     checkAndInitSheets();
-
     switch (action) {
-      // 1. 成員與認證
       case 'loginUser': result = loginUser(data); break;
       case 'registerUser': result = registerUser(data); break;
       case 'saveMember': result = saveMember(data); break;
-      
-      // 2. 公告系統
       case 'getAnnouncement': result = getAnnouncement(); break;
       case 'saveAnnouncement': result = saveAnnouncement(data); break;
-      
-      // 3. 活動管理
       case 'getSystemStatus': result = getSystemStatus(data); break;
       case 'submitCheckin': result = submitCheckin(data); break; 
       case 'getAttendanceHistory': result = getAttendanceHistory(data); break;
       case 'getEventList': result = getEventList(); break;
       case 'saveEvent': result = saveEvent(data); break; 
       case 'activateEvent': result = activateEvent(data); break;
-      case 'getMemberHistory': result = getMemberHistory(data); break;
-
-      // 4. 即時狀態監控
       case 'getRealtimeStatus': result = getRealtimeStatus(data); break; 
-      
-      // 5. 問卷管理系統 (支援 EmbedURL 與 姓名紀錄)
       case 'getSurveyList': result = getSurveyList(); break;
       case 'saveSurveyConfig': result = saveSurveyConfig(data); break; 
       case 'getSurveyStatus': result = getSurveyStatus(data); break; 
       case 'submitSurveyResponse': result = submitSurveyResponse(data); break; 
       case 'getSurveyResults': result = getSurveyResults(data); break; 
-
-      default: result = { success: false, message: "未知指令: " + action };
+      default: result = { success: false, message: "未知指令" };
     }
   } catch (err) {
-    result = { success: false, message: "後端程式錯誤: " + err.toString() };
+    result = { success: false, message: "後端錯誤: " + err.toString() };
   }
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -111,7 +95,7 @@ function activateEvent(data) {
 }
 
 // ==========================================
-// B. 問卷管理函數 (Survey Management)
+// B.  改進後的問卷管理 (一問卷一分頁)
 // ==========================================
 
 function getSurveyList() {
@@ -169,28 +153,66 @@ function getSurveyStatus(data) {
 function submitSurveyResponse(data) {
   try {
     const activeSurId = SS.getSheetByName("SystemConfig").getRange(2, 12).getValue();
-    const sheet = SS.getSheetByName("SurveyResponses");
+    if (!activeSurId) return { success: false, message: "無啟動中問卷" };
+    
+    // 1. 取得題目定義以建立表頭
+    const templates = SS.getSheetByName("SurveyTemplates").getDataRange().getValues();
+    const templateRow = templates.find(r => String(r[0]) === String(activeSurId));
+    if (!templateRow) return { success: false, message: "找不到問卷定義" };
+    const questions = JSON.parse(templateRow[3] || "[]");
+    
+    // 2. 獲取或建立專屬分頁
+    const surveySheet = getOrCreateSurveySheet(activeSurId, templateRow[1], questions);
+    
+    // 3. 準備資料列
     const userEmail = data.email.toLowerCase();
-    const userName = data.name || ""; // 接收前端傳來的姓名
-    const vals = sheet.getDataRange().getValues();
+    const userName = data.name || "";
+    const responses = JSON.parse(data.responsesJSON || "{}");
+    const headers = surveySheet.getRange(1, 1, 1, surveySheet.getLastColumn()).getValues()[0];
+    const rowData = new Array(headers.length).fill("");
     
+    rowData[0] = new Date(); // 時間
+    rowData[1] = userEmail;
+    rowData[2] = userName;
+    
+    // 根據題目標籤填入欄位
+    for (let i = 3; i < headers.length; i++) {
+      const label = headers[i];
+      if (responses.hasOwnProperty(label)) rowData[i] = responses[label];
+    }
+    
+    // 4. 重複填寫檢查 (Email 為主)
+    const sheetVals = surveySheet.getDataRange().getValues();
     let rowIdx = -1;
-    for (let i = 1; i < vals.length; i++) {
-      // 檢查是否已填寫過此份問卷，若有則覆蓋舊紀錄
-      if (vals[i][1].toLowerCase() === userEmail && String(vals[i][3]) === String(activeSurId)) { 
-        rowIdx = i + 1; 
-        break; 
-      }
+    for (let i = 1; i < sheetVals.length; i++) {
+        if (String(sheetVals[i][1]).toLowerCase() === userEmail) { rowIdx = i + 1; break; }
     }
     
-    const rowData = [new Date(), userEmail, userName, activeSurId, data.responsesJSON];
-    if (rowIdx !== -1) {
-      sheet.getRange(rowIdx, 1, 1, 5).setValues([rowData]);
-    } else {
-      sheet.appendRow(rowData);
-    }
+    if (rowIdx !== -1) surveySheet.getRange(rowIdx, 1, 1, rowData.length).setValues([rowData]);
+    else surveySheet.appendRow(rowData);
+    
+    // 備份到總表 (選填)
+    const master = SS.getSheetByName("SurveyResponses");
+    if (master) master.appendRow([new Date(), userEmail, userName, activeSurId, data.responsesJSON]);
     return { success: true };
   } catch (e) { return { success: false, message: e.toString() }; }
+}
+function getOrCreateSurveySheet(surveyId, title, questions) {
+  const sheetName = "SRV_" + surveyId;
+  let sheet = SS.getSheetByName(sheetName);
+  if (!sheet) sheet = SS.insertSheet(sheetName);
+  
+  // 動態產生表頭：時間 | Email | 姓名 | [所有題目標籤...]
+  const expectedHeaders = ["填寫時間", "Email", "姓名"].concat(questions.map(q => q.label));
+  const currentHeaders = sheet.getLastColumn() > 0 ? sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0] : [];
+  
+  if (JSON.stringify(currentHeaders) !== JSON.stringify(expectedHeaders)) {
+    sheet.getRange(1, 1, 1, expectedHeaders.length).setValues([expectedHeaders])
+         .setFontWeight("bold").setBackground("#f3f4f6").setHorizontalAlignment("center");
+    sheet.setFrozenRows(1);
+    for(let i=1; i<=expectedHeaders.length; i++) sheet.autoResizeColumn(i);
+  }
+  return sheet;
 }
 
 function getSurveyResults(data) {
