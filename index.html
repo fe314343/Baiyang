@@ -431,6 +431,25 @@
                 <button id="broadcast-announce-btn" onclick="openAnnouncementModal()"
                     class="bg-amber-100 text-amber-700 px-6 py-4 rounded-[22px] text-xs font-black flex items-center justify-center gap-3 border border-amber-200 active:scale-95 w-full shadow-md"><i
                         data-lucide="megaphone" class="w-5 h-5"></i>發布全員公告</button>
+
+                <!-- 系統授權碼設定 (僅管理員可見) -->
+                <div id="admin-bypass-config" class="hidden glass-panel p-6 rounded-[32px] w-full shadow-lg border-white/40 bg-indigo-50/30">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        </div>
+                        <h4 class="font-[900] text-slate-700 text-sm tracking-tight">系統授權碼設定</h4>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="bypass-code-input" placeholder="演出授權碼" 
+                            class="flex-1 px-5 py-3.5 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm">
+                        <button onclick="handleSaveBypassCode()" id="btn-save-bypass"
+                            class="px-6 py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-xs shadow-md active:scale-95 transition-all">儲存</button>
+                    </div>
+                    <p class="text-[9px] text-slate-400 mt-3 px-1 leading-relaxed text-left">
+                        提示：此密碼用於團員在「不在崇正寶宮」定位範圍時簽到之用。建議設定 4-6 位數字。
+                    </p>
+                </div>
             </div>
 
             <!-- 分頁5: 問卷管理 -->
@@ -706,12 +725,13 @@
 
     <script>
         // --- 核心工具 ---
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwoVDdmQGZ4hgkhMedz2xju8VU_KUf3kSJrfILU0fsK61kzGi-_rrT4DPf_zRpGnLWw/exec";
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbweYPdRxBUQXP_S0pVSTQUwFiRsjZHC1mLEBA_Qkz0jryLSQ0152yguZi4Df8zFZtQh/exec";
         const MAX_DISTANCE = 500, ALLOWED_LOCATIONS = [{ name: "崇正寶宮", lat: 24.133658, lng: 120.717338 }];
         const orchestraData = { "吹管組": ["笛", "嗩", "笙", "(上)低音號"], "拉弦組": ["高胡", "二胡", "中胡"], "彈撥組": ["柳琴", "琵琶", "中阮", "大阮", "古箏"], "揚打組": ["揚琴", "打擊"], "低音組": ["大提琴", "低音提琴"] };
 
         let currentUser = null, currentEventData = null, allEvents = [], allSurveys = [], editingSurveyId = null, editingId = null, cachedMemberList = [];
         let surveyQuestions = [], userResponses = {}, adminQuestions = [], currentEmbedURL = "";
+        let currentBypassCode = ""; // 從後端讀取的演出授權碼
         // 區段導覽狀態
         let surveySections = [], currentSectionIdx = 0, sectionHistory = [], allSurveyResponses = {};
 
@@ -850,6 +870,9 @@
             if (broadcastAddBtn) broadcastAddBtn.classList.toggle('hidden', !isActuallyAdmin);
             if (broadcastAnnounceBtn) broadcastAnnounceBtn.classList.toggle('hidden', !(isActuallyAdmin || isActuallyOfficer));
 
+            const bypassConfig = document.getElementById('admin-bypass-config');
+            if (bypassConfig) bypassConfig.classList.toggle('hidden', !isActuallyAdmin);
+
             const monitorTitle = document.getElementById('monitor-title');
             if (monitorTitle) monitorTitle.innerText = isLeader ? `${currentUser.Section} 簽到狀態` : "全員簽到狀態";
 
@@ -922,6 +945,11 @@
                     ti.innerText = res.enabled ? `${res.eventStart} ~ ${res.eventEnd}` : "--:--";
                     ti.classList.toggle('opacity-100', res.enabled);
                 }
+                if (res.bypassCode) {
+                    currentBypassCode = res.bypassCode;
+                    const input = document.getElementById('bypass-code-input');
+                    if (input) input.value = res.bypassCode;
+                }
             }
         }
 
@@ -971,11 +999,36 @@
             try {
                 const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000 }));
                 const dist = (function (lat1, lon1, lat2, lon2) { const R = 6371e3; const f1 = lat1 * Math.PI / 180, f2 = lat2 * Math.PI / 180; const df = (lat2 - lat1) * Math.PI / 180, dl = (lon2 - lon1) * Math.PI / 180; const a = Math.sin(df / 2) * Math.sin(df / 2) + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) * Math.sin(dl / 2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); })(pos.coords.latitude, pos.coords.longitude, ALLOWED_LOCATIONS[0].lat, ALLOWED_LOCATIONS[0].lng);
-                if (dist > MAX_DISTANCE) { showToast(`距離崇正寶宮約 ${Math.round(dist)}m，請靠近 500m 內再簽到`, true); btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); return; }
+                
+                if (dist > MAX_DISTANCE) {
+                    // 原本顯示距離，改為統一文字
+                    const userInput = prompt("不在崇正寶宮\n若為外部演出，請輸入演出授權碼簽到：");
+                    if (!userInput) {
+                        btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); return;
+                    }
+                    if (String(userInput) !== String(currentBypassCode)) {
+                        showToast("授權碼錯誤", true);
+                        btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); return;
+                    }
+                }
+                
                 const res = await callBackend('submitCheckin', { email: currentUser.Email, name: currentUser.Name, section: currentUser.Section, date: currentEventData.eventDate, eventName: currentEventData.eventName, eventTimeRange: `${currentEventData.eventStart} ~ ${currentEventData.eventEnd}` });
                 if (res?.success) { showToast("簽到成功！排練愉快"); currentEventData.hasCheckedIn = true; updateCheckinBtnStatus(true); setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1500); }
                 else showToast(res.message || "簽到失敗", true);
             } catch (e) { showToast("定位失敗", true); btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); }
+        }
+
+        async function handleSaveBypassCode() {
+            const input = document.getElementById('bypass-code-input');
+            const newCode = input?.value.trim() || "";
+            if (!newCode) return showToast("授權碼不可為空", true);
+            const btn = document.getElementById('btn-save-bypass'); setBtnLoading(btn, true, "儲存中...");
+            try {
+                const res = await callBackend('saveSystemSetting', { key: 'bypassCode', value: newCode });
+                if (res?.success) { showToast("系統授權碼已更新"); currentBypassCode = newCode; }
+                else showToast("更新失敗", true);
+            } catch (e) { showToast("連線異常", true); }
+            finally { setBtnLoading(btn, false, "儲存"); }
         }
 
         async function fetchAnnouncement() {
@@ -1112,7 +1165,22 @@
             editingSurveyId = id;
             const sur = id ? allSurveys.find(s => String(s.ID) === String(id)) : null;
             const fields = { 'sur-admin-title': 'Title', 'sur-admin-desc': 'Description', 'sur-admin-embed-url': 'EmbedURL' };
-            for (let id in fields) { const el = document.getElementById(id); if (el) el.value = sur ? (sur[fields[id]] || "") : ""; }
+            const isActuallyAdmin = currentUser && currentUser.Role === 'Admin';
+            
+            for (let id in fields) { 
+                const el = document.getElementById(id); 
+                if (el) {
+                    el.value = sur ? (sur[fields[id]] || "") : ""; 
+                    el.readOnly = !isActuallyAdmin;
+                    el.classList.toggle('bg-slate-100', !isActuallyAdmin);
+                }
+            }
+            
+            const addSecBtn = document.querySelector('button[onclick="addSurveySection()"]');
+            const addQueBtn = document.querySelector('button[onclick="addSurveyQuestion()"]');
+            if (addSecBtn) addSecBtn.classList.toggle('hidden', !isActuallyAdmin);
+            if (addQueBtn) addQueBtn.classList.toggle('hidden', !isActuallyAdmin);
+
             const statusEl = document.getElementById('sur-admin-status'); if (statusEl) statusEl.checked = sur ? sur.Active : false;
             adminQuestions = []; if (sur && sur.QuestionsJSON) try { adminQuestions = JSON.parse(sur.QuestionsJSON); } catch (e) { adminQuestions = []; }
             renderAdminQuestions(); switchSurveyAdminTab('config');
@@ -1139,18 +1207,21 @@
             const branchTargetOptions = `<option value="__next__">下一區段（預設）</option><option value="__end__">提交問卷</option>` +
                 sections.map(s => `<option value="${s.id}">${s.label || '未命名區段'}</option>`).join('');
 
+            const isActuallyAdmin = currentUser && currentUser.Role === 'Admin';
+
             list.innerHTML = adminQuestions.map((q, i) => {
                 if (q.type === 'section') {
                     return `<div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl relative">
                         <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-1">
+                            <div class="flex items-center gap-1 ${!isActuallyAdmin ? 'hidden' : ''}">
                                 <button onclick="moveAdminQuestion(${i},-1)" ${i === 0 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-indigo-100 text-indigo-600 text-[9px] font-black disabled:opacity-30 hover:bg-indigo-200 transition-all active:scale-95"><i data-lucide="arrow-up" class="w-3 h-3"></i>上移</button>
                                 <button onclick="moveAdminQuestion(${i},1)" ${i === adminQuestions.length - 1 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-indigo-100 text-indigo-600 text-[9px] font-black disabled:opacity-30 hover:bg-indigo-200 transition-all active:scale-95"><i data-lucide="arrow-down" class="w-3 h-3"></i>下移</button>
                                 <span class="text-[9px] font-black text-indigo-500 uppercase flex items-center gap-1 ml-1"><i data-lucide="layout-panel-top" class="w-3 h-3"></i> 區段分頁</span>
                             </div>
-                            <button onclick="removeAdminQuestion(${i})" class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-rose-100 text-rose-500 text-[9px] font-black hover:bg-rose-200 transition-all active:scale-95"><i data-lucide="trash-2" class="w-3 h-3"></i>刪除</button>
+                            <button onclick="removeAdminQuestion(${i})" class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-rose-100 text-rose-500 text-[9px] font-black hover:bg-rose-200 transition-all active:scale-95 ${!isActuallyAdmin ? 'hidden' : ''}"><i data-lucide="trash-2" class="w-3 h-3"></i>刪除</button>
+                            ${!isActuallyAdmin ? `<span class="text-[9px] font-black text-indigo-500 uppercase flex items-center gap-1"><i data-lucide="layout-panel-top" class="w-3 h-3"></i> 區段分頁</span>` : ''}
                         </div>
-                        <input type="text" placeholder="區段標題（如：基本資料）" value="${q.label}" oninput="adminQuestions[${i}].label=this.value" class="w-full bg-white px-3 py-2.5 rounded-lg text-xs font-black border-none outline-none shadow-sm text-indigo-700">
+                        <input type="text" placeholder="區段標題" value="${q.label}" ${!isActuallyAdmin ? 'readOnly' : `oninput="adminQuestions[${i}].label=this.value"`} class="w-full bg-white px-3 py-2.5 rounded-lg text-xs font-black border-none outline-none shadow-sm text-indigo-700">
                     </div>`;
                 }
                 // ── 條件顯示來源選項 ──
@@ -1173,23 +1244,24 @@
                                 const curBranch = (q.branches && q.branches[o]) || '__next__';
                                 return `<div class="flex items-center gap-2 mb-1.5">
                                     <span class="text-[9px] font-black text-slate-500 min-w-[36px]">${o}：</span>
-                                    <select onchange="setQuestionBranch(${i},'${o}',this.value)" class="flex-1 bg-white px-2 py-1.5 rounded-lg text-[9px] font-black border-none outline-none shadow-sm">${branchTargetOptions.replace(`value="${curBranch}"`, `value="${curBranch}" selected`)}</select>
+                                    <select ${!isActuallyAdmin ? 'disabled' : `onchange="setQuestionBranch(${i},'${o}',this.value)"`} class="flex-1 bg-white px-2 py-1.5 rounded-lg text-[9px] font-black border-none outline-none shadow-sm">${branchTargetOptions.replace(`value="${curBranch}"`, `value="${curBranch}" selected`)}</select>
                                 </div>`;
                             }).join('') + '</div>';
                     }
                 }
                 return `<div class="bg-slate-50 p-4 rounded-xl space-y-2.5 relative border border-slate-100">
                     <div class="flex items-center justify-between mb-1">
-                        <div class="flex items-center gap-1">
+                        <div class="flex items-center gap-1 ${!isActuallyAdmin ? 'hidden' : ''}">
                             <button onclick="moveAdminQuestion(${i},-1)" ${i === 0 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-slate-200 text-slate-600 text-[9px] font-black disabled:opacity-30 hover:bg-slate-300 transition-all active:scale-95"><i data-lucide="arrow-up" class="w-3 h-3"></i>上移</button>
                             <button onclick="moveAdminQuestion(${i},1)" ${i === adminQuestions.length - 1 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-slate-200 text-slate-600 text-[9px] font-black disabled:opacity-30 hover:bg-slate-300 transition-all active:scale-95"><i data-lucide="arrow-down" class="w-3 h-3"></i>下移</button>
                             <span class="text-[9px] font-black text-slate-400 uppercase ml-1">Q${i + 1}</span>
                         </div>
-                        <button onclick="removeAdminQuestion(${i})" class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-rose-100 text-rose-500 text-[9px] font-black hover:bg-rose-200 transition-all active:scale-95"><i data-lucide="trash-2" class="w-3 h-3"></i>刪除</button>
+                        <button onclick="removeAdminQuestion(${i})" class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-rose-100 text-rose-500 text-[9px] font-black hover:bg-rose-200 transition-all active:scale-95 ${!isActuallyAdmin ? 'hidden' : ''}"><i data-lucide="trash-2" class="w-3 h-3"></i>刪除</button>
+                        ${!isActuallyAdmin ? `<span class="text-[9px] font-black text-slate-400 uppercase">Q${i + 1}</span>` : ''}
                     </div>
-                    <input type="text" placeholder="題目文字" value="${q.label}" oninput="adminQuestions[${i}].label=this.value" class="w-full bg-white px-3 py-2.5 rounded-lg text-xs font-bold border-none outline-none shadow-sm">
+                    <input type="text" placeholder="題目文字" value="${q.label}" ${!isActuallyAdmin ? 'readOnly' : `oninput="adminQuestions[${i}].label=this.value"`} class="w-full bg-white px-3 py-2.5 rounded-lg text-xs font-bold border-none outline-none shadow-sm">
                     <div class="flex gap-2">
-                        <select onchange="adminQuestions[${i}].type=this.value; renderAdminQuestions()" class="flex-1 bg-white px-3 py-2.5 rounded-lg text-[10px] font-black border-none outline-none shadow-sm">
+                        <select ${!isActuallyAdmin ? 'disabled' : `onchange="adminQuestions[${i}].type=this.value; renderAdminQuestions()"`} class="flex-1 bg-white px-3 py-2.5 rounded-lg text-[10px] font-black border-none outline-none shadow-sm">
                             <option value="text" ${q.type === 'text' ? 'selected' : ''}>文字輸入</option>
                             <option value="date" ${q.type === 'date' ? 'selected' : ''}>日期</option>
                             <option value="yesno" ${q.type === 'yesno' ? 'selected' : ''}>是 / 否</option>
@@ -1197,14 +1269,14 @@
                             <option value="multiselect" ${q.type === 'multiselect' ? 'selected' : ''}>多選</option>
                         </select>
                         <label class="flex items-center gap-1 text-[10px] font-black text-slate-500 bg-white px-3 rounded-lg shadow-sm cursor-pointer">
-                            <input type="checkbox" ${q.required ? 'checked' : ''} onchange="adminQuestions[${i}].required=this.checked" class="accent-indigo-600 w-3.5 h-3.5"> 必填
+                            <input type="checkbox" ${q.required ? 'checked' : ''} ${!isActuallyAdmin ? 'disabled' : `onchange="adminQuestions[${i}].required=this.checked"`} class="accent-indigo-600 w-3.5 h-3.5"> 必填
                         </label>
                     </div>
-                    ${(q.type === 'select' || q.type === 'multiselect') ? `<input type="text" placeholder="選項（逗號分隔），如：是,否,未定" value="${q.options || ""}" oninput="adminQuestions[${i}].options=this.value" class="w-full bg-white px-3 py-2.5 rounded-lg text-[10px] font-medium border-none outline-none shadow-sm">` : ''}
+                    ${(q.type === 'select' || q.type === 'multiselect') ? `<input type="text" placeholder="選項（逗號分隔）" value="${q.options || ""}" ${!isActuallyAdmin ? 'readOnly' : `oninput="adminQuestions[${i}].options=this.value"`} class="w-full bg-white px-3 py-2.5 rounded-lg text-[10px] font-medium border-none outline-none shadow-sm">` : ''}
                     ${branchHtml}
                     <div class="pt-2 border-t border-slate-200">
                         <label class="text-[9px] font-black text-indigo-500 uppercase mb-1 block">條件顯示（選填）</label>
-                        <select onchange="setQuestionCondition(${i}, this.value)" class="w-full bg-white px-3 py-2.5 rounded-lg text-[10px] font-black border-none outline-none shadow-sm">
+                        <select ${!isActuallyAdmin ? 'disabled' : `onchange="setQuestionCondition(${i}, this.value)"`} class="w-full bg-white px-3 py-2.5 rounded-lg text-[10px] font-black border-none outline-none shadow-sm">
                             <option value="">永遠顯示（無條件）</option>
                             ${condOptions}
                         </select>
