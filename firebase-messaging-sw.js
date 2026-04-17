@@ -15,7 +15,7 @@ try {
     firebase.initializeApp(firebaseConfig);
     const messaging = firebase.messaging();
 
-    // v42: 使用相容版背景處理器 (排除 manual push 衝突)
+    // v48: 使用相容版背景處理器 (排除 manual push 衝突)
     messaging.setBackgroundMessageHandler(function(payload) {
         console.log('[SW] Firebase 背景訊息解析: ', payload);
         const title = payload.notification?.title || payload.data?.title || '國樂團公告';
@@ -33,7 +33,7 @@ try {
     console.error("Firebase init failed in SW", e);
 }
 
-const CACHE_NAME = 'cz-smart-v42';
+const CACHE_NAME = 'cz-smart-v48';
 
 self.addEventListener('install', event => { self.skipWaiting(); });
 
@@ -49,7 +49,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
 });
 
-// v42: 我們移除手動 push 監聽器，讓上面的 setBackgroundMessageHandler 獨家處理
+// v48: 我們移除手動 push 監聽器，讓上面的 setBackgroundMessageHandler 獨家處理
 // 這能解決某些系統中「監聽器搶食」導致通知不跳的問題
 
 self.addEventListener('notificationclick', event => {
