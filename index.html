@@ -1,0 +1,2624 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="崇正國樂">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <title>崇正國樂團簽到系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/umd/lucide.min.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#6366f1">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4338ca;
+            --accent: #f43f5e;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #f8faff 0%, #ffffff 50%, #f1f5ff 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#6366f1 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+            opacity: 0.04;
+            z-index: -1;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.1);
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 12px 24px -8px rgba(99, 102, 241, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-premium:active {
+            transform: scale(0.96);
+            box-shadow: 0 4px 8px -2px rgba(99, 102, 241, 0.4);
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        .pulse-effect::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary);
+            border-radius: 9999px;
+            z-index: -1;
+            animation: ripple 2s infinite ease-out;
+        }
+
+        .tab-btn {
+            transition: all 0.4s ease;
+        }
+
+        .tab-btn.tab-active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .fade-up {
+            animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* 自定義捲軸樣式 - 用於彈窗內部 */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        .app-icon-card {
+            width: 85px;
+            height: 85px;
+            background: #ffffff;
+            border-radius: 26px;
+            box-shadow: 10px 10px 25px #d1d9e6, -8px -8px 20px #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.8rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .app-icon-card img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            z-index: 2;
+        }
+
+        input,
+        select,
+        textarea {
+            border: 1px solid rgba(0, 0, 0, 0.03) !important;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary) !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08) !important;
+        }
+
+        /* 跳題動畫 */
+        .survey-question-wrap {
+            overflow: hidden;
+            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease, transform 0.35s ease;
+            max-height: 400px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .survey-question-wrap.sq-hidden {
+            max-height: 0 !important;
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+        }
+    </style>
+    <!-- Firebase SDKs (v10.13.2) - Moved to head and controlled for stability -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js"></script>
+</head>
+
+<body class="pb-10">
+
+    <!-- 頂部導覽列 -->
+    <nav id="nav-bar" class="hidden fixed top-0 w-full max-w-md z-50 p-4 flex justify-center text-center">
+        <div
+            class="glass-panel rounded-[22px] p-2 flex justify-between items-center px-4 border-white/60 w-full shadow-lg">
+            <div class="flex items-center gap-3">
+                <div class="relative flex items-center justify-center">
+                    <div id="status-dot"
+                        class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                    <div class="absolute w-4 h-4 rounded-full border border-emerald-400 animate-ping opacity-20"></div>
+                </div>
+                <span id="nav-user-info" class="text-sm font-bold text-slate-700 tracking-tight">載入中...</span>
+                <span class="text-[8px] text-slate-300 font-mono ml-2">v49</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="getAndRegisterToken()" title="同步推播設定"
+                    class="bg-indigo-50 text-indigo-500 p-2 rounded-xl hover:bg-indigo-100 transition-all border border-indigo-100 shadow-sm">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+                <button onclick="handleLogout()"
+                    class="bg-slate-50 text-slate-500 px-4 py-2 rounded-xl text-[11px] font-black hover:bg-rose-50 hover:text-rose-500 transition-all flex items-center gap-2 border border-slate-100 hover:border-rose-100 shadow-sm">
+                    <i data-lucide="power" class="w-3.5 h-3.5"></i>登出
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="app" class="w-full max-w-md px-6 pt-6 sm:pt-10 transition-all duration-500 text-center">
+        <!-- 登入視圖 -->
+        <section id="login-view" class="space-y-5 fade-up text-center">
+            <div class="app-icon-card mx-auto">
+                <img src="Baiyang.png" alt="Logo"
+                    onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=CY&backgroundColor=6366f1';">
+            </div>
+            <h1 class="text-2xl font-[900] text-slate-800 tracking-tighter mb-1">崇正國樂團</h1>
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 mx-auto shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                <p class="text-indigo-600 text-[9px] font-black uppercase tracking-widest">Smart System</p>
+            </div>
+            <div class="glass-panel p-7 rounded-[32px] space-y-5 shadow-xl">
+                <div class="space-y-3">
+                    <div class="group relative"><i data-lucide="mail"
+                            class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i><input
+                            type="text" id="login-email"
+                            class="w-full pl-12 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center"
+                            placeholder="帳號 / Email"></div>
+                    <div class="group relative"><i data-lucide="key-round"
+                            class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i><input
+                            type="password" id="login-password"
+                            class="w-full pl-12 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center"
+                            placeholder="密碼"></div>
+                </div>
+                <button id="login-submit-btn" onclick="handleLogin()"
+                    class="relative w-full btn-premium text-white font-black py-4 rounded-[20px] text-lg tracking-wide shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">立即登入
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i></button>
+                <div class="text-center pt-1"><button onclick="switchAuthMode('register')"
+                        class="text-slate-400 text-xs font-bold hover:text-indigo-600 underline decoration-indigo-200 underline-offset-4">註冊新成員</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 註冊視圖 -->
+        <section id="register-view" class="hidden space-y-6 fade-up text-center">
+            <h2 class="text-2xl font-[900] text-slate-800 tracking-tight">成員註冊加入</h2>
+            <div class="glass-panel p-8 rounded-[32px] space-y-4 shadow-xl">
+                <input type="text" id="reg-name"
+                    class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-bold text-center"
+                    placeholder="真實姓名">
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="reg-section" onchange="updateInstrumentOptions()"
+                        class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center">
+                        <option value="">選擇組別</option>
+                        <option value="吹管組">吹管組</option>
+                        <option value="拉弦組">拉弦組</option>
+                        <option value="彈撥組">彈撥組</option>
+                        <option value="揚打組">揚打組</option>
+                        <option value="低音組">低音組</option>
+                    </select>
+                    <select id="reg-instrument"
+                        class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center">
+                        <option value="">選擇樂器</option>
+                    </select>
+                </div>
+                <input type="email" id="reg-email"
+                    class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center"
+                    placeholder="常用帳號"><input type="password" id="reg-password"
+                    class="w-full px-6 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold text-center"
+                    placeholder="設定登入密碼"><button id="reg-submit-btn" onclick="handleRegister()"
+                    class="w-full btn-premium text-white font-black py-4 rounded-[20px] mt-4 tracking-wide shadow-lg active:scale-95 transition-all">確認註冊</button><button
+                    onclick="switchAuthMode('login')"
+                    class="w-full text-slate-400 text-sm font-black mt-2">返回登入</button>
+            </div>
+        </section>
+
+        <!-- 儀表板主要內容區 -->
+        <section id="dashboard-view" class="hidden space-y-6 fade-up pb-24 w-full flex flex-col items-center">
+            <!-- 全局提示區 -->
+            <div id="global-alerts" class="w-full space-y-3">
+                <!-- 通知權限提醒 -->
+                <div id="notif-permission-banner"
+                    class="hidden glass-panel p-4 rounded-2xl bg-amber-50 border-amber-200 mb-6 flex justify-between items-center shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-amber-100 p-2 rounded-xl text-amber-600 shadow-sm"><i data-lucide="bell-ring"
+                                class="w-5 h-5"></i></div>
+                        <div class="text-left">
+                            <p class="text-xs font-black text-slate-800">未開啟公告通知</p>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tight">點擊右側按鈕以獲得即時團練提醒</p>
+                        </div>
+                    </div>
+                    <button onclick="requestNotificationPermission(true)"
+                        class="bg-amber-600 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-md active:scale-95 shrink-0">立即開啟</button>
+                </div>
+                <div id="announcement-board"
+                    class="w-full glass-panel p-5 rounded-[28px] border-amber-200 bg-amber-50 shadow-md flex items-start gap-4 transition-all hover:shadow-lg text-left">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+                        <i data-lucide="megaphone" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-[10px] font-[900] text-amber-600/70 uppercase tracking-[0.2em] mb-1">Official
+                            Announcement</p>
+                        <div id="announcement-content"
+                            class="text-sm font-bold text-slate-700 leading-relaxed whitespace-pre-wrap">正在讀取最新公告...
+                        </div>
+                        <p id="announcement-time" class="text-[9px] text-slate-400 mt-2 font-bold"></p>
+                    </div>
+                </div>
+                <div id="survey-board"
+                    class="hidden w-full glass-panel p-5 rounded-[28px] border-indigo-200 bg-indigo-50/50 shadow-md flex items-start gap-4 transition-all hover:shadow-lg text-left">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0">
+                        <i data-lucide="clipboard-check" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start mb-1">
+                            <p class="text-[10px] font-[900] text-indigo-600/70 uppercase tracking-[0.2em]">Active
+                                Survey</p><span id="survey-status-badge"
+                                class="text-[8px] font-black px-2 py-0.5 rounded-full"></span>
+                        </div>
+                        <h4 id="survey-display-title" class="text-sm font-black text-slate-800 mb-1 leading-tight">
+                            演出意願調查</h4>
+                        <p id="survey-display-desc" class="text-xs text-slate-500 line-clamp-1"></p>
+                        <button onclick="openSurveyModal()"
+                            class="mt-3 text-xs font-black text-indigo-600 underline underline-offset-4 hover:text-indigo-800">填寫/修改回覆</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分頁1: 首頁 -->
+            <div id="home-section" class="w-full space-y-6 animate-in">
+                <div class="flex justify-between items-center px-1">
+                    <div class="text-left">
+                        <h2 class="text-2xl font-[900] text-slate-800 leading-none" id="user-display">你好</h2>
+                        <p class="text-slate-400 text-xs font-bold mt-2">歡迎回到簽到管理系統</p>
+                    </div>
+                    <button onclick="openProfileModal()"
+                        class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg font-black transition-all active:scale-90"
+                        id="user-avatar-initial">-</button>
+                </div>
+                <div class="glass-panel p-6 rounded-[32px] w-full shadow-lg border-white/60 text-left">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600"><i
+                                data-lucide="user-round" class="w-4 h-4"></i></div>
+                        <h4 class="font-[900] text-slate-800 text-sm tracking-tight">團員檔案</h4>
+                    </div>
+                    <div class="space-y-3">
+                        <div
+                            class="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-slate-50">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">目前組別</span><span
+                                class="text-sm font-black text-slate-700" id="home-section-display">-</span>
+                        </div>
+                        <div
+                            class="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-slate-50">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">主要樂器</span><span
+                                class="text-sm font-black text-slate-700" id="home-instrument-display">-</span>
+                        </div>
+                        <div
+                            class="flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-slate-50">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">權限角色</span><span
+                                class="text-sm font-black text-indigo-600" id="home-role-display">-</span>
+                        </div>
+                    </div>
+                    <button onclick="openProfileModal()"
+                        class="w-full mt-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"><i
+                            data-lucide="edit-3" class="w-3.5 h-3.5"></i> 修改資料</button>
+                </div>
+            </div>
+
+            <!-- 分頁2: 我的紀錄 -->
+            <div id="history-section" class="hidden w-full space-y-6 animate-in">
+                <div class="glass-panel p-7 rounded-[36px] border-white/80 w-full shadow-xl">
+                    <div
+                        class="relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[32px] text-white shadow-2xl flex flex-col items-center">
+                        <p class="text-[9px] opacity-50 font-black tracking-[0.3em] mb-2 uppercase text-indigo-200/50">
+                            Total Practice Record</p>
+                        <div class="flex items-baseline gap-2 justify-center">
+                            <h3 id="total-duration-display" class="text-5xl font-[900] tracking-tighter leading-none">0
+                            </h3>
+                            <div class="flex flex-col items-start leading-none"><span
+                                    class="text-xs font-bold opacity-60 uppercase tracking-widest">Hours</span><span
+                                    id="total-minutes-label"
+                                    class="text-[10px] font-black text-indigo-300 mt-1 opacity-80"></span></div>
+                        </div>
+                    </div>
+                    <div class="mt-10 flex flex-col items-center">
+                        <div class="mb-6 space-y-1">
+                            <p id="current-event-display" class="text-sm font-bold text-slate-500 tracking-tight">
+                                活動同步中...</p>
+                            <p id="checkin-time-display"
+                                class="text-indigo-500 text-[11px] font-black uppercase tracking-widest opacity-0 transition-opacity">
+                                --:--</p>
+                        </div>
+                        <div class="relative"><button id="checkin-btn" onclick="submitCheckin()" disabled
+                                class="relative z-10 w-36 h-36 bg-slate-200 rounded-full text-white font-black shadow-xl border-[10px] border-white overflow-hidden hover:scale-105 active:scale-95"><i
+                                    data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span
+                                    class="text-lg tracking-tight">簽到</span></button>
+                            <div id="btn-pulse" class="absolute inset-0 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="attendance-list" class="space-y-3 w-full"></div>
+            </div>
+
+            <!-- 分頁3: 組員名單 -->
+            <div id="monitor-section" class="hidden animate-in w-full">
+                <div class="glass-panel p-6 rounded-[32px] w-full shadow-lg">
+                    <div class="flex justify-between items-center mb-6 px-1">
+                        <h4 class="font-[900] text-slate-800 text-lg tracking-tight" id="monitor-title">全員簽到狀態</h4>
+                        <button onclick="loadRealtimeStatus()"
+                            class="w-10 h-10 bg-white shadow-sm border border-slate-100 text-indigo-600 rounded-xl flex items-center justify-center hover:rotate-180 transition-all duration-500"><i
+                                data-lucide="refresh-cw" class="w-5 h-5"></i></button>
+                    </div>
+                    <div class="flex gap-3 mb-6"><select id="monitor-filter-section" onchange="applyMonitorFilters()"
+                            class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 shadow-sm">
+                            <option value="all">全體成員</option>
+                            <option value="吹管組">吹管組</option>
+                            <option value="拉弦組">拉弦組</option>
+                            <option value="彈撥組">彈撥組</option>
+                            <option value="揚打組">揚打組</option>
+                            <option value="低音組">低音組</option>
+                        </select><select id="monitor-sort-order" onchange="applyMonitorFilters()"
+                            class="flex-1 px-4 py-3 rounded-2xl bg-slate-100/80 border-none outline-none text-xs font-black text-slate-600 shadow-sm">
+                            <option value="default">預設排序</option>
+                            <option value="checkin">簽到優先</option>
+                            <option value="absence">缺席優先</option>
+                        </select></div>
+                    <div class="grid grid-cols-2 gap-4 mb-6 text-center">
+                        <div
+                            class="bg-emerald-500/5 p-4 rounded-[22px] border border-emerald-100/50 flex flex-col items-center shadow-sm">
+                            <p class="text-[9px] text-emerald-600 font-black mb-1">Present</p>
+                            <p class="text-3xl font-[900] text-emerald-700" id="stat-present">0</p>
+                        </div>
+                        <div
+                            class="bg-rose-500/5 p-4 rounded-[22px] border border-rose-100/50 flex flex-col items-center shadow-sm">
+                            <p class="text-[9px] text-rose-600 font-black mb-1">Absent</p>
+                            <p class="text-3xl font-[900] text-rose-700" id="stat-absent">0</p>
+                        </div>
+                    </div>
+                    <div id="realtime-status-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scroll"></div>
+                </div>
+            </div>
+
+            <!-- 分頁4: 活動廣播 -->
+            <div id="broadcast-section" class="hidden animate-in w-full space-y-6">
+                <div class="flex items-center justify-between px-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+                            <i data-lucide="radio" class="w-4 h-4"></i>
+                        </div>
+                        <h4 class="font-[900] text-slate-800 text-base tracking-tight">廣播中心</h4>
+                    </div>
+                    <button id="broadcast-add-btn" onclick="openEditModal(null)"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2 active:scale-95"><i
+                            data-lucide="plus" class="w-3.5 h-3.5"></i>新增活動</button>
+                </div>
+                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40">
+                    <div id="admin-event-list" class="space-y-4"></div>
+                </div>
+                <div class="flex gap-2">
+                    <button id="broadcast-announce-btn" onclick="openAnnouncementModal()"
+                        class="flex-[2] bg-amber-100 text-amber-700 px-6 py-4 rounded-[22px] text-xs font-black flex items-center justify-center gap-3 border border-amber-200 active:scale-95 shadow-md"><i
+                            data-lucide="megaphone" class="w-5 h-5"></i>發布全員公告</button>
+                    <button onclick="testNotification()"
+                        class="flex-1 bg-white text-slate-500 px-4 py-4 rounded-[22px] text-[10px] font-black flex items-center justify-center gap-2 border border-slate-200 active:scale-95 shadow-sm"><i
+                            data-lucide="bell-ring" class="w-4 h-4"></i>測試推播</button>
+                </div>
+
+                <!-- 系統授權碼設定 (僅管理員可見) -->
+                <div id="admin-bypass-config"
+                    class="hidden glass-panel p-6 rounded-[32px] w-full shadow-lg border-white/40 bg-indigo-50/30">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        </div>
+                        <h4 class="font-[900] text-slate-700 text-sm tracking-tight">系統授權碼設定</h4>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="bypass-code-input" placeholder="演出授權碼"
+                            class="flex-1 px-5 py-3.5 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm">
+                        <button onclick="handleSaveBypassCode()" id="btn-save-bypass"
+                            class="px-6 py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-xs shadow-md active:scale-95 transition-all">儲存</button>
+                    </div>
+                    <p class="text-[9px] text-slate-400 mt-3 px-1 leading-relaxed text-left">
+                        提示：此密碼用於團員在「不在崇正寶宮」定位範圍時簽到之用。建議設定 4-6 位數字。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 分頁5: 問卷管理 -->
+            <div id="surveys-section" class="hidden animate-in w-full space-y-6">
+                <div class="flex items-center justify-between px-2">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
+                            <i data-lucide="files" class="w-4 h-4"></i>
+                        </div>
+                        <h4 class="font-[900] text-slate-800 text-base tracking-tight">問卷庫</h4>
+                    </div>
+                    <button onclick="openSurveyAdminModal(null)"
+                        class="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black border border-emerald-100 active:scale-95 flex items-center gap-2"><i
+                            data-lucide="plus" class="w-3.5 h-3.5"></i>建立</button>
+                </div>
+                <div class="glass-panel p-5 rounded-[32px] w-full shadow-lg border-white/40">
+                    <div id="admin-survey-list" class="space-y-4"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部導覽列 -->
+    <nav id="tab-nav-container" class="hidden fixed bottom-0 w-full max-w-md z-40 p-4 pt-0">
+        <div id="tab-nav"
+            class="flex bg-slate-900/90 backdrop-blur-xl p-2 rounded-[28px] border border-white/10 shadow-2xl w-full">
+            <button onclick="switchTab('home')" id="btn-home"
+                class="flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn tab-active flex flex-col items-center justify-center text-indigo-400"><i
+                    data-lucide="home" class="w-5 h-5 mb-1"></i>首頁</button>
+            <button onclick="switchTab('history')" id="btn-history"
+                class="flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i
+                    data-lucide="clipboard-list" class="w-5 h-5 mb-1"></i>紀錄</button>
+            <button onclick="switchTab('monitor')" id="btn-monitor"
+                class="hidden flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i
+                    data-lucide="users" class="w-5 h-5 mb-1"></i>組員</button>
+            <button onclick="switchTab('broadcast')" id="btn-broadcast"
+                class="hidden flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i
+                    data-lucide="radio" class="w-5 h-5 mb-1"></i>廣播</button>
+            <button onclick="switchTab('surveys')" id="btn-surveys"
+                class="hidden flex-1 py-3 text-[9px] font-black rounded-[22px] transition-all tab-btn text-slate-400 flex flex-col items-center justify-center"><i
+                    data-lucide="files" class="w-5 h-5 mb-1"></i>問卷庫</button>
+        </div>
+    </nav>
+
+    <!-- Modals -->
+
+    <script>
+        window.onerror = function(msg, url, line, col, error) {
+            console.error("Global Error:", msg, "at", url, ":", line);
+            if (typeof showToast === 'function') showToast("JS 錯誤: " + msg, true);
+            return false;
+        };
+
+        // v49: 強化彈窗開啟魯棒性與錯誤捕獲
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxXYCpCifba8ltSrkSMJx9qF2_wNbSZN8Gm7VnOxFdc_p6PWPf8_0H4uQZ_37h2bupr/exec";
+        const MAX_DISTANCE = 500, ALLOWED_LOCATIONS = [{ name: "崇正寶宮", lat: 24.1059419, lng: 120.5055394 }];
+        //const MAX_DISTANCE = 500, ALLOWED_LOCATIONS = [{ name: "崇正寶宮", lat: 24.133658, lng: 120.717338 }];
+        const orchestraData = { "吹管組": ["笛", "嗩", "笙", "(上)低音號"], "拉弦組": ["高胡", "二胡", "中胡"], "彈撥組": ["柳琴", "琵琶", "中阮", "大阮", "古箏"], "揚打組": ["揚琴", "打擊"], "低音組": ["大提琴", "低音提琴"] };
+
+        let currentUser = null, currentEventData = null, allEvents = [], allSurveys = [], editingSurveyId = null, editingId = null, cachedMemberList = [];
+        let surveyQuestions = [], userResponses = {}, adminQuestions = [], currentEmbedURL = "";
+        let currentBypassCode = ""; // 從後端讀取的演出授權碼
+        // 區段導覽狀態
+        let surveySections = [], currentSectionIdx = 0, sectionHistory = [], allSurveyResponses = {};
+
+        // --- Firebase 設定 ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjjkrPrHBsoYuazfHlS4DwclksIw5SYYk",
+            authDomain: "baiyang-co.firebaseapp.com",
+            projectId: "baiyang-co",
+            storageBucket: "baiyang-co.firebasestorage.app",
+            messagingSenderId: "744052473577",
+            appId: "1:744052473577:web:ee5b767dfde9438af67a78",
+            measurementId: "G-8CF9E1E98E"
+        };
+        
+        // v37 穩定化：回歸字串格式以符合 V1 API 的 Scalar 要求
+        const VAPID_KEY = "BMWOLWSRgJ_zs-3_ZTFtigDmggvcXa_-QnDaGI3rQqEADBkszd-emdUmkh9iEO7e_8X_jc8pTEolmzkj_72mF9M";
+        
+        // --- v37 核心：環境守護者 ---
+        // 我們將不再使用複雜的 Uint8Array 轉換，而是直接讓環境的 atob 變聰明
+        const iosSafeAtob = (str) => {
+            return window.atob(str.replace(/-/g, '+').replace(/_/g, '/'));
+        };
+        
+        window.getFCMTokenModular = null;
+
+        // 初始化 Firebase 全域變數
+        let messaging;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            messaging = firebase.messaging();
+            
+            // 監聽前台推播訊息
+            if (messaging) {
+                messaging.onMessage((payload) => {
+                    console.log('Message received. ', payload);
+                    if (payload.notification) {
+                        showToast(payload.notification.title + ": " + payload.notification.body);
+                    }
+                });
+            }
+        } catch (e) {
+            console.error("Firebase/Messaging init error:", e);
+        }
+
+        async function getAndRegisterToken() {
+            try {
+                console.log("👉 正在取得 Service Worker 註冊對象...");
+                const registration = await navigator.serviceWorker.ready;
+                
+                // 強制檢查當前是否為 PWA 獨立模式 (iOS 推播必備)
+                const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+                console.log("📱 是否為 PWA 模式:", isPWA);
+
+                if (!messaging) {
+                    firebase.initializeApp(firebaseConfig);
+                    messaging = firebase.messaging();
+                }
+                
+                let currentToken;
+                if (window.getFCMTokenModular) {
+                    console.log("[v36 DEBUG] 採用 Modular SDK 獲取憑證...");
+                    currentToken = await window.getFCMTokenModular(registration);
+                } else {
+                    console.warn("[v36 DEBUG] 模組化模組尚未就緒，嘗試使用備案...");
+                    currentToken = await messaging.getToken({ 
+                        vapidKey: VAPID_KEY, // 這裡僅作備案
+                        serviceWorkerRegistration: registration 
+                    });
+                }
+                
+                if (currentToken) {
+                    console.log("✅ Device Token 取得完畢");
+                    const stored = JSON.parse(localStorage.getItem('user') || '{}');
+                    const email = currentUser?.Email || currentUser?.email || stored.Email || stored.email;
+                    
+                    if (email) {
+                        showToast("⏳ 正在同步至伺服器...");
+                        const res = await callBackend('updateDeviceToken', { 
+                            email: email, 
+                            token: currentToken 
+                        });
+                        if (res.success) {
+                            showToast("🎉 推播裝置同步成功！");
+                        } else {
+                            showToast("❌ 同步失敗: " + (res.message || "未知伺服器錯誤"), "error");
+                        }
+                    } else {
+                        showToast("⚠️ 偵測不到登入者，請嘗試重新登入", "warning");
+                    }
+                } else {
+                    showToast("⚠️ 無法連線至 Firebase (Token 為空)", "warning");
+                }
+            } catch (err) {
+                console.error('❌ FCM Error:', err);
+                if (err.code === 'messaging/permission-blocked') {
+                    showToast("❌ 通知權限已被瀏覽器封鎖", "error");
+                } else {
+                    showToast("❌ [v43] 憑證錯誤: " + err.message, "error");
+                    console.error("[v43 DEBUG] 完整報課對象:", err);
+                }
+            }
+        }
+
+        // --- Firebase Modular SDK 實作 (僅用於 getToken) ---
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js";
+
+        // v36: 使用獨立的變數名以避免與全域全域變數衝突
+        const configV36 = {
+            apiKey: "AIzaSyAjjkrPrHBsoYuazfHlS4DwclksIw5SYYk",
+            authDomain: "baiyang-co.firebaseapp.com",
+            projectId: "baiyang-co",
+            storageBucket: "baiyang-co.firebasestorage.app",
+            messagingSenderId: "744052473577",
+            appId: "1:744052473577:web:ee5b767dfde9438af67a78",
+            measurementId: "G-8CF9E1E98E"
+        };
+        
+        const vapidV37 = "BMWOLWSRgJ_zs-3_ZTFtigDmggvcXa_-QnDaGI3rQqEADBkszd-emdUmkh9iEO7e_8X_jc8pTEolmzkj_72mF9M";
+
+        const appV37 = initializeApp(configV36);
+        const messagingV37 = getMessaging(appV37);
+
+        // 暴露給全域調用
+        window.getFCMTokenModular = async (registration) => {
+            // v37 終極修正：暫時修復 iOS atob 崩潰問題，同時傳入字串滿足 Scalar 要求
+            const originalAtob = window.atob;
+            try {
+                window.atob = (s) => originalAtob(s.replace(/-/g, '+').replace(/_/g, '/'));
+                console.log("[v37 DEBUG] 正在以字串格式獲取 Token...");
+                return await getToken(messagingV37, {
+                    vapidKey: vapidV37,
+                    serviceWorkerRegistration: registration
+                });
+            } finally {
+                window.atob = originalAtob; // 務必還原環境變數
+            }
+        };
+        console.log("[v48 DEBUG] Modular SDK 已準備就緒 (v48)");
+    </script>
+    <script>
+        async function requestNotificationPermission(showFeedback = false) {
+            if (!("Notification" in window)) {
+                showToast("❌ 您的瀏覽器不支援通知功能", "error");
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                if (showFeedback) showToast("✅ 通知權限已對齊");
+                getAndRegisterToken();
+                return;
+            }
+
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    showToast("✅ 已成功授權，正在取得憑證...");
+                    document.getElementById('notif-permission-banner')?.classList.add('hidden');
+                    getAndRegisterToken();
+                } else {
+                    showToast("❌ 您拒絕了授權，請至 iPhone 設定開啟通知", "error");
+                }
+            } catch (err) {
+                showToast("❌ 授權過程錯誤: " + err.message, "error");
+            }
+        }
+
+        function setupUserPWA() {
+            if (Notification.permission !== 'granted') {
+                document.getElementById('notif-permission-banner')?.classList.remove('hidden');
+            } else {
+                getAndRegisterToken();
+            }
+        }
+
+        // --- 新增：從本地存儲恢復登入狀態 ---
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                currentUser = JSON.parse(storedUser);
+                console.log("Restored user from storage:", currentUser);
+            } catch (e) { localStorage.removeItem('user'); }
+        }
+
+        function formatDateTime(isoStr, onlyDate = false) {
+            if (!isoStr) return "";
+            const date = new Date(isoStr);
+            if (isNaN(date.getTime())) return isoStr;
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            if (onlyDate) return `${y}-${m}-${d}`;
+            const hh = String(date.getHours()).padStart(2, '0');
+            const mm = String(date.getMinutes()).padStart(2, '0');
+            return `${y}-${m}-${d} ${hh}:${mm}`;
+        }
+
+        function formatDurationDisplay(dur) {
+            if (!dur) return "0時0分";
+            let s = String(dur);
+            if (s.includes('1899') || s.includes('Dec 30 1899') || s.includes('Dec 29 1899') || (s.includes('T') && s.includes('Z') && s.includes('1899'))) {
+                const date = new Date(s);
+                if (!isNaN(date.getTime())) {
+                    const h = date.getHours();
+                    const m = date.getMinutes();
+                    return `${h}時${m}分`;
+                }
+            }
+            if (s.includes('時')) return s;
+            if (/^\d{1,2}:\d{1,2}/.test(s)) {
+                const p = s.split(':');
+                return `${parseInt(p[0])}時${parseInt(p[1])}分`;
+            }
+            return s;
+        }
+
+        function showToast(m, e = false) {
+            const t = document.getElementById('toast'), msg = document.getElementById('toast-msg'), icon = document.getElementById('toast-icon');
+            if (!t || !msg || !icon) return;
+            msg.innerText = m;
+            t.className = `fixed top-12 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[200] transition-all transform duration-500 border-white text-center shadow-lg ${e ? 'text-rose-500 border-rose-100' : 'text-indigo-600 border-indigo-100'}`;
+            icon.setAttribute('data-lucide', e ? 'alert-circle' : 'check-circle');
+            t.classList.remove('hidden', 'opacity-0');
+            safeCreateIcons();
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => { t.classList.add('hidden'); }, 500); }, 3000);
+        }
+
+        async function callBackend(action, data) {
+            try {
+                const response = await fetch(GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action, data }) });
+                const text = await response.text();
+                try { return JSON.parse(text); } catch (e) { return { success: false, message: "解析失敗" }; }
+            } catch (e) { return { success: false, message: "通訊異常" }; }
+        }
+
+        function safeCreateIcons() { if (typeof lucide !== 'undefined') lucide.createIcons(); }
+        function setBtnLoading(btn, isLoading, text) {
+            if (!btn) return;
+            btn.innerHTML = isLoading ? '<i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto"></i>' : text;
+            btn.disabled = isLoading;
+            btn.classList.toggle('opacity-70', isLoading);
+            safeCreateIcons();
+        }
+
+        function switchAuthMode(mode) { document.getElementById('login-view').classList.toggle('hidden', mode === 'register'); document.getElementById('register-view').classList.toggle('hidden', mode === 'login'); }
+        function switchView(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            const t = document.getElementById(id); if (t) t.classList.remove('hidden');
+            const isDash = (id === 'dashboard-view');
+            const navBar = document.getElementById('nav-bar');
+            const tabNav = document.getElementById('tab-nav-container');
+            if (navBar) navBar.classList.toggle('hidden', !isDash);
+            if (tabNav) tabNav.classList.toggle('hidden', !isDash);
+            const app = document.getElementById('app');
+            if (app) {
+                if (isDash) { app.classList.replace('pt-6', 'pt-24'); app.classList.replace('sm:pt-10', 'sm:pt-28'); }
+                else { app.classList.replace('pt-24', 'pt-6'); app.classList.replace('sm:pt-28', 'sm:pt-10'); }
+            }
+        }
+
+        function switchTab(t) {
+            document.querySelectorAll('#tab-nav .tab-btn').forEach(b => { b.classList.remove('tab-active', 'text-indigo-400'); b.classList.add('text-slate-400'); });
+            const b = document.getElementById(`btn-${t}`);
+            if (b) { b.classList.add('tab-active', 'text-indigo-400'); b.classList.remove('text-slate-400'); }
+            ['home', 'history', 'monitor', 'broadcast', 'surveys'].forEach(s => { const el = document.getElementById(`${s}-section`); if (el) el.classList.toggle('hidden', s !== t); });
+            if (t === 'home') { fetchAnnouncement(); fetchSurveyStatus(); }
+            if (t === 'monitor') loadRealtimeStatus();
+            if (t === 'broadcast') loadEventList();
+            if (t === 'surveys') loadSurveyList();
+            safeCreateIcons();
+        }
+
+        async function handleLogin() {
+            const emailEl = document.getElementById('login-email'), pwdEl = document.getElementById('login-password');
+            if (!emailEl.value || !pwdEl.value) return showToast("帳密必填", true);
+            const btn = document.getElementById('login-submit-btn'); setBtnLoading(btn, true, "驗證中...");
+            const res = await callBackend('loginUser', { email: emailEl.value.trim(), password: pwdEl.value.trim() });
+            setBtnLoading(btn, false, "立即登入");
+            if (res?.success) {
+                // 修正：從 res.userData 讀取，並存入 localStorage
+                currentUser = res.userData;
+                localStorage.setItem('user', JSON.stringify(currentUser));
+
+                setupDashboard();
+                switchView('dashboard-view');
+                switchTab('home');
+                refreshSystemStatus();
+                loadAttendanceHistory();
+                setupUserPWA();
+            } else showToast(res?.message || "登入失敗", true);
+        }
+
+        function setupDashboard() {
+            if (!currentUser) return;
+            const uName = currentUser.Name || "成員";
+            const userDisplay = document.getElementById('user-display');
+            const navInfo = document.getElementById('nav-user-info');
+            const avatarBtn = document.getElementById('user-avatar-initial');
+            if (userDisplay) userDisplay.innerText = `你好，${uName}`;
+            if (navInfo) navInfo.innerText = uName;
+            if (avatarBtn) avatarBtn.innerText = (uName || "?").charAt(0);
+
+            const sectionEl = document.getElementById('home-section-display');
+            const instEl = document.getElementById('home-instrument-display');
+            const roleEl = document.getElementById('home-role-display');
+            if (sectionEl) sectionEl.innerText = currentUser.Section || "-";
+            if (instEl) instEl.innerText = currentUser.Instrument || "-";
+            if (roleEl) roleEl.innerText = currentUser.Role || "Member";
+
+            const isLeader = currentUser.Role === 'Leader';
+            const isAdmin = ['Admin', 'Officer'].includes(currentUser.Role);
+            const isActuallyAdmin = currentUser.Role === 'Admin';
+            const isActuallyOfficer = currentUser.Role === 'Officer';
+
+            const btnMonitor = document.getElementById('btn-monitor');
+            const btnBroadcast = document.getElementById('btn-broadcast');
+            const btnSurveys = document.getElementById('btn-surveys');
+            if (btnMonitor) btnMonitor.classList.toggle('hidden', !isLeader && !isAdmin);
+            if (btnBroadcast) btnBroadcast.classList.toggle('hidden', !isAdmin);
+            if (btnSurveys) btnSurveys.classList.toggle('hidden', !isAdmin);
+
+            const broadcastAddBtn = document.getElementById('broadcast-add-btn');
+            const broadcastAnnounceBtn = document.getElementById('broadcast-announce-btn');
+
+            if (broadcastAddBtn) broadcastAddBtn.classList.toggle('hidden', !isActuallyAdmin);
+            if (broadcastAnnounceBtn) broadcastAnnounceBtn.classList.toggle('hidden', !(isActuallyAdmin || isActuallyOfficer));
+
+            const bypassConfig = document.getElementById('admin-bypass-config');
+            if (bypassConfig) bypassConfig.classList.toggle('hidden', !isActuallyAdmin);
+
+            const monitorTitle = document.getElementById('monitor-title');
+            if (monitorTitle) monitorTitle.innerText = isLeader ? `${currentUser.Section} 簽到狀態` : "全員簽到狀態";
+
+            const filterEl = document.getElementById('monitor-filter-section');
+            if (filterEl) {
+                if (isLeader) { filterEl.value = currentUser.Section; filterEl.disabled = true; }
+                else { filterEl.disabled = false; }
+            }
+            safeCreateIcons();
+        }
+
+        function openProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+            try {
+                if (!currentUser) return;
+                const nameInput = document.getElementById('profile-name-input');
+                const profileInitial = document.getElementById('profile-initial');
+                const roleEl = document.getElementById('profile-role');
+                const emailEl = document.getElementById('profile-email');
+                const sectionEl = document.getElementById('profile-section-display');
+                const instSelect = document.getElementById('profile-instrument-input');
+
+                if (nameInput) nameInput.value = currentUser.Name || "";
+                if (profileInitial) profileInitial.innerText = (currentUser.Name || "?").charAt(0);
+                if (roleEl) roleEl.innerText = currentUser.Role || "Member";
+                if (emailEl) emailEl.innerText = (currentUser.Email || "").toLowerCase();
+                if (sectionEl) sectionEl.innerText = currentUser.Section || "-";
+
+                const phoneInput = document.getElementById('profile-phone');
+                const bdayInput = document.getElementById('profile-birthday');
+                const idInput = document.getElementById('profile-id-number');
+                if (phoneInput) phoneInput.value = currentUser.Phone || "";
+                if (bdayInput) {
+                    let d = currentUser.Birthday;
+                    if (d) {
+                        const dt = new Date(d);
+                        if (!isNaN(dt.getTime())) {
+                            const y = dt.getFullYear();
+                            const mo = String(dt.getMonth() + 1).padStart(2, '0');
+                            const da = String(dt.getDate()).padStart(2, '0');
+                            d = `${y}-${mo}-${da}`;
+                        }
+                    }
+                    bdayInput.value = d || "";
+                }
+                if (idInput) idInput.value = currentUser.ID_Number || "";
+
+                if (instSelect) {
+                    instSelect.innerHTML = (orchestraData[currentUser.Section] || []).map(i => `<option value="${i}" ${i === currentUser.Instrument ? 'selected' : ''}>${i}</option>`).join('');
+                }
+
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+                const hasNotif = ("Notification" in window);
+                const diagPwa = document.getElementById('diag-pwa');
+                const diagSupport = document.getElementById('diag-support');
+                const diagPermission = document.getElementById('diag-permission');
+                if (diagPwa) diagPwa.innerText = isStandalone ? "YES" : "NO";
+                if (diagSupport) diagSupport.innerText = hasNotif ? "YES" : "NO";
+                if (diagPermission) diagPermission.innerText = hasNotif ? Notification.permission : "N/A";
+
+                switchProfileTab('basic');
+                const diagVal = document.getElementById('diag-push-result');
+                if (diagVal) diagVal.innerText = "尚未發起診斷";
+
+                const pushDiagPanel = document.getElementById('diag-push-panel');
+                if (pushDiagPanel) {
+                    const isAdmin = currentUser && (currentUser.Role === 'Admin' || currentUser.role === 'Admin');
+                    pushDiagPanel.classList.toggle('hidden', !isAdmin);
+                }
+                safeCreateIcons();
+                requestNotificationPermission();
+            } catch (err) {
+                console.error("Profile modal data error:", err);
+            }
+        }
+
+        function switchProfileTab(tab) {
+            const basicTab = document.getElementById('profile-tab-basic');
+            const personalTab = document.getElementById('profile-tab-personal');
+            const basicBtn = document.getElementById('tab-btn-basic');
+            const personalBtn = document.getElementById('tab-btn-personal');
+
+            if (!basicTab || !personalTab) return;
+
+            if (tab === 'basic') {
+                basicTab.classList.remove('hidden');
+                personalTab.classList.add('hidden');
+                basicBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                basicBtn.classList.remove('text-slate-400');
+                personalBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                personalBtn.classList.add('text-slate-400');
+            } else {
+                basicTab.classList.add('hidden');
+                personalTab.classList.remove('hidden');
+                personalBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                personalBtn.classList.remove('text-slate-400');
+                basicBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                basicBtn.classList.add('text-slate-400');
+                safeCreateIcons();
+            }
+        }
+
+        async function triggerPushDiagnostic() {
+            if (!currentUser) return;
+            const btn = document.getElementById('diag-push-btn');
+            const resultEl = document.getElementById('diag-push-result');
+            setBtnLoading(btn, true, "診斷中...");
+            resultEl.innerText = "⏳ 正在請求後端發送測試訊息...";
+            
+            try {
+                const res = await callBackend('testPush', { email: currentUser.Email || currentUser.email });
+                if (res.success) {
+                    resultEl.innerText = "📡 成功觸發！請檢查手機通知。\n原始回應: " + res.rawResponse;
+                    showToast("✅ 已發出診斷請求");
+                } else {
+                    resultEl.innerText = "❌ 發送失敗: " + res.message;
+                    showToast("❌ 診斷失敗", "error");
+                }
+            } catch (e) {
+                resultEl.innerText = "❌ 通訊異常: " + e.message;
+            } finally {
+                setBtnLoading(btn, false, "重新診斷");
+            }
+        }
+
+        function closeProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        }
+
+        async function handleUpdatePassword() {
+            const name = document.getElementById('profile-name-input')?.value || currentUser.Name;
+            const inst = document.getElementById('profile-instrument-input')?.value || currentUser.Instrument;
+            const phone = document.getElementById('profile-phone')?.value || "";
+            const bday = document.getElementById('profile-birthday')?.value || "";
+            const idNum = document.getElementById('profile-id-number')?.value || "";
+            const pwd = document.getElementById('profile-new-password')?.value || "";
+
+            // 暫存資料用於最後送出
+            window.pendingProfileData = { name, instrument: inst, phone, birthday: bday, idNumber: idNum, password: pwd };
+
+            // 判斷是否需要跳出個資授權 (如果有填寫敏感資料，且之前沒同意過)
+            const hasSensitive = phone || bday || idNum;
+            const alreadyConsented = currentUser.PrivacyConsent && currentUser.PrivacyConsent !== "NO";
+
+            if (hasSensitive && !alreadyConsented) {
+                openPrivacyModal();
+            } else {
+                submitFinalProfile();
+            }
+        }
+
+        async function submitFinalProfile(consent = false) {
+            const data = window.pendingProfileData;
+            if (!data) return;
+
+            const btn = document.getElementById('update-password-btn');
+            const origText = btn.innerText;
+            btn.disabled = true; btn.innerText = "儲存中...";
+
+            const res = await callBackend('saveMember', {
+                email: currentUser.Email,
+                name: data.name,
+                instrument: data.instrument,
+                password: data.password,
+                phone: data.phone,
+                birthday: data.birthday,
+                idNumber: data.idNumber,
+                privacyConsent: consent ? "YES" : (currentUser.PrivacyConsent || "NO")
+            });
+
+            btn.disabled = false; btn.innerText = origText;
+
+            if (res?.success) {
+                showToast("已更新資料");
+                closeProfileModal();
+                // 更新本機變數與本地存儲
+                Object.assign(currentUser, {
+                    Name: data.name,
+                    Instrument: data.instrument,
+                    Phone: data.phone,
+                    Birthday: data.birthday,
+                    ID_Number: data.idNumber,
+                    PrivacyConsent: consent ? "YES" : (currentUser.PrivacyConsent || "NO")
+                });
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                setupDashboard();
+            } else {
+                showToast(res?.message || "更新失敗", true);
+            }
+        }
+
+        function openPrivacyModal() {
+            const modal = document.getElementById('privacy-modal');
+            const check = document.getElementById('privacy-agree-check');
+            if (check) check.checked = false;
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                safeCreateIcons();
+            }
+        }
+
+        function closePrivacyModal() {
+            const modal = document.getElementById('privacy-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        }
+
+        function confirmPrivacyConsent() {
+            const check = document.getElementById('privacy-agree-check');
+            if (!check || !check.checked) return showToast("請先勾選同意條款", true);
+
+            closePrivacyModal();
+            submitFinalProfile(true);
+        }
+
+        async function refreshSystemStatus() {
+            if (!currentUser) return;
+            const res = await callBackend('getSystemStatus', { email: currentUser.Email });
+            if (res?.success) {
+                currentEventData = res;
+                updateCheckinBtnStatus(res.hasCheckedIn);
+                const eventDisplay = document.getElementById('current-event-display');
+                if (eventDisplay) eventDisplay.innerText = res.enabled ? res.eventName : "目前暫無團練活動";
+                const ti = document.getElementById('checkin-time-display');
+                if (ti) {
+                    ti.innerText = res.enabled ? `${res.eventStart} ~ ${res.eventEnd}` : "--:--";
+                    ti.classList.toggle('opacity-100', res.enabled);
+                }
+                if (res.bypassCode) {
+                    currentBypassCode = res.bypassCode;
+                    const input = document.getElementById('bypass-code-input');
+                    if (input) input.value = res.bypassCode;
+                }
+                // 同步更新公告
+                fetchAnnouncement();
+            }
+        }
+
+        function updateCheckinBtnStatus(hasCheckedIn) {
+            const btn = document.getElementById('checkin-btn'), pulse = document.getElementById('btn-pulse');
+            if (!btn || !pulse) return;
+            if (hasCheckedIn) {
+                btn.disabled = true; btn.className = "relative z-10 w-36 h-36 bg-emerald-500 rounded-full text-white font-black shadow-xl border-[10px] border-white flex flex-col items-center justify-center transition-all duration-700";
+                btn.innerHTML = '<i data-lucide="check-circle" class="w-12 h-12 mb-1"></i><span class="text-[10px] font-black uppercase">簽到完成</span>';
+                pulse.classList.remove('pulse-effect');
+            } else {
+                const isEnabled = currentEventData?.enabled;
+                btn.disabled = !isEnabled;
+                btn.innerHTML = isEnabled ? '<i data-lucide="scan-face" class="w-12 h-12 mb-2"></i><span class="text-lg">簽到</span>' : '<i data-lucide="clock" class="w-10 h-10 mb-2 opacity-30"></i><span class="text-[10px]">尚未開放</span>';
+                btn.className = isEnabled ? "relative z-10 w-36 h-36 btn-premium rounded-full text-white font-black shadow-2xl border-[10px] border-white flex flex-col items-center justify-center" : "relative z-10 w-36 h-36 bg-slate-200 rounded-full text-slate-400 font-black border-[10px] border-white flex flex-col items-center justify-center cursor-not-allowed";
+                if (isEnabled) pulse.classList.add('pulse-effect'); else pulse.classList.remove('pulse-effect');
+            }
+            safeCreateIcons();
+        }
+
+        async function loadAttendanceHistory() {
+            if (!currentUser) return;
+            const res = await callBackend('getAttendanceHistory', { email: currentUser.Email });
+            if (res?.success) {
+                const listEl = document.getElementById('attendance-list');
+                if (!listEl) return;
+                let totalMin = 0;
+                listEl.innerHTML = (res.list || []).map(h => {
+                    const dur = formatDurationDisplay(h.duration);
+                    const displayDate = formatDateTime(h.date, true);
+                    const match = dur.match(/(\d+)時(\d+)分/);
+                    if (match) totalMin += (parseInt(match[1]) * 60 + parseInt(match[2]));
+                    return `<div class="glass-panel p-4 rounded-2xl flex justify-between items-center text-left"><div><p class="font-black text-slate-700 text-xs">${h.status}</p><p class="text-[9px] text-slate-400 font-bold uppercase">${displayDate}</p></div><span class="bg-indigo-500 text-white px-3 py-1.5 rounded-xl font-black text-[10px] shadow-lg">${dur}</span></div>`;
+                }).join('');
+                const totalDurEl = document.getElementById('total-duration-display');
+                const totalMinEl = document.getElementById('total-minutes-label');
+                if (totalDurEl) totalDurEl.innerText = Math.floor(totalMin / 60);
+                if (totalMinEl) totalMinEl.innerText = `${totalMin % 60} Minutes`;
+            }
+            safeCreateIcons();
+        }
+
+        async function submitCheckin() {
+            if (!currentEventData) return;
+            const btn = document.getElementById('checkin-btn'); if (!btn) return;
+            const oldH = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-12 h-12 animate-spin"></i><span class="text-[10px] mt-1">定位中...</span>'; safeCreateIcons();
+            try {
+                const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000 }));
+                const dist = (function (lat1, lon1, lat2, lon2) { const R = 6371e3; const f1 = lat1 * Math.PI / 180, f2 = lat2 * Math.PI / 180; const df = (lat2 - lat1) * Math.PI / 180, dl = (lon2 - lon1) * Math.PI / 180; const a = Math.sin(df / 2) * Math.sin(df / 2) + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) * Math.sin(dl / 2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); })(pos.coords.latitude, pos.coords.longitude, ALLOWED_LOCATIONS[0].lat, ALLOWED_LOCATIONS[0].lng);
+
+                if (dist > MAX_DISTANCE) {
+                    // 原本顯示距離，改為統一文字
+                    const userInput = prompt("不在崇正寶宮\n若為外部演出，請輸入演出授權碼簽到：");
+                    if (!userInput) {
+                        btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); return;
+                    }
+                    if (String(userInput) !== String(currentBypassCode)) {
+                        showToast("授權碼錯誤", true);
+                        btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); return;
+                    }
+                }
+
+                const res = await callBackend('submitCheckin', { email: currentUser.Email, name: currentUser.Name, section: currentUser.Section, date: currentEventData.eventDate, eventName: currentEventData.eventName, eventTimeRange: `${currentEventData.eventStart} ~ ${currentEventData.eventEnd}` });
+                if (res?.success) { showToast("簽到成功！排練愉快"); currentEventData.hasCheckedIn = true; updateCheckinBtnStatus(true); setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1500); }
+                else showToast(res.message || "簽到失敗", true);
+            } catch (e) { showToast("定位失敗", true); btn.disabled = false; btn.innerHTML = oldH; safeCreateIcons(); }
+        }
+
+        async function handleSaveBypassCode() {
+            const input = document.getElementById('bypass-code-input');
+            const newCode = input?.value.trim() || "";
+            if (!newCode) return showToast("授權碼不可為空", true);
+            const btn = document.getElementById('btn-save-bypass'); setBtnLoading(btn, true, "儲存中...");
+            try {
+                const res = await callBackend('saveSystemSetting', { key: 'bypassCode', value: newCode });
+                if (res?.success) { showToast("系統授權碼已更新"); currentBypassCode = newCode; }
+                else showToast("更新失敗", true);
+            } catch (e) { showToast("連線異常", true); }
+            finally { setBtnLoading(btn, false, "儲存"); }
+        }
+
+        async function fetchAnnouncement() {
+            const board = document.getElementById('announcement-board');
+            const contentEl = document.getElementById('announcement-content');
+            const timeEl = document.getElementById('announcement-time');
+
+            try {
+                // 如果是第一次載入且看板還沒顯示，可以先顯示「載入中」
+                if (board && board.classList.contains('hidden')) {
+                    // 暫時不自動顯示，等結果。但如果想診斷，可以先移除 hidden
+                }
+
+                const res = await callBackend('getAnnouncement', {});
+                console.log("Fetch Announcement Raw Res:", res);
+
+                if (res?.success && res.content) {
+                    // --- 檢查是否有新公告並觸發推播 (PWA) ---
+                    const lastContent = localStorage.getItem('last_announcement');
+                    if (lastContent && lastContent !== String(res.content)) {
+                        showLocalNotification("崇正國樂團：新公告", String(res.content).substring(0, 40) + "...");
+                    }
+                    localStorage.setItem('last_announcement', String(res.content));
+
+                    if (board) board.classList.remove('hidden');
+                    if (contentEl) {
+                        contentEl.innerText = res.content;
+                        contentEl.classList.remove('text-rose-500', 'opacity-50');
+                    }
+                    const formattedTime = formatDateTime(res.updateTime);
+                    if (timeEl) timeEl.innerText = formattedTime ? `最後更新: ${formattedTime}` : "";
+                    console.log("Announcement Board Visible: true");
+                } else if (res?.success && !res.content) {
+                    // 成功但沒內容 -> 隱藏
+                    console.log("Announcement Board Visible: false (empty content)");
+                    if (board) board.classList.add('hidden');
+                } else {
+                    // 失敗
+                    console.log("Announcement Board Fetch Failed:", res?.message);
+                    // 只有在已經有內容的情況下才顯示錯誤，否則保持隱藏
+                    if (board && !board.classList.contains('hidden')) {
+                        if (contentEl) contentEl.innerText = "公告更新失敗：" + (res?.message || "不明錯誤");
+                    }
+                }
+            } catch (e) {
+                console.error("fetchAnnouncement Error:", e);
+                if (contentEl && board && !board.classList.contains('hidden')) {
+                    contentEl.innerText = "連線異常，請檢查網路";
+                    contentEl.classList.add('text-rose-500', 'opacity-50');
+                }
+            }
+        }
+
+        async function showLocalNotification(title, body) {
+            console.log("Attempting notification:", title, "Permission:", Notification.permission);
+            if (Notification.permission !== "granted") {
+                console.warn("Notification permission not granted.");
+                return;
+            }
+            try {
+                // 優先使用 ServiceWorkerRegistration (PWA 最佳實作)
+                if ('serviceWorker' in navigator) {
+                    const reg = await navigator.serviceWorker.ready;
+                    if (reg && reg.showNotification) {
+                        console.log("Using Service Worker showNotification");
+                        await reg.showNotification(title, {
+                            body,
+                            icon: "icon-192.png",
+                            badge: "icon-192.png",
+                            vibrate: [200, 100, 200, 100, 500],
+                            data: { url: window.location.href }
+                        });
+                        return;
+                    }
+                }
+                // 備援：一般桌面通知
+                console.log("Using fallback new Notification()");
+                new Notification(title, { body, icon: "icon-192.png" });
+            } catch (e) {
+                console.error("Notification failed:", e);
+                showToast("通知發送失敗: " + e.message, true);
+            }
+        }
+
+        function testNotification() {
+            if (!("Notification" in window)) {
+                return showToast("您的瀏覽器不支援通知功能", true);
+            }
+            if (Notification.permission === "default") {
+                showToast("正在請求權限...");
+                requestNotificationPermission().then(() => {
+                    if (Notification.permission === "granted") {
+                        showLocalNotification("測試通知", "這是一則推播測試，代表您的系統設定正確！");
+                    } else {
+                        showToast("權限被拒絕", true);
+                    }
+                });
+            } else if (Notification.permission === "granted") {
+                showLocalNotification("測試通知", "這是一則推播測試，您的權限已開啟！");
+                showToast("已發送測試通知");
+            } else {
+                showToast("請在瀏覽器設定中手動開啟通知權限", true);
+                console.error("Permission denied state.");
+            }
+        }
+
+        async function handleSaveAnnouncement() {
+            const input = document.getElementById('announcement-edit-input');
+            const content = input?.value.trim() || "";
+            console.log("Saving announcement:", content);
+            if (!content) return showToast("內容不可為空", true);
+
+            const btn = document.getElementById('save-announcement-btn');
+            setBtnLoading(btn, true, "發布中...");
+
+            try {
+                const res = await callBackend('saveAnnouncement', { content });
+                console.log("Save announcement result:", res);
+                if (res?.success) {
+                    showToast("公告發布成功");
+                    closeAnnouncementModal();
+                    fetchAnnouncement();
+                    if (input) input.value = ""; // 清空
+                } else {
+                    showToast(res?.message || "發布失敗", true);
+                }
+            } catch (e) {
+                console.error("handleSaveAnnouncement Error:", e);
+                showToast("連線異常", true);
+            } finally {
+                setBtnLoading(btn, false, "發布公告");
+            }
+        }
+
+        async function loadEventList() {
+            const listEl = document.getElementById('admin-event-list');
+            if (!listEl) return;
+            listEl.innerHTML = '<div class="py-10 text-[10px] font-black uppercase text-center">Syncing...</div>';
+            try {
+                const res = await callBackend('getEventList', {});
+                if (res?.success) {
+                    allEvents = res.data || [];
+                    const activeEventId = res.activeEventId;
+                    const isActuallyAdmin = currentUser && currentUser.Role === 'Admin';
+                    if (allEvents.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前無活動資料</div>';
+                    else {
+                        listEl.innerHTML = allEvents.map(ev => {
+                            const isActive = String(ev.ID) === String(activeEventId);
+                            return `
+                            <div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm flex flex-col gap-3">
+                                <div class="text-left">
+                                    <p class="font-[900] text-slate-800 text-sm mb-1">${ev.Name}</p>
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">${ev.Date} • ${ev.StartTime} - ${ev.EndTime}</p>
+                                    ${isActive ? '<p class="text-[9px] text-emerald-500 font-black mt-1 uppercase tracking-tighter">● 正在廣播中</p>' : ''}
+                                </div>
+                                <div class="flex gap-2">
+                                    ${isActive
+                                    ? `<button onclick="deactivateEventFromList()" class="flex-1 py-3 bg-rose-50 text-rose-600 rounded-2xl active:scale-95 text-[10px] font-black border border-rose-100">停止廣播</button>`
+                                    : `<button onclick="activateEventFromList('${ev.ID}')" class="flex-1 py-3 bg-amber-50 text-amber-600 rounded-2xl active:scale-95 text-[10px] font-black border border-amber-100">廣播</button>`
+                                }
+                                    ${isActuallyAdmin ? `<button onclick="openEditModal('${ev.ID}')" class="flex-1 py-3 bg-indigo-50 rounded-2xl text-indigo-600 active:scale-95 text-[10px] font-black border border-indigo-100">編輯</button>` : ''}
+                                </div>
+                            </div>`;
+                        }).join('');
+                    }
+                } else listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">載入失敗: ${res?.message || '未知錯誤'}</div>`;
+            } catch (e) { listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">連線錯誤</div>'; }
+            safeCreateIcons();
+        }
+
+        async function activateEventFromList(id) {
+            const res = await callBackend('activateEvent', { id });
+            if (res?.success) { showToast("活動已開始廣播"); refreshSystemStatus(); loadEventList(); }
+        }
+
+        async function deactivateEventFromList() {
+            const res = await callBackend('deactivateEvent', {});
+            if (res?.success) { showToast("廣播已關閉"); refreshSystemStatus(); loadEventList(); }
+        }
+
+        function openEditModal(id) {
+            const modal = document.getElementById('edit-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+            try {
+                editingId = id; const ev = id ? allEvents.find(e => String(e.ID) === String(id)) : null;
+                const modalTitle = document.getElementById('modal-title');
+                if (modalTitle) modalTitle.innerText = id ? "編輯活動" : "新增活動";
+                const fields = { 'edit-name': 'Name', 'edit-date': 'Date', 'edit-start': 'StartTime', 'edit-end': 'EndTime', 'edit-rest-start': 'RestStart', 'edit-rest-end': 'RestEnd' };
+                for (let fid in fields) {
+                    const el = document.getElementById(fid);
+                    if (el) el.value = ev ? (ev[fields[fid]] || "") : (fid === 'edit-date' ? new Date().toISOString().split('T')[0] : (fid === 'edit-start' ? "19:00" : (fid === 'edit-end' ? "21:30" : "")));
+                }
+                safeCreateIcons();
+            } catch (err) {
+                console.error("Edit modal data error:", err);
+            }
+        }
+
+        async function saveEvent() {
+            const name = document.getElementById('edit-name')?.value.trim() || "";
+            if (!name) return showToast("名稱必填", true);
+            const btn = document.getElementById('save-event-btn'); setBtnLoading(btn, true, "儲存中...");
+            const res = await callBackend('saveEvent', { id: editingId, name, date: document.getElementById('edit-date').value, startTime: document.getElementById('edit-start').value, endTime: document.getElementById('edit-end').value, restStart: document.getElementById('edit-rest-start').value, restEnd: document.getElementById('edit-rest-end').value });
+            setBtnLoading(btn, false, "儲存活動");
+            if (res?.success) { showToast("活動已儲存"); closeEditModal(); loadEventList(); }
+        }
+
+        async function loadRealtimeStatus() {
+            const listEl = document.getElementById('realtime-status-list'); if (!listEl) return;
+            listEl.innerHTML = '<div class="py-10 text-[10px] font-black uppercase text-center">資料同步中...</div>';
+            try {
+                const res = await callBackend('getRealtimeStatus', { section: currentUser.Section, role: currentUser.Role });
+                if (res && res.success) {
+                    cachedMemberList = res.data || [];
+                    const presentEl = document.getElementById('stat-present'), absentEl = document.getElementById('stat-absent');
+                    if (presentEl) presentEl.innerText = res.stats?.present || 0;
+                    if (absentEl) absentEl.innerText = res.stats?.absent || 0;
+                    applyMonitorFilters();
+                } else listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">同步失敗: ${res?.message || '未知錯誤'}</div>`;
+            } catch (e) { listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">伺服器異常</div>'; }
+        }
+
+        function getAbsenceColorClass(count) {
+            if (count === 0) return 'text-emerald-500';
+            if (count === 1) return 'text-amber-500';
+            if (count === 2) return 'text-orange-500';
+            return 'text-rose-500';
+        }
+
+        function applyMonitorFilters() {
+            const isLeader = currentUser.Role === 'Leader';
+            const filterEl = document.getElementById('monitor-filter-section');
+            if (filterEl && isLeader) filterEl.value = currentUser.Section;
+            const section = filterEl ? filterEl.value : 'all';
+            const sort = document.getElementById('monitor-sort-order')?.value || 'default';
+            const listEl = document.getElementById('realtime-status-list');
+
+            if (!cachedMemberList || cachedMemberList.length === 0) {
+                if (listEl) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前無成員資料</div>';
+                return;
+            }
+
+            let list = [...cachedMemberList];
+            if (section !== 'all') list = list.filter(m => m.Section === section);
+
+            // --- 更新組別統計數字 ---
+            const presentCount = list.filter(m => m.status === '已簽到').length;
+            const absentCount = list.length - presentCount;
+            const presentEl = document.getElementById('stat-present');
+            const absentEl = document.getElementById('stat-absent');
+            if (presentEl) presentEl.innerText = presentCount;
+            if (absentEl) absentEl.innerText = absentCount;
+
+            if (sort === 'checkin') list.sort((a, b) => (a.status === '已簽到' ? -1 : 1));
+            else if (sort === 'absence') {
+                list.sort((a, b) => {
+                    // 1. 目前狀態優先 (未簽到/缺席 放在前面)
+                    const aMissing = a.status !== '已簽到';
+                    const bMissing = b.status !== '已簽到';
+                    if (aMissing && !bMissing) return -1;
+                    if (!aMissing && bMissing) return 1;
+                    // 2. 若狀態相同，則看缺席次數 (多到少)
+                    return (b.absenceCount || 0) - (a.absenceCount || 0);
+                });
+            }
+
+            if (listEl) listEl.innerHTML = list.map(m => {
+                const abs = m.absenceCount || 0;
+                return `<div class="bg-white/70 p-4 rounded-2xl flex justify-between items-center text-left"><div class="flex flex-col gap-1"><p class="font-black text-slate-800 text-xs">${m.Name} <span class="text-[9px] text-slate-400">(${m.Instrument})</span></p><p class="text-[10px] font-black ${getAbsenceColorClass(abs)}">缺 ${abs}</p></div><div class="text-right"><span class="text-xs font-black ${m.status === '已簽到' ? 'text-emerald-500' : 'text-rose-400'}">${m.status}</span></div></div>`
+            }).join('');
+            safeCreateIcons();
+        }
+
+        async function loadSurveyList() {
+            const listEl = document.getElementById('admin-survey-list'); if (!listEl) return;
+            listEl.innerHTML = '<div class="py-10 text-[10px] font-black uppercase text-center">Syncing...</div>';
+            try {
+                const res = await callBackend('getSurveyList', {});
+                if (res?.success) {
+                    allSurveys = res.data || [];
+                    if (allSurveys.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前問卷庫為空</div>';
+                    else listEl.innerHTML = allSurveys.map(s => `<div class="bg-white/70 p-5 rounded-[28px] border border-white shadow-sm flex flex-col gap-3"><div class="text-left"><p class="font-[900] text-slate-800 text-sm mb-1">${s.Title}</p><p class="text-[9px] ${s.Active ? 'text-emerald-500' : 'text-slate-400'} font-black uppercase">${s.Active ? '開放中' : '已關閉'}</p></div><button onclick="openSurveyAdminModal('${s.ID}')" class="w-full py-3 bg-indigo-50 rounded-2xl text-indigo-600 active:scale-95 text-[10px] font-black">管理與統計</button></div>`).join('');
+                } else listEl.innerHTML = `<div class="py-10 text-rose-500 font-bold text-center">載入失敗: ${res?.message || '未知錯誤'}</div>`;
+            } catch (e) { listEl.innerHTML = '<div class="py-10 text-rose-500 font-bold text-center">伺服器異常</div>'; }
+            safeCreateIcons();
+        }
+
+        function openSurveyAdminModal(id) {
+            editingSurveyId = id;
+            const sur = id ? allSurveys.find(s => String(s.ID) === String(id)) : null;
+            const fields = { 'sur-admin-title': 'Title', 'sur-admin-desc': 'Description', 'sur-admin-embed-url': 'EmbedURL' };
+            const isActuallyAdmin = currentUser && currentUser.Role === 'Admin';
+
+            for (let id in fields) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.value = sur ? (sur[fields[id]] || "") : "";
+                    el.readOnly = !isActuallyAdmin;
+                    el.classList.toggle('bg-slate-100', !isActuallyAdmin);
+                }
+            }
+
+            const addSecBtn = document.querySelector('button[onclick="addSurveySection()"]');
+            const addQueBtn = document.querySelector('button[onclick="addSurveyQuestion()"]');
+            if (addSecBtn) addSecBtn.classList.toggle('hidden', !isActuallyAdmin);
+            if (addQueBtn) addQueBtn.classList.toggle('hidden', !isActuallyAdmin);
+
+            const statusEl = document.getElementById('sur-admin-status'); if (statusEl) statusEl.checked = sur ? sur.Active : false;
+            adminQuestions = []; if (sur && sur.QuestionsJSON) try { adminQuestions = JSON.parse(sur.QuestionsJSON); } catch (e) { adminQuestions = []; }
+            renderAdminQuestions(); switchSurveyAdminTab('config');
+            const modal = document.getElementById('survey-admin-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+            safeCreateIcons();
+        }
+
+        function switchSurveyAdminTab(tab) {
+            const sections = ['config', 'result'];
+            sections.forEach(s => {
+                const el = document.getElementById(`sur-admin-${s}`); if (el) el.classList.toggle('hidden', s !== tab);
+                const btn = document.getElementById(`sur-tab-${s}`); if (btn) { if (s === tab) btn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm'); else btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm'); }
+            });
+            if (tab === 'result') loadSurveyResults();
+        }
+
+        function renderAdminQuestions() {
+            const list = document.getElementById('sur-admin-questions-list'); if (!list) return;
+            const generateUniqueId = (prefix) => prefix + Date.now() + Math.random().toString(36).substr(2, 5);
+            adminQuestions.forEach((q, i) => { if (!q.id) q.id = generateUniqueId(q.type === 'section' ? 's' : 'q'); });
+            // 可作條件/跳轉來源的選擇題 (納入多選)
+            const condSources = adminQuestions.filter(q => q.type === 'select' || q.type === 'yesno' || q.type === 'multiselect');
+            // 可跳轉的區段（section 題型）
+            const sections = adminQuestions.filter(q => q.type === 'section');
+            const branchTargetOptions = `<option value="__next__">下一區段（預設）</option><option value="__end__">提交問卷</option>` +
+                sections.map(s => `<option value="${s.id}">${s.label || '未命名區段'}</option>`).join('');
+
+            const isActuallyAdmin = currentUser && currentUser.Role === 'Admin';
+
+            list.innerHTML = adminQuestions.map((q, i) => {
+                if (q.type === 'section') {
+                    return `<div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl relative">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-1 ${!isActuallyAdmin ? 'hidden' : ''}">
+                                <button onclick="moveAdminQuestion(${i},-1)" ${i === 0 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-indigo-100 text-indigo-600 text-[9px] font-black disabled:opacity-30 hover:bg-indigo-200 transition-all active:scale-95"><i data-lucide="arrow-up" class="w-3 h-3"></i>上移</button>
+                                <button onclick="moveAdminQuestion(${i},1)" ${i === adminQuestions.length - 1 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-indigo-100 text-indigo-600 text-[9px] font-black disabled:opacity-30 hover:bg-indigo-200 transition-all active:scale-95"><i data-lucide="arrow-down" class="w-3 h-3"></i>下移</button>
+                                <span class="text-[9px] font-black text-indigo-500 uppercase flex items-center gap-1 ml-1"><i data-lucide="layout-panel-top" class="w-3 h-3"></i> 區段分頁</span>
+                            </div>
+                            <button onclick="removeAdminQuestion(${i})" class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-rose-100 text-rose-500 text-[9px] font-black hover:bg-rose-200 transition-all active:scale-95 ${!isActuallyAdmin ? 'hidden' : ''}"><i data-lucide="trash-2" class="w-3 h-3"></i>刪除</button>
+                            ${!isActuallyAdmin ? `<span class="text-[9px] font-black text-indigo-500 uppercase flex items-center gap-1"><i data-lucide="layout-panel-top" class="w-3 h-3"></i> 區段分頁</span>` : ''}
+                        </div>
+                        <input type="text" placeholder="區段標題" value="${q.label}" ${!isActuallyAdmin ? 'readOnly' : `oninput="adminQuestions[${i}].label=this.value"`} class="w-full bg-white px-3 py-2.5 rounded-lg text-xs font-black border-none outline-none shadow-sm text-indigo-700">
+                    </div>`;
+                }
+                // ── 條件顯示來源選項 ──
+                const condSrc2 = condSources.filter(s => String(s.id) !== String(q.id));
+                const condOptions = condSrc2.map(s => {
+                    const opts = (s.type === 'yesno') ? ['是', '否'] : (s.options || '').split(',').map(o => o.trim()).filter(Boolean);
+                    return `<optgroup label="${s.label || '題目'}">` + opts.map(o =>
+                        `<option value="${s.id}|${o}" ${(q.condition && String(q.condition.questionId) === String(s.id) && q.condition.answer === o) ? 'selected' : ''}>${s.label}: ${o}</option>`
+                    ).join('') + '</optgroup>';
+                }).join('');
+                const hasCondition = q.condition && q.condition.questionId;
+                // ── 每個選項的跳轉設定（單選/是否） ──
+                let branchHtml = '';
+                if (q.type === 'select' || q.type === 'yesno') {
+                    const opts2 = (q.type === 'yesno') ? ['是', '否'] : (q.options || '').split(',').map(o => o.trim()).filter(Boolean);
+                    if (opts2.length > 0 && sections.length > 0) {
+                        branchHtml = `<div class="pt-2 border-t border-slate-200">
+                            <label class="text-[9px] font-black text-amber-500 uppercase mb-1 block flex items-center gap-1"><i data-lucide="git-branch" class="w-3 h-3"></i> 前往區段（選填）</label>` +
+                            opts2.map(o => {
+                                const curBranch = (q.branches && q.branches[o]) || '__next__';
+                                return `<div class="flex items-center gap-2 mb-1.5">
+                                    <span class="text-[9px] font-black text-slate-500 min-w-[36px]">${o}：</span>
+                                    <select ${!isActuallyAdmin ? 'disabled' : `onchange="setQuestionBranch(${i},'${o}',this.value)"`} class="flex-1 bg-white px-2 py-1.5 rounded-lg text-[9px] font-black border-none outline-none shadow-sm">${branchTargetOptions.replace(`value="${curBranch}"`, `value="${curBranch}" selected`)}</select>
+                                </div>`;
+                            }).join('') + '</div>';
+                    }
+                }
+                return `<div class="bg-slate-50 p-4 rounded-xl space-y-2.5 relative border border-slate-100">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="flex items-center gap-1 ${!isActuallyAdmin ? 'hidden' : ''}">
+                            <button onclick="moveAdminQuestion(${i},-1)" ${i === 0 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-slate-200 text-slate-600 text-[9px] font-black disabled:opacity-30 hover:bg-slate-300 transition-all active:scale-95"><i data-lucide="arrow-up" class="w-3 h-3"></i>上移</button>
+                            <button onclick="moveAdminQuestion(${i},1)" ${i === adminQuestions.length - 1 ? 'disabled' : ''} class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-slate-200 text-slate-600 text-[9px] font-black disabled:opacity-30 hover:bg-slate-300 transition-all active:scale-95"><i data-lucide="arrow-down" class="w-3 h-3"></i>下移</button>
+                            <span class="text-[9px] font-black text-slate-400 uppercase ml-1">Q${i + 1}</span>
+                        </div>
+                        <button onclick="removeAdminQuestion(${i})" class="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-rose-100 text-rose-500 text-[9px] font-black hover:bg-rose-200 transition-all active:scale-95 ${!isActuallyAdmin ? 'hidden' : ''}"><i data-lucide="trash-2" class="w-3 h-3"></i>刪除</button>
+                        ${!isActuallyAdmin ? `<span class="text-[9px] font-black text-slate-400 uppercase">Q${i + 1}</span>` : ''}
+                    </div>
+                    <input type="text" placeholder="題目文字" value="${q.label}" ${!isActuallyAdmin ? 'readOnly' : `oninput="adminQuestions[${i}].label=this.value"`} class="w-full bg-white px-3 py-2.5 rounded-lg text-xs font-bold border-none outline-none shadow-sm">
+                    <div class="flex gap-2">
+                        <select ${!isActuallyAdmin ? 'disabled' : `onchange="adminQuestions[${i}].type=this.value; renderAdminQuestions()"`} class="flex-1 bg-white px-3 py-2.5 rounded-lg text-[10px] font-black border-none outline-none shadow-sm">
+                            <option value="text" ${q.type === 'text' ? 'selected' : ''}>文字輸入</option>
+                            <option value="date" ${q.type === 'date' ? 'selected' : ''}>日期</option>
+                            <option value="yesno" ${q.type === 'yesno' ? 'selected' : ''}>是 / 否</option>
+                            <option value="select" ${q.type === 'select' ? 'selected' : ''}>單選</option>
+                            <option value="multiselect" ${q.type === 'multiselect' ? 'selected' : ''}>多選</option>
+                        </select>
+                        <label class="flex items-center gap-1 text-[10px] font-black text-slate-500 bg-white px-3 rounded-lg shadow-sm cursor-pointer">
+                            <input type="checkbox" ${q.required ? 'checked' : ''} ${!isActuallyAdmin ? 'disabled' : `onchange="adminQuestions[${i}].required=this.checked"`} class="accent-indigo-600 w-3.5 h-3.5"> 必填
+                        </label>
+                    </div>
+                    ${(q.type === 'select' || q.type === 'multiselect') ? `<input type="text" placeholder="選項（逗號分隔）" value="${q.options || ""}" ${!isActuallyAdmin ? 'readOnly' : `oninput="adminQuestions[${i}].options=this.value"`} class="w-full bg-white px-3 py-2.5 rounded-lg text-[10px] font-medium border-none outline-none shadow-sm">` : ''}
+                    ${branchHtml}
+                    <div class="pt-2 border-t border-slate-200">
+                        <label class="text-[9px] font-black text-indigo-500 uppercase mb-1 block">條件顯示（選填）</label>
+                        <select ${!isActuallyAdmin ? 'disabled' : `onchange="setQuestionCondition(${i}, this.value)"`} class="w-full bg-white px-3 py-2.5 rounded-lg text-[10px] font-black border-none outline-none shadow-sm">
+                            <option value="">永遠顯示（無條件）</option>
+                            ${condOptions}
+                        </select>
+                        ${hasCondition ? `<p class="text-[9px] text-indigo-400 mt-1 font-bold">▶ 當「${adminQuestions.find(s => String(s.id) === String(q.condition.questionId))?.label || ''}」選「${q.condition.answer}」時才顯示</p>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+            safeCreateIcons();
+        }
+
+        function setQuestionCondition(i, value) {
+            if (!value) { adminQuestions[i].condition = null; }
+            else { const [qId, answer] = value.split('|'); adminQuestions[i].condition = { questionId: qId, answer }; }
+            renderAdminQuestions();
+        }
+
+        function setQuestionBranch(i, option, target) {
+            if (!adminQuestions[i].branches) adminQuestions[i].branches = {};
+            adminQuestions[i].branches[option] = target;
+            renderAdminQuestions();
+        }
+
+        async function handleUpdateSurveyConfig() {
+            const title = document.getElementById('sur-admin-title')?.value.trim() || "";
+            if (!title) return showToast("標題必填", true);
+            const btn = document.getElementById('btn-save-sur-config'); setBtnLoading(btn, true, "儲存中...");
+            const res = await callBackend('saveSurveyConfig', { id: editingSurveyId, title, description: document.getElementById('sur-admin-desc').value, embedURL: document.getElementById('sur-admin-embed-url').value, questionsJSON: JSON.stringify(adminQuestions), active: document.getElementById('sur-admin-status').checked });
+            setBtnLoading(btn, false, "儲存問卷設定");
+            if (res?.success) { showToast("問卷模板已儲存"); closeSurveyAdminModal(); loadSurveyList(); }
+        }
+
+        async function loadSurveyResults() {
+            const res = await callBackend('getSurveyResults', { id: editingSurveyId });
+            const listEl = document.getElementById('sur-admin-result');
+            if (res?.success && listEl) {
+                const results = res.data || [];
+                if (results.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前尚無回覆資料</div>';
+                else listEl.innerHTML = results.map(r => `<div class="p-4 bg-slate-50 rounded-xl space-y-2"><p class="text-xs font-black text-slate-700">${r.label}</p><div class="space-y-1">${Object.entries(r.stats || {}).map(([k, v]) => `<div class="flex justify-between text-[10px] font-bold text-slate-500"><span>${k}</span><span>${v} 票</span></div>`).join('')}</div></div>`).join('');
+            }
+        }
+
+        async function fetchSurveyStatus() {
+            if (!currentUser) return;
+            const res = await callBackend('getSurveyStatus', { email: currentUser.Email });
+            const board = document.getElementById('survey-board');
+            if (res?.success && res.active) {
+                if (board) board.classList.remove('hidden');
+                document.getElementById('survey-display-title').innerText = res.title;
+                document.getElementById('survey-display-desc').innerText = res.description || "";
+                currentEmbedURL = res.embedURL || "";
+                const badge = document.getElementById('survey-status-badge');
+                if (badge) {
+                    if (res.responded) { badge.innerText = "已提交"; badge.className = "text-[8px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600"; }
+                    else { badge.innerText = "待填寫"; badge.className = "text-[8px] font-black px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-600"; }
+                }
+                surveyQuestions = res.questions || []; userResponses = res.lastResponse || {};
+            } else { if (board) board.classList.add('hidden'); }
+            safeCreateIcons();
+        }
+
+        // ─── 問卷區段邏輯 ───
+        function buildSurveySections(questions) {
+            const result = [];
+            let cur = { id: '__s0__', title: '', questions: [] };
+            for (const q of questions) {
+                if (q.type === 'section') { result.push(cur); cur = { id: q.id, title: q.label || '區段', questions: [] }; }
+                else { cur.questions.push(q); }
+            }
+            result.push(cur);
+            return result.filter(s => s.questions.length > 0);
+        }
+
+        function renderQInput(q, prevVal) {
+            const qId = q.id || q.label;
+
+            // --- 新增：自動帶入個人資料邏輯 ---
+            if (!prevVal && currentUser) {
+                const labelStr = String(q.label || "").toLowerCase();
+                if (labelStr.includes("姓名") || labelStr.includes("名字") || labelStr === "name") {
+                    prevVal = currentUser.Name || "";
+                } else if (labelStr.includes("手機") || labelStr.includes("電話") || labelStr.includes("連絡") || labelStr.includes("聯絡") || labelStr.includes("phone")) {
+                    prevVal = currentUser.Phone || "";
+                } else if (labelStr.includes("身分證") || labelStr.includes("身份證") || labelStr.includes("id")) {
+                    prevVal = currentUser.ID_Number || "";
+                } else if (labelStr.includes("生日") || labelStr.includes("出生") || labelStr.includes("birthday")) {
+                    let d = currentUser.Birthday;
+                    if (d) {
+                        // 用本地時區解析，避免 UTC vs UTC+8 造成日期少一天
+                        const dt = new Date(d);
+                        if (!isNaN(dt.getTime())) {
+                            const y = dt.getFullYear();
+                            const mo = String(dt.getMonth() + 1).padStart(2, '0');
+                            const da = String(dt.getDate()).padStart(2, '0');
+                            d = `${y}-${mo}-${da}`;
+                        }
+                    }
+                    prevVal = d || "";
+                }
+            }
+            if (q.type === 'date') {
+                return `<input type="date" data-qid="${qId}" data-label="${q.label}" value="${prevVal}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm" onchange="evaluateSurveyConditions()">`;
+            } else if (q.type === 'yesno') {
+                return `<div class="flex gap-3">
+                    <button type="button" onclick="setYesNo(this,'${qId}','${q.label}','是')" data-qid="${qId}" data-label="${q.label}" data-value="是" class="yesno-btn flex-1 py-4 rounded-2xl font-black text-sm transition-all ${prevVal === '是' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 text-slate-600 hover:bg-indigo-50'}">✓ 是</button>
+                    <button type="button" onclick="setYesNo(this,'${qId}','${q.label}','否')" data-qid="${qId}" data-label="${q.label}" data-value="否" class="yesno-btn flex-1 py-4 rounded-2xl font-black text-sm transition-all ${prevVal === '否' ? 'bg-rose-500 text-white shadow-lg' : 'bg-slate-100 text-slate-600 hover:bg-rose-50'}">✗ 否</button>
+                </div>
+                <input type="hidden" data-qid="${qId}" data-label="${q.label}" value="${prevVal}" class="survey-input yesno-hidden">`;
+            } else if (q.type === 'select') {
+                return `<select data-qid="${qId}" data-label="${q.label}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm" onchange="evaluateSurveyConditions()">
+                    <option value="">請選擇...</option>
+                    ${(q.options || '').split(',').map(o => `<option value="${o.trim()}" ${prevVal === o.trim() ? 'selected' : ''}>${o.trim()}</option>`).join('')}
+                </select>`;
+            } else if (q.type === 'multiselect') {
+                const prevArr = prevVal ? prevVal.split(',').map(s => s.trim()) : [];
+                return `<div class="space-y-2">${(q.options || '').split(',').map(o => o.trim()).filter(Boolean).map(o =>
+                    `<label class="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-2xl cursor-pointer hover:bg-indigo-50 transition-all">
+                        <input type="checkbox" data-qid="${qId}" data-label="${q.label}" value="${o}" ${prevArr.includes(o) ? 'checked' : ''} class="survey-input accent-indigo-600 w-4 h-4" onchange="evaluateSurveyConditions()">
+                        <span class="text-sm font-bold text-slate-700">${o}</span>
+                    </label>`).join('')}</div>`;
+            } else {
+                return `<input type="text" data-qid="${qId}" data-label="${q.label}" value="${prevVal}" class="survey-input w-full px-5 py-4 rounded-2xl bg-slate-50 border-none outline-none font-bold text-sm" oninput="evaluateSurveyConditions()">`;
+            }
+        }
+
+        function setYesNo(btn, qId, label, value) {
+            const wrap = btn.closest('.survey-question-wrap');
+            wrap.querySelectorAll('.yesno-btn').forEach(b => {
+                const isYes = b.dataset.value === '是';
+                const active = b.dataset.value === value;
+                b.className = `yesno-btn flex-1 py-4 rounded-2xl font-black text-sm transition-all ${active ? (isYes ? 'bg-indigo-600 text-white shadow-lg' : 'bg-rose-500 text-white shadow-lg') : 'bg-slate-100 text-slate-600'}`;
+            });
+            const hidden = wrap.querySelector('.yesno-hidden');
+            if (hidden) { hidden.value = value; hidden.dataset.label = label; }
+            evaluateSurveyConditions();
+        }
+
+        function evaluateSurveyConditions() {
+            const currentAnswers = {};
+            // 1. 從歷史資料與已填寫資料初始化 (用於跨分頁判斷)
+            const idMap = {}; // label -> id
+            adminQuestions.forEach(q => { if (q.id) idMap[q.label] = q.id; });
+            
+            // 先從歷史/全域資料帶入
+            Object.keys(userResponses).forEach(label => { if (idMap[label]) currentAnswers[idMap[label]] = userResponses[label]; });
+            Object.keys(allSurveyResponses).forEach(label => { if (idMap[label]) currentAnswers[idMap[label]] = allSurveyResponses[label]; });
+
+            // 2. 從目前畫面上的 DOM 元素取得最新值 (覆蓋之前的)
+            document.querySelectorAll('.survey-question-wrap').forEach(wrap => {
+                const qId = wrap.dataset.qid;
+                const checkboxes = wrap.querySelectorAll('input[type="checkbox"].survey-input');
+                if (checkboxes.length > 0) { currentAnswers[qId] = [...checkboxes].filter(c => c.checked).map(c => c.value).join(','); }
+                else { const el = wrap.querySelector('.survey-input'); if (el) currentAnswers[qId] = el.value; }
+            });
+
+            // 3. 執行判斷
+            document.querySelectorAll('.survey-question-wrap').forEach(wrap => {
+                const condStr = wrap.dataset.condition;
+                if (!condStr) return;
+                try {
+                    const cond = JSON.parse(condStr);
+                    const match = (currentAnswers[cond.questionId] || '').split(',').map(s => s.trim()).includes(cond.answer);
+                    wrap.classList.toggle('sq-hidden', !match);
+                } catch (e) { }
+            });
+        }
+
+        function renderSectionUI() {
+            const indicator = document.getElementById('survey-section-indicator');
+            const label = document.getElementById('survey-section-label');
+            const dots = document.getElementById('survey-section-dots');
+            const prevBtn = document.getElementById('survey-prev-btn');
+            const nextBtn = document.getElementById('survey-next-btn');
+            const saveBtn = document.getElementById('save-survey-btn');
+            const isLast = currentSectionIdx === surveySections.length - 1;
+            if (surveySections.length > 1) {
+                indicator.classList.remove('hidden');
+                const sec = surveySections[currentSectionIdx];
+                label.innerText = sec.title || `區段 ${currentSectionIdx + 1} / ${surveySections.length}`;
+                dots.innerHTML = surveySections.map((_, i) =>
+                    `<div class="w-2 h-2 rounded-full transition-all ${i === currentSectionIdx ? 'bg-indigo-600 w-4' : 'bg-slate-300'}"></div>`
+                ).join('');
+            } else { indicator.classList.add('hidden'); }
+            prevBtn.classList.toggle('hidden', sectionHistory.length === 0);
+            nextBtn.classList.toggle('hidden', isLast);
+            saveBtn.classList.toggle('hidden', !isLast);
+        }
+
+        function renderCurrentSection() {
+            const sec = surveySections[currentSectionIdx];
+            if (!sec) return;
+            const fieldsEl = document.getElementById('survey-dynamic-fields');
+
+            // 預先計算當前所有答案，用於消除閃爍
+            const currentAnswers = {};
+            const idMap = {};
+            adminQuestions.forEach(q => { if (q.id) idMap[q.label] = q.id; });
+            Object.keys(userResponses).forEach(label => { if (idMap[label]) currentAnswers[idMap[label]] = userResponses[label]; });
+            Object.keys(allSurveyResponses).forEach(label => { if (idMap[label]) currentAnswers[idMap[label]] = allSurveyResponses[label]; });
+
+            fieldsEl.innerHTML = sec.questions.map(q => {
+                const condAttr = q.condition ? `data-condition='${JSON.stringify(q.condition)}'` : '';
+                const qId = q.id || q.label;
+                const prevVal = allSurveyResponses[q.label] || userResponses[q.label] || '';
+                const reqMark = q.required ? '<span class="text-rose-500 ml-0.5">*</span>' : '';
+
+                // 初始判斷隱藏狀態，避免閃爍
+                let isHidden = false;
+                if (q.condition && q.condition.questionId) {
+                    const match = (currentAnswers[q.condition.questionId] || '').split(',').map(s => s.trim()).includes(q.condition.answer);
+                    if (!match) isHidden = true;
+                }
+
+                return `<div class="survey-question-wrap ${isHidden ? 'sq-hidden' : ''}" data-qid="${qId}" ${condAttr}>
+                    <div class="space-y-2 text-left">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-1">${q.label}${reqMark}</label>
+                        ${renderQInput(q, prevVal)}
+                    </div>
+                </div>`;
+            }).join('');
+
+            evaluateSurveyConditions(); // 立即執行，不延遲
+            renderSectionUI();
+            safeCreateIcons();
+        }
+
+        function collectCurrentSectionAnswers() {
+            const sec = surveySections[currentSectionIdx];
+            if (!sec) return {};
+            const answers = {};
+            sec.questions.forEach(q => {
+                const qId = q.id || q.label;
+                const wrap = document.querySelector(`.survey-question-wrap[data-qid="${qId}"]`);
+                if (!wrap || wrap.classList.contains('sq-hidden')) return;
+                const checkboxes = wrap.querySelectorAll('input[type="checkbox"].survey-input');
+                if (checkboxes.length > 0) { answers[q.label] = [...checkboxes].filter(c => c.checked).map(c => c.value).join(','); }
+                else { const el = wrap.querySelector('.survey-input'); if (el) answers[q.label] = el.value; }
+            });
+            return answers;
+        }
+
+        function surveyGoNext() {
+            const sec = surveySections[currentSectionIdx];
+            const answers = collectCurrentSectionAnswers();
+            // 必填檢查
+            const missing = (sec?.questions || []).find(q => {
+                if (!q.required) return false;
+                const wrap = document.querySelector(`.survey-question-wrap[data-qid="${q.id || q.label}"]`);
+                if (!wrap || wrap.classList.contains('sq-hidden')) return false;
+                return !answers[q.label] || answers[q.label].trim() === '';
+            });
+            if (missing) { showToast(`「${missing.label}」為必填項目`, true); return; }
+            Object.assign(allSurveyResponses, answers);
+            sectionHistory.push(currentSectionIdx);
+            // 判斷跳轉
+            let nextIdx = currentSectionIdx + 1;
+            // 找有分支設定的題目
+            for (const q of (sec?.questions || [])) {
+                if (!q.branches) continue;
+                const ans = answers[q.label];
+                const target = q.branches[ans];
+                
+                if (target && target !== '__next__') {
+                    if (target === '__end__') {
+                        console.log('Branch Logic: Jumping to End (__end__)');
+                        handleSaveSurvey(); 
+                        return; 
+                    }
+                    const idx = surveySections.findIndex(s => String(s.id) === String(target));
+                    if (idx !== -1) {
+                        console.log(`Branch Logic: Jumping from current section to section idx ${idx} (Target ID: ${target})`);
+                        nextIdx = idx; 
+                        break; 
+                    } else {
+                        console.warn(`Branch Logic: Target section ID "${target}" not found in current survey sections.`);
+                    }
+                }
+            }
+            if (nextIdx < surveySections.length) {
+                currentSectionIdx = nextIdx;
+                renderCurrentSection();
+                document.getElementById('survey-content-container').scrollTop = 0;
+            } else { handleSaveSurvey(); }
+        }
+
+        function surveyGoPrev() {
+            if (sectionHistory.length === 0) return;
+            currentSectionIdx = sectionHistory.pop();
+            renderCurrentSection();
+            document.getElementById('survey-content-container').scrollTop = 0;
+        }
+
+        function openSurveyModal() {
+            const modal = document.getElementById('survey-modal');
+            if (!modal) return;
+            
+            // 優先開啟容器
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            
+            try {
+                const title = document.getElementById('survey-display-title')?.innerText || "";
+                const desc = document.getElementById('survey-display-desc')?.innerText || "";
+                const modalTitle = document.getElementById('survey-modal-title');
+                const modalDesc = document.getElementById('survey-modal-desc');
+                if (modalTitle) modalTitle.innerText = title;
+                if (modalDesc) modalDesc.innerText = desc;
+                
+                const modalContent = document.getElementById('survey-modal-content');
+                if (currentEmbedURL && currentEmbedURL.trim() !== "") {
+                    if (modalContent) modalContent.classList.replace('max-w-sm', 'max-w-3xl');
+                    document.getElementById('survey-dynamic-fields')?.classList.add('hidden');
+                    document.getElementById('survey-iframe-container')?.classList.remove('hidden');
+                    const frame = document.getElementById('survey-external-frame');
+                    if (frame) frame.src = currentEmbedURL;
+                    document.getElementById('survey-next-btn')?.classList.add('hidden');
+                    document.getElementById('save-survey-btn')?.classList.remove('hidden');
+                    document.getElementById('survey-section-indicator')?.classList.add('hidden');
+                } else {
+                    if (modalContent) modalContent.classList.replace('max-w-3xl', 'max-w-sm');
+                    document.getElementById('survey-iframe-container')?.classList.add('hidden');
+                    document.getElementById('survey-dynamic-fields')?.classList.remove('hidden');
+                    allSurveyResponses = {};
+                    sectionHistory = [];
+                    currentSectionIdx = 0;
+                    surveySections = buildSurveySections(surveyQuestions || []);
+                    if (surveySections.length === 0) surveySections = [{ id: '__s0__', title: '', questions: surveyQuestions || [] }];
+                    renderCurrentSection();
+                }
+                setTimeout(() => { safeCreateIcons(); }, 0);
+            } catch (err) {
+                console.error("Survey modal data error:", err);
+            }
+        }
+
+        function closeSurveyModal() {
+            const modal = document.getElementById('survey-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        }
+        async function handleSaveSurvey() {
+            // 收集最後一個區段的答案
+            const lastAnswers = collectCurrentSectionAnswers ? collectCurrentSectionAnswers() : {};
+            Object.assign(allSurveyResponses, lastAnswers);
+            // 必填檢查（最後一頁）
+            const sec = surveySections[currentSectionIdx];
+            const missing = (sec?.questions || []).find(q => {
+                if (!q.required) return false;
+                const wrap = document.querySelector(`.survey-question-wrap[data-qid="${q.id || q.label}"]`);
+                if (!wrap || wrap.classList.contains('sq-hidden')) return false;
+                return !allSurveyResponses[q.label] || allSurveyResponses[q.label].trim() === '';
+            });
+            if (missing) return showToast(`「${missing.label}」為必填項目`, true);
+            const btn = document.getElementById('save-survey-btn'); setBtnLoading(btn, true, "提交中...");
+            const res = await callBackend('submitSurveyResponse', { email: currentUser.Email, name: currentUser.Name, responsesJSON: JSON.stringify(allSurveyResponses) });
+            setBtnLoading(btn, false, "提交回覆");
+            if (res?.success) { showToast("回覆已提交"); closeSurveyModal(); fetchSurveyStatus(); }
+        }
+
+        function updateInstrumentOptions() {
+            const section = document.getElementById('reg-section')?.value;
+            const instSelect = document.getElementById('reg-instrument'); if (!instSelect) return;
+            instSelect.innerHTML = '<option value="">選擇樂器</option>';
+            if (section && orchestraData[section]) orchestraData[section].forEach(i => instSelect.add(new Option(i, i)));
+        }
+
+        async function handleRegister() {
+            const data = { name: document.getElementById('reg-name')?.value, section: document.getElementById('reg-section')?.value, instrument: document.getElementById('reg-instrument')?.value, email: document.getElementById('reg-email')?.value, password: document.getElementById('reg-password')?.value };
+            if (!Object.values(data).every(v => v)) return showToast("全部必填", true);
+            const btn = document.getElementById('reg-submit-btn'); setBtnLoading(btn, true, "處理中...");
+            const res = await callBackend('registerUser', data); setBtnLoading(btn, false, "確認加入");
+            if (res?.success) { showToast("註冊成功"); switchAuthMode('login'); } else showToast(res.message || "註冊失敗", true);
+        }
+
+        function handleLogout() { localStorage.removeItem('user'); location.reload(); }
+        function closeEditModal() {
+            const modal = document.getElementById('edit-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        }
+
+        function openAnnouncementModal() {
+            const modal = document.getElementById('announcement-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                setTimeout(() => { safeCreateIcons(); }, 0);
+            }
+        }
+
+        function closeAnnouncementModal() {
+            const modal = document.getElementById('announcement-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none'; // 重置行內樣式
+            }
+        }
+        function closeSurveyAdminModal() {
+            const modal = document.getElementById('survey-admin-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        }
+        function addSurveyQuestion() { 
+            const newId = 'q' + Date.now() + Math.random().toString(36).substr(2, 5);
+            adminQuestions.push({ id: newId, label: "新題目", type: "text", options: "", required: false, condition: null, branches: {} }); 
+            renderAdminQuestions(); 
+        }
+        function addSurveySection() { 
+            const newId = 's' + Date.now() + Math.random().toString(36).substr(2, 5);
+            adminQuestions.push({ id: newId, label: "新區段", type: "section" }); 
+            renderAdminQuestions(); 
+        }
+        function moveAdminQuestion(i, dir) { const j = i + dir; if (j < 0 || j >= adminQuestions.length) return;[adminQuestions[i], adminQuestions[j]] = [adminQuestions[j], adminQuestions[i]]; renderAdminQuestions(); }
+        function removeAdminQuestion(i) { adminQuestions.splice(i, 1); renderAdminQuestions(); }
+
+        window.onload = () => {
+            safeCreateIcons();
+            initPWA();
+        };
+
+        async function initPWA() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+                    console.log('✅ firebase-messaging-sw.js 註冊成功 (v42)', reg);
+
+                    // 偵測 Service Worker 更新
+                    reg.onupdatefound = () => {
+                        const installingWorker = reg.installing;
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // 新版本已下載，提示用戶
+                                showToast("偵測到新版本，正在自動更新...", false);
+                                setTimeout(() => location.reload(true), 1500);
+                            }
+                        };
+                    };
+
+                    // 如果已經登入了，直接啟動
+                    if (currentUser) {
+                        setupUserPWA();
+                    }
+                } catch (e) { console.error('SW registration failed:', e); }
+            }
+        }
+
+        // PWA 使用者相關功能 (登入後或重啟頁面且已登入時觸發)
+        let isPWAUserSetupDone = false;
+        async function setupUserPWA() {
+            if (isPWAUserSetupDone) return;
+            isPWAUserSetupDone = true;
+            console.log("Setting up User PWA features...");
+
+            requestNotificationPermission();
+            // 立即輪詢一次公告
+            fetchAnnouncement();
+            setInterval(fetchAnnouncement, 20 * 1000);
+
+            // 監聽視窗回到焦點時自動刷新
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    console.log("App focused - auto-fetching");
+                    fetchAnnouncement();
+                    refreshSystemStatus();
+                }
+            });
+        }
+
+        async function requestNotificationPermission(isManual = false) {
+            if (!("Notification" in window)) return;
+
+            const banner = document.getElementById('notif-permission-banner');
+            const profileRow = document.getElementById('profile-notif-row');
+
+            // iOS 檢查
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+            // 如果已經開啟，全部隱藏
+            if (Notification.permission === "granted") {
+                banner?.classList.add('hidden');
+                profileRow?.classList.add('hidden');
+                return;
+            }
+
+            // iOS 的特殊處理：必須在 Standalone 模式下才支援
+            if (isIOS) {
+                if (!isStandalone) {
+                    // 非 PWA 模式：顯示說明 Toast 並隱藏 Banner (因為 Banner 按了也沒用)
+                    if (isManual) showToast("iOS 必須點擊「分享」並「加入主畫面」後開啟 App 才能使用通知", true);
+                    banner?.classList.add('hidden');
+                    profileRow?.classList.add('hidden'); // 这里也可以保持隐藏或者显示一个说明
+                    return;
+                }
+            }
+
+            // 顯示 Banner 或 Profile 按鈕 (排除 iOS 非 PWA 的情況)
+            if (Notification.permission === "default") {
+                banner?.classList.remove('hidden');
+                profileRow?.classList.remove('hidden');
+            } else {
+                banner?.classList.add('hidden');
+                profileRow?.classList.add('hidden');
+            }
+
+            // 手動觸發彈窗
+            if (isManual && Notification.permission === "default") {
+                try {
+                    const permission = await Notification.requestPermission();
+                    console.log("Permission request result:", permission);
+                    if (permission === "granted") {
+                        showToast("已開啟通知權限");
+                        banner?.classList.add('hidden');
+                        profileRow?.classList.add('hidden');
+                        // 測試發送一則
+                        showLocalNotification("成功開啟通知", "您現在可以接收即時公告提醒囉！");
+                    } else if (permission === "denied") {
+                        showToast("權限被拒絕，請在設定中開啟", true);
+                    }
+                } catch (e) { console.error("Permission request failed", e); }
+            }
+        }
+
+        function downloadPrivacyConsent() {
+            const consentText = `崇正國樂團 個人資料蒐集、處理及利用同意書\n\n為完善本團團務管理、提升練習成效及辦理各項演出行政庶務，崇正國樂團（以下簡稱本團）依據《個人資料保護法》第 8 條規定，向您告知下列事項：\n\n一、 蒐集之目的\n1. 團員行政管理： 包含團員名冊建立、聯絡通訊、排練與演出通知。\n2. 保險與行政申報： 用於演出意外險投保、政府補助計畫申請、車資或演出費領據核銷。\n3. 數位考勤與學習追蹤： 紀錄簽到紀錄、請假紀錄。\n4. 聲部編制與評鑑： 紀錄所屬聲部項目（吹管、拉弦、彈撥、打擊、低音等）及演出表現評核。\n5. 影像紀錄： 排練或演出期間之攝影與錄影，用於成果展示、非營利宣傳及教學存檔。\n\n二、 蒐集之個人資料類別\n本團將透過系統或表單蒐集以下資料，並採取適當之安全措施妥善保管：\n• 基本辨識： 姓名、身分證字號（或護照號碼）、聯絡電話、電子郵件、通訊地址。\n• 特徵資訊： 出生年月日、性別。\n• 團務資訊： 所屬聲部與樂器名稱、入團日期、職位（團員/組長/幹部）。\n• 活動紀錄： 出缺席紀錄、簽到時間、作業繳交紀錄、排練/演出之影像紀錄。\n\n三、 利用之期間、地區、對象及方式\n1. 期間： 自您加入本團起，至您退團後三年止（或依法令規定之會計憑證保存年限）。\n2. 地區： 中華民國（台灣）境內及本團租用之加密雲端儲存空間。\n3. 對象： 本團行政管理人員、各聲部組長（組長僅限查閱其管轄成員之考勤與聲部資料，無法查閱身分證字號等高度敏感資料）。\n4. 方式： 以數位資料庫（如 Google Sheets、Google Apps Script 加密管控）或紙本方式進行蒐集與處理。\n\n四、 資料安全防護承諾\n本團承諾對於所蒐集之高度敏感個資（如身分證字號、生日）採取嚴格之存取控制。相關資料僅限授權行政人員因公務需要（如保險）時調閱，嚴禁挪作他用。\n\n五、 您的權利與影響\n1. 您得依個資法第 3 條行使查詢、閱覽、補充、更正、停止蒐集處理利用，或請求刪除之權利。\n2. 若您拒絕提供正確之身分證字號、生日或電話，本團將無法為您辦理演出保險。\n\n本人已充分瞭解上述告知事項，並同意 崇正國樂團 蒐集、處理及利用本人之個人資料。`;
+            const blob = new Blob([consentText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '崇正國樂團_個人資料同意書.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("同意書下載成功");
+        }
+
+        function printPrivacyConsent() {
+            const printWindow = window.open('', '_blank');
+            const consentContent = `
+                <html>
+                <head>
+                    <title>崇正國樂團 個人資料蒐集同意書</title>
+                    <style>
+                        body { font-family: sans-serif; padding: 40px; line-height: 1.6; color: #333; }
+                        h1 { text-align: center; font-size: 20px; }
+                        h2 { font-size: 16px; margin-top: 20px; }
+                        li { margin-bottom: 8px; }
+                        .footer { margin-top: 40px; text-align: right; border-top: 1px solid #ccc; padding-top: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>崇正國樂團 個人資料蒐集、處理及利用同意書</h1>
+                    <p>為完善本團團務管理、提升練習成效及辦理各項演出行政庶務，崇正國樂團（以下簡稱本團）依據《個人資料保護法》第 8 條規定，向您告知下列事項：</p>
+                    <h2>一、 蒐集之目的</h2>
+                    <ul>
+                        <li>團員行政管理： 包含團員名冊建立、聯絡通訊、排練與演出通知。</li>
+                        <li>保險與行政申報： 用於演出意外險投保、政府補助計畫申請、車資或演出費領據核銷。</li>
+                        <li>數位考勤與學習追蹤： 紀錄簽到紀錄、請假紀錄。</li>
+                        <li>聲部編制與評鑑： 紀錄所屬聲部項目（吹管、拉弦、彈撥、打擊、低音等）及演出表現評核。</li>
+                        <li>影像紀錄： 排練或演出期間之攝影與錄影，用於成果展示、非營利宣傳及教學存檔。</li>
+                    </ul>
+                    <h2>二、 蒐集之個人資料類別</h2>
+                    <p>本團將透過系統或表單蒐集以下資料，並採取適當之安全措施妥善保管：</p>
+                    <ul>
+                        <li>基本辨識： 姓名、身分證字號（或護照號碼）、聯絡電話、電子郵件、通訊地址。</li>
+                        <li>特徵資訊： 出生年月日、性別。</li>
+                        <li>團務資訊： 所屬聲部與樂器名稱、入團日期、職位（團員/組長/幹部）。</li>
+                        <li>活動紀錄： 出缺席紀錄、簽到時間、作業繳交紀錄、排練/演出之影像紀錄。</li>
+                    </ul>
+                    <h2>三、 利用之期間、地區、對象及方式</h2>
+                    <ul>
+                        <li>期間： 自您加入本團起，至您退團後三年止。</li>
+                        <li>地區： 中華民國（台灣）境內及本團租用之加密雲端儲存空間。</li>
+                        <li>對象： 本團行政管理人員、各聲部組長。</li>
+                        <li>方式： 以數位資料庫或紙本方式進行蒐集與處理。</li>
+                    </ul>
+                    <h2>四、 資料安全防護承諾</h2>
+                    <p>本團承諾對於所蒐集之高度敏感個資採取嚴格之存取控制。相關資料僅限授權行政人員因公務需要時調閱，嚴禁挪作他用。</p>
+                    <h2>五、 您的權利與影響</h2>
+                    <ol>
+                        <li>您得依個資法第 3 條行使查詢、閱覽、補充、更正、停止蒐集處理利用，或請求刪除之權利。</li>
+                        <li>若您拒絕提供正確之身分證字號、生日或電話，本團將無法為您辦理演出保險。</li>
+                    </ol>
+                    <div class="footer">
+                        <p>本人已充分瞭解上述告知事項，並同意 崇正國樂團 蒐集、處理及利用本人之個人資料。</p>
+                    </div>
+                    <script>window.print();<\/script>
+                </body>
+                </html>
+            `;
+            printWindow.document.write(consentContent);
+            printWindow.document.close();
+        }
+    </script>
+
+    <!-- 所有 Modal 統一放置於底部確保 z-index 正常 -->
+
+    <!-- 個人資料編輯 Modal -->
+    <div id="profile-modal" class="hidden fixed inset-0 z-[10100] flex items-center justify-center p-6 shadow-2xl">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeProfileModal()"></div>
+        <div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center max-h-[90vh]"
+            style="z-index: 10106;">
+            <div class="w-full flex-1 overflow-y-auto pr-2 custom-scrollbar flex flex-col items-center pb-2">
+            <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white"
+                id="profile-initial">-</div>
+            <div class="w-full space-y-2 mb-6 text-center">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">個人姓名
+                    (限本人修改)</label>
+                <input type="text" id="profile-name-input"
+                    class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 shadow-inner">
+            </div>
+            <!-- 新增：分頁切換器 -->
+            <div class="flex w-full bg-slate-100 p-1.5 rounded-[22px] mb-6 gap-1">
+                <button onclick="switchProfileTab('basic')" id="tab-btn-basic"
+                    class="flex-1 py-2.5 rounded-[18px] text-[10px] font-black transition-all bg-white text-indigo-600 shadow-sm">基本資料</button>
+                <button onclick="switchProfileTab('personal')" id="tab-btn-personal"
+                    class="flex-1 py-2.5 rounded-[18px] text-[10px] font-black transition-all text-slate-400">個資管理</button>
+            </div>
+
+            <div id="profile-tab-basic" class="w-full space-y-4">
+                <div class="space-y-1"><label
+                        class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">角色/權限</label>
+                    <div id="profile-role"
+                        class="w-full px-4 py-3.5 bg-slate-50 rounded-2xl text-sm font-bold text-center text-indigo-600">
+                        Member</div>
+                </div>
+                <div class="space-y-1"><label
+                        class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">主要樂器</label><select
+                        id="profile-instrument-input"
+                        class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none shadow-sm"></select>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center"><span
+                        class="text-[10px] font-black text-slate-500 uppercase text-center">組別</span><span
+                        class="text-sm font-bold text-slate-700 text-center" id="profile-section-display">-</span></div>
+                <div class="p-4 bg-indigo-50/50 rounded-[20px] text-left space-y-2">
+                    <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">系統診斷 v15</p>
+                    <div class="flex justify-between text-[10px] font-bold"><span class="text-slate-400">PWA
+                            模式</span><span id="diag-pwa" class="text-slate-600">-</span></div>
+                    <div class="flex justify-between text-[10px] font-bold"><span
+                            class="text-slate-400">通知支援</span><span id="diag-support" class="text-slate-600">-</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] font-bold"><span
+                            class="text-slate-400">權限狀態</span><span id="diag-permission" class="text-slate-600">-</span>
+                    </div>
+                </div>
+                <div id="profile-notif-row" class="space-y-1 hidden">
+                    <button onclick="requestNotificationPermission(true)"
+                        class="w-full py-4 bg-white text-indigo-600 rounded-[18px] font-black text-xs flex items-center justify-center gap-2 border border-slate-100 shadow-sm"><i
+                            data-lucide="bell" class="w-4 h-4"></i>開啟通知功能</button>
+                </div>
+                <div class="space-y-1"><label
+                        class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">變更密碼</label><input
+                        type="password" id="profile-new-password"
+                        class="w-full px-4 py-3.5 rounded-2xl bg-slate-100 outline-none border-none text-xs font-bold text-center"
+                        placeholder="不變請留空"></div>
+            </div>
+
+            <!-- 個資管理分頁 -->
+            <div id="profile-tab-personal" class="hidden w-full space-y-4">
+                <div class="p-5 bg-amber-50 rounded-[28px] border border-amber-100 mb-2">
+                    <p class="text-[10px] font-bold text-amber-700 leading-relaxed text-left">
+                        <i data-lucide="info" class="w-3 h-3 inline-block mr-1"></i> 填寫下列個資主要用於演出保險投保，系統將進行加密傳輸與保護。
+                    </p>
+                </div>
+                <!-- 新增：個資管理欄位 -->
+                <div class="space-y-4 p-5 bg-slate-50/50 rounded-[30px] border border-slate-100">
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1">連絡電話</label><input type="tel"
+                            id="profile-phone"
+                            class="w-full px-4 py-4 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm"
+                            placeholder="未填寫"></div>
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1">出生日期</label><input type="date"
+                            id="profile-birthday"
+                            class="w-full px-4 py-4 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm">
+                    </div>
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1">身分證字號</label><input type="text"
+                            id="profile-id-number"
+                            class="w-full px-4 py-4 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm"
+                            placeholder="A123456789"></div>
+                </div>
+                <button onclick="openPrivacyModal()" class="w-full py-4 mt-2 bg-white text-indigo-600 rounded-[18px] font-black text-xs flex items-center justify-center gap-2 border border-slate-100 shadow-sm">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> 查看個資同意書
+                </button>
+
+                <!-- v42: 推播診斷專區 -->
+                <div id="diag-push-panel" class="mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <h5 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <i data-lucide="activity" class="w-3.5 h-3.5"></i> 系統通訊診斷 (v42)
+                    </h5>
+                    <div class="flex flex-col gap-3">
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 text-[9px] font-mono whitespace-pre-wrap break-all text-slate-500" id="diag-push-result">
+                            尚未發起診斷
+                        </div>
+                        <button id="diag-push-btn" onclick="triggerPushDiagnostic()" 
+                            class="w-full py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black border border-indigo-100 active:scale-95 transition-all">
+                            測試背景推播通道
+                        </button>
+                    </div>
+                </div>
+            </div> <!-- Close tab-personal -->
+            </div> <!-- Close scrollable container from line 2235 -->
+
+            <div class="pt-6 w-full flex gap-3 bg-white mt-auto">
+                <button onclick="location.reload(true)"
+                    class="flex-1 py-4 bg-slate-100 text-slate-500 font-black rounded-[22px] text-xs">強制重整</button>
+                <button id="update-password-btn" onclick="handleUpdatePassword()"
+                    class="flex-[2] py-4 btn-premium text-white font-black rounded-[22px] text-xs shadow-lg">更新資料</button>
+            </div>
+            <button onclick="closeProfileModal()"
+                class="mt-8 text-slate-400 text-[10px] font-black uppercase tracking-widest">返回主頁面</button>
+        </div>
+    </div>
+
+    <!-- 活動編輯 Modal -->
+    <div id="edit-modal" class="hidden fixed inset-0 z-[10101] flex items-center justify-center p-6 shadow-2xl">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md text-center" onclick="closeEditModal()"></div>
+        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up text-center flex flex-col max-h-[90vh]"
+            style="z-index: 10106;">
+            <h3 id="modal-title" class="text-xl font-[900] text-slate-800 mb-6 tracking-tight">活動詳細設定</h3>
+            <div class="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                <div class="space-y-1"><label
+                        class="text-[10px] font-black text-slate-400 uppercase px-1">活動名稱</label><input type="text"
+                        id="edit-name"
+                        class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none font-bold text-center shadow-inner">
+                </div>
+                <div class="space-y-1"><label
+                        class="text-[10px] font-black text-slate-400 uppercase px-1">日期</label><input type="date"
+                        id="edit-date"
+                        class="w-full px-6 py-4 rounded-[18px] bg-slate-50 border-none font-bold text-center shadow-inner">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1">開始</label><input type="time"
+                            id="edit-start"
+                            class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none font-bold text-center"></div>
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1">結束</label><input type="time"
+                            id="edit-end"
+                            class="w-full px-5 py-4 rounded-[18px] bg-slate-50 border-none font-bold text-center"></div>
+                </div>
+                <!-- 新增：中場休息時間設定 -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1">休息開始</label><input type="time"
+                            id="edit-rest-start"
+                            class="w-full px-5 py-4 rounded-[18px] bg-slate-100 border-none font-bold text-center opacity-70">
+                    </div>
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1">休息結束</label><input type="time"
+                            id="edit-rest-end"
+                            class="w-full px-5 py-4 rounded-[18px] bg-slate-100 border-none font-bold text-center opacity-70">
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-4 mt-8 bg-white">
+                <button onclick="closeEditModal()"
+                    class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm">取消</button>
+                <button id="save-event-btn" onclick="saveEvent()"
+                    class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="announcement-modal" class="hidden fixed inset-0 z-[10102] flex items-center justify-center p-6">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAnnouncementModal()"></div>
+        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up flex flex-col max-h-[90vh]" style="z-index: 10106;">
+            <h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2"><i
+                    data-lucide="megaphone" class="w-6 h-6 text-amber-500"></i>發布全員公告</h3>
+            <textarea id="announcement-edit-input"
+                class="w-full h-40 px-6 py-5 rounded-[22px] bg-slate-50 border-none outline-none font-bold text-sm text-slate-700 shadow-inner resize-none mb-6"
+                placeholder="請輸入公告內容..."></textarea>
+            <div class="flex gap-4">
+                <button onclick="closeAnnouncementModal()"
+                    class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm">取消</button>
+                <button id="save-announcement-btn" onclick="handleSaveAnnouncement()"
+                    class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm">發布</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 問卷管理 Modal -->
+    <div id="survey-admin-modal" class="hidden fixed inset-0 z-[10103] flex items-center justify-center p-6">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeSurveyAdminModal()"></div>
+        <div class="bg-white w-full max-w-lg rounded-[36px] shadow-2xl p-8 relative fade-up max-h-[90vh] flex flex-col"
+            style="z-index: 10106;">
+            <h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2"><i
+                    data-lucide="settings-2" class="w-5 h-5 text-indigo-500"></i>問卷管理</h3>
+
+            <!-- 頁籤選擇 -->
+            <div class="flex gap-2 p-1 bg-slate-100 rounded-[20px] mb-6 shadow-inner">
+                <button id="sur-tab-config" onclick="switchSurveyAdminTab('config')"
+                    class="flex-1 py-3 rounded-[16px] text-xs font-black transition-all bg-white text-indigo-600 shadow-sm">問卷設定</button>
+                <button id="sur-tab-result" onclick="switchSurveyAdminTab('result')"
+                    class="flex-1 py-3 rounded-[16px] text-xs font-black transition-all text-slate-500">回覆統計</button>
+            </div>
+
+            <!-- 設定頁面 -->
+            <div id="sur-admin-config" class="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                <div class="space-y-1"><label
+                        class="text-[10px] font-black text-slate-400 uppercase px-1">問卷標題</label><input type="text"
+                        id="sur-admin-title"
+                        class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none font-bold text-sm shadow-inner">
+                </div>
+                <div class="space-y-1"><label
+                        class="text-[10px] font-black text-slate-400 uppercase px-1">問卷描述/導引文字</label><textarea
+                        id="sur-admin-desc"
+                        class="w-full h-24 px-5 py-4 rounded-2xl bg-slate-50 border-none font-bold text-sm resize-none"
+                        placeholder="給填寫者的說明..."></textarea></div>
+                <div class="space-y-1"><label
+                        class="text-[10px] font-black text-amber-500 uppercase px-1 flex items-center gap-1"><i
+                            data-lucide="link-2" class="w-3 h-3"></i> 外部問卷 URL (填入後將以此為主，不顯示下方題目)</label><input
+                        type="text" id="sur-admin-embed-url"
+                        class="w-full px-5 py-3 rounded-2xl bg-amber-50/50 border-none text-xs font-bold"
+                        placeholder="Google 表單網址等..."></div>
+
+                <div class="pt-6 border-t border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="text-[10px] font-black text-slate-400 uppercase">設計問卷題目</label>
+                        <div class="flex gap-2">
+                            <button onclick="addSurveySection()"
+                                class="px-3 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black border border-indigo-100 hover:bg-indigo-100 active:scale-95 transition-all flex items-center gap-1"><i
+                                    data-lucide="layout-panel-top" class="w-3 h-3"></i>+ 區段</button>
+                            <button onclick="addSurveyQuestion()"
+                                class="px-3 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center gap-1"><i
+                                    data-lucide="plus" class="w-3 h-3"></i>+ 題目</button>
+                        </div>
+                    </div>
+                    <div id="sur-admin-questions-list" class="space-y-3"></div>
+                </div>
+
+                <div
+                    class="flex items-center justify-between p-5 bg-indigo-50/50 rounded-[24px] border border-indigo-100/50 mt-6">
+                    <div class="flex flex-col"><span class="text-sm font-black text-slate-700">對全員開放</span><span
+                            class="text-[9px] text-slate-400 font-bold">關閉後成員將看不到此問卷</span></div><input type="checkbox"
+                        id="sur-admin-status" class="w-6 h-6 accent-indigo-600">
+                </div>
+                <button id="btn-save-sur-config" onclick="handleUpdateSurveyConfig()"
+                    class="w-full py-4 btn-premium text-white rounded-2xl font-black text-sm shadow-xl mt-4">儲存問卷設定</button>
+            </div>
+
+            <!-- 統計頁面 -->
+            <div id="sur-admin-result" class="hidden flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                <div class="text-center py-10">
+                    <p class="text-sm font-bold text-slate-400">正在彙整回覆統計...</p>
+                </div>
+            </div>
+
+            <button onclick="closeSurveyAdminModal()"
+                class="mt-6 text-slate-400 text-[10px] font-black uppercase self-center hover:text-slate-600 transition-colors">返回問卷列表</button>
+        </div>
+    </div>
+
+    <!-- 問卷填寫 Modal -->
+    <div id="survey-modal" class="hidden fixed inset-0 z-[10104] flex items-center justify-center p-6 shadow-2xl">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeSurveyModal()"></div>
+        <div id="survey-modal-content"
+            class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-0 relative fade-up flex flex-col overflow-hidden max-h-[90vh]"
+            style="z-index: 10106;">
+            <div class="p-8 pb-3 text-center">
+                <h3 id="survey-modal-title" class="text-xl font-[900] text-slate-800 mb-1 tracking-tight">調查</h3>
+                <p id="survey-modal-desc" class="text-xs text-slate-400"></p>
+                <div id="survey-section-indicator" class="hidden mt-3">
+                    <p id="survey-section-label" class="text-[10px] font-black text-indigo-500 uppercase"></p>
+                    <div id="survey-section-dots" class="flex justify-center gap-1.5"></div>
+                </div>
+            </div>
+            <div id="survey-content-container" class="flex-1 overflow-y-auto px-8 pb-4">
+                <div id="survey-dynamic-fields" class="space-y-5"></div>
+                <div id="survey-iframe-container"
+                    class="hidden w-full h-[65vh] rounded-2xl overflow-hidden border border-slate-100 shadow-inner mt-4">
+                    <iframe id="survey-external-frame" src="" class="w-full h-full border-none"></iframe></div>
+            </div>
+            <div class="p-6 pt-4 flex gap-3 bg-slate-50/50 border-t border-slate-100">
+                <button onclick="closeSurveyModal()"
+                    class="py-4 px-5 bg-white text-slate-500 rounded-[20px] font-black text-sm border border-slate-200">取消</button>
+                <button id="survey-prev-btn" onclick="surveyGoPrev()"
+                    class="hidden py-4 px-5 bg-slate-100 text-slate-600 rounded-[20px] font-black text-sm">←
+                    上一步</button>
+                <button id="survey-next-btn" onclick="surveyGoNext()"
+                    class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">下一步
+                    →</button>
+                <button id="save-survey-btn" onclick="handleSaveSurvey()"
+                    class="hidden flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">提交回覆</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 個資授權同意書 Modal -->
+    <div id="privacy-modal"
+        class="hidden fixed inset-0 z-[20000] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
+        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up flex flex-col max-h-[85vh]">
+            <h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2">
+                <i data-lucide="shield-alert" class="w-6 h-6 text-indigo-500"></i>個資使用授權同意
+            </h3>
+            <div id="privacy-content"
+                class="flex-1 overflow-y-auto bg-slate-50 p-6 rounded-2xl text-[11px] leading-relaxed text-slate-600 font-bold mb-6 custom-scrollbar text-left">
+                <h4 class="text-sm font-black text-slate-800 mb-4 text-center">崇正國樂團 個人資料蒐集、處理及利用同意書</h4>
+                <p class="mb-4">為完善本團團務管理、提升練習成效及辦理各項演出行政庶務，崇正國樂團（以下簡稱本團）依據《個人資料保護法》第 8 條規定，向您告知下列事項：</p>
+
+                <p class="font-black text-slate-800 mb-2">一、 蒐集之目的</p>
+                <ul class="list-decimal pl-5 mb-4 space-y-1">
+                    <li>團員行政管理： 包含團員名冊建立、聯絡通訊、排練與演出通知。</li>
+                    <li>保險與行政申報： 用於演出意外險投保、政府補助計畫申請、車資或演出費領據核銷。</li>
+                    <li>數位考勤與學習追蹤： 紀錄簽到紀錄、請假紀錄。</li>
+                    <li>聲部編制與評鑑： 紀錄所屬聲部項目（吹管、拉弦、彈撥、打擊、低音等）及演出表現評核。</li>
+                    <li>影像紀錄： 排練或演出期間之攝影與錄影，用於成果展示、非營利宣傳及教學存檔。</li>
+                </ul>
+
+                <p class="font-black text-slate-800 mb-2">二、 蒐集之個人資料類別</p>
+                <p class="mb-2">本團將透過系統或表單蒐集以下資料，並採取適當之安全措施妥善保管：</p>
+                <ul class="list-disc pl-5 mb-4 space-y-1">
+                    <li>基本辨識： 姓名、身分證字號（或護照號碼）、聯絡電話、電子郵件、通訊地址。</li>
+                    <li>特徵資訊： 出生年月日、性別。</li>
+                    <li>團務資訊： 所屬聲部與樂器名稱、入團日期、職位（團員/組長/幹部）。</li>
+                    <li>活動紀錄： 出缺席紀錄、簽到時間、作業繳交紀錄、排練/演出之影像紀錄。</li>
+                </ul>
+
+                <p class="font-black text-slate-800 mb-2">三、 利用之期間、地區、對象及方式</p>
+                <ul class="list-decimal pl-5 mb-4 space-y-1">
+                    <li>期間： 自您加入本團起，至您退團後三年止。</li>
+                    <li>地區： 中華民國（台灣）境內及本團租用之加密雲端儲存空間。</li>
+                    <li>對象： 本團行政管理人員、各聲部組長。</li>
+                    <li>方式： 以數位資料庫或紙本方式進行蒐集與處理。</li>
+                </ul>
+
+                <p class="font-black text-slate-800 mb-2">四、 資料安全防護承諾</p>
+                <p class="mb-4">本團承諾對於所蒐集之高度敏感個資採取嚴格之存取控制。相關資料僅限授權行政人員因公務需要時調閱，嚴禁挪作他用。</p>
+
+                <p class="font-black text-slate-800 mb-2">五、 您的權利與影響</p>
+                <ul class="list-decimal pl-5 mb-4 space-y-1">
+                    <li>您得依個資法第 3 條行使查詢、閱覽、補充、更正、停止蒐集處理利用，或請求刪除之權利。</li>
+                    <li>若您拒絕提供正確之身分證字號、生日或電話，本團將無法為您辦理演出保險。</li>
+                </ul>
+
+                <div class="mt-6 pt-6 border-t border-slate-200">
+                    <p class="text-right italic">本人已充分瞭解上述告知事項，並同意 崇正國樂團 蒐集、處理及利用本人之個人資料。</p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-4 mb-6">
+                <div class="flex items-center gap-3 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                    <input type="checkbox" id="privacy-agree-check" class="w-5 h-5 accent-indigo-600 shrink-0">
+                    <label for="privacy-agree-check"
+                        class="text-xs font-black text-slate-700 cursor-pointer">我已閱讀並同意上述條款</label>
+                </div>
+                <div class="flex justify-center gap-4">
+                    <button onclick="downloadPrivacyConsent()"
+                        class="flex items-center gap-1.5 text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-2 rounded-xl border border-indigo-100 active:scale-95">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> 下載文字檔
+                    </button>
+                    <button onclick="printPrivacyConsent()"
+                        class="flex items-center gap-1.5 text-[10px] font-black text-slate-500 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 active:scale-95">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i> 列印文件
+                    </button>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="closePrivacyModal()"
+                    class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[20px] font-black text-sm">先不要</button>
+                <button id="privacy-submit-btn" onclick="confirmPrivacyConsent()"
+                    class="flex-1 py-4 btn-premium text-white rounded-[20px] font-black text-sm shadow-lg">同意並送出</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Toast 通知 -->
+    <div id="toast" class="hidden fixed top-12 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[10200] transition-all transform duration-500 border-white text-center">
+        <div class="p-2 rounded-xl bg-white shadow-sm">
+            <i id="toast-icon" class="w-5 h-5"></i>
+        </div>
+        <span id="toast-msg" class="text-sm font-black tracking-tight"></span>
+    </div>
+
+    <script>
+        // v40: 確保 Service Worker 獲正確註冊
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // v40: 註冊 Firebase 標準命名的 SW 檔案
+                navigator.serviceWorker.register('firebase-messaging-sw.js')
+                .then(function(registration) {
+                    console.log('✅ firebase-messaging-sw.js 註冊成功 (v40)', registration.scope);
+                }).catch(function(err) {
+                    console.error('❌ Service Worker 註冊失敗:', err);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
