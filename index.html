@@ -125,10 +125,22 @@
         }
 
         /* 自定義捲軸樣式 - 用於彈窗內部 */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #cbd5e1;
+        }
 
         .app-icon-card {
             width: 85px;
@@ -242,6 +254,12 @@
                             class="w-full pl-12 pr-6 py-4 rounded-[18px] bg-slate-100/50 outline-none border-none text-sm font-medium text-center"
                             placeholder="密碼"></div>
                 </div>
+                <!-- 新增：記住帳號密碼 -->
+                <div class="flex items-center justify-center gap-2 px-1 py-1">
+                    <input type="checkbox" id="remember-me" class="w-4 h-4 accent-indigo-600 rounded-lg cursor-pointer">
+                    <label for="remember-me" class="text-xs font-bold text-slate-400 cursor-pointer">下次自動登入 /
+                        記住帳密</label>
+                </div>
                 <button id="login-submit-btn" onclick="handleLogin()"
                     class="relative w-full btn-premium text-white font-black py-4 rounded-[20px] text-lg tracking-wide shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">立即登入
                     <i data-lucide="arrow-right" class="w-5 h-5"></i></button>
@@ -267,6 +285,7 @@
                         <option value="彈撥組">彈撥組</option>
                         <option value="揚打組">揚打組</option>
                         <option value="低音組">低音組</option>
+                        <option value="行政組">行政組（協助人員）</option>
                     </select>
                     <select id="reg-instrument"
                         class="px-5 py-4 rounded-[18px] bg-slate-100/50 border-none outline-none text-sm font-bold appearance-none text-center">
@@ -496,6 +515,23 @@
                         提示：此密碼用於團員在「不在崇正寶宮」定位範圍時簽到之用。建議設定 4-6 位數字。
                     </p>
                 </div>
+
+                <!-- 行政人員個資清單 (僅 Admin/Officer 可見) -->
+                <div id="admin-staff-panel"
+                    class="hidden glass-panel p-6 rounded-[32px] w-full shadow-lg border-white/40 bg-teal-50/30">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600">
+                                <i data-lucide="contact" class="w-4 h-4"></i>
+                            </div>
+                            <h4 class="font-[900] text-slate-700 text-sm tracking-tight">行政協助人員</h4>
+                        </div>
+                        <button onclick="loadStaffList()"
+                            class="w-8 h-8 bg-white shadow-sm border border-slate-100 text-teal-600 rounded-xl flex items-center justify-center hover:rotate-180 transition-all duration-500">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+                    </div>
+                    <div id="staff-list" class="space-y-3 max-h-[400px] overflow-y-auto hide-scroll"></div>
+                </div>
             </div>
 
             <!-- 分頁5: 問卷管理 -->
@@ -544,7 +580,7 @@
     <!-- Modals -->
 
     <script>
-        window.onerror = function(msg, url, line, col, error) {
+        window.onerror = function (msg, url, line, col, error) {
             console.error("Global Error:", msg, "at", url, ":", line);
             if (typeof showToast === 'function') showToast("JS 錯誤: " + msg, true);
             return false;
@@ -554,7 +590,7 @@
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxXYCpCifba8ltSrkSMJx9qF2_wNbSZN8Gm7VnOxFdc_p6PWPf8_0H4uQZ_37h2bupr/exec";
         //const MAX_DISTANCE = 500, ALLOWED_LOCATIONS = [{ name: "測試", lat: 24.1059419, lng: 120.5055394 }];
         const MAX_DISTANCE = 500, ALLOWED_LOCATIONS = [{ name: "崇正寶宮", lat: 24.133658, lng: 120.717338 }];
-        const orchestraData = { "吹管組": ["笛", "嗩", "笙", "(上)低音號"], "拉弦組": ["高胡", "二胡", "中胡"], "彈撥組": ["柳琴", "琵琶", "中阮", "大阮", "古箏"], "揚打組": ["揚琴", "打擊"], "低音組": ["大提琴", "低音提琴"] };
+        const orchestraData = { "吹管組": ["笛", "嗩", "笙", "(上)低音號"], "拉弦組": ["高胡", "二胡", "中胡"], "彈撥組": ["柳琴", "琵琶", "中阮", "大阮", "古箏"], "揚打組": ["揚琴", "打擊"], "低音組": ["大提琴", "低音提琴"], "行政組": ["攝影", "錄影", "音控", "燈光", "行政"] };
 
         let currentUser = null, currentEventData = null, allEvents = [], allSurveys = [], editingSurveyId = null, editingId = null, cachedMemberList = [];
         let surveyQuestions = [], userResponses = {}, adminQuestions = [], currentEmbedURL = "";
@@ -572,16 +608,16 @@
             appId: "1:744052473577:web:ee5b767dfde9438af67a78",
             measurementId: "G-8CF9E1E98E"
         };
-        
+
         // v37 穩定化：回歸字串格式以符合 V1 API 的 Scalar 要求
         const VAPID_KEY = "BMWOLWSRgJ_zs-3_ZTFtigDmggvcXa_-QnDaGI3rQqEADBkszd-emdUmkh9iEO7e_8X_jc8pTEolmzkj_72mF9M";
-        
+
         // --- v37 核心：環境守護者 ---
         // 我們將不再使用複雜的 Uint8Array 轉換，而是直接讓環境的 atob 變聰明
         const iosSafeAtob = (str) => {
             return window.atob(str.replace(/-/g, '+').replace(/_/g, '/'));
         };
-        
+
         window.getFCMTokenModular = null;
 
         // 初始化 Firebase 全域變數
@@ -589,7 +625,7 @@
         try {
             firebase.initializeApp(firebaseConfig);
             messaging = firebase.messaging();
-            
+
             // 監聽前台推播訊息
             if (messaging) {
                 messaging.onMessage((payload) => {
@@ -607,7 +643,7 @@
             try {
                 console.log("👉 正在取得 Service Worker 註冊對象...");
                 const registration = await navigator.serviceWorker.ready;
-                
+
                 // 強制檢查當前是否為 PWA 獨立模式 (iOS 推播必備)
                 const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
                 console.log("📱 是否為 PWA 模式:", isPWA);
@@ -616,29 +652,29 @@
                     firebase.initializeApp(firebaseConfig);
                     messaging = firebase.messaging();
                 }
-                
+
                 let currentToken;
                 if (window.getFCMTokenModular) {
                     console.log("[v36 DEBUG] 採用 Modular SDK 獲取憑證...");
                     currentToken = await window.getFCMTokenModular(registration);
                 } else {
                     console.warn("[v36 DEBUG] 模組化模組尚未就緒，嘗試使用備案...");
-                    currentToken = await messaging.getToken({ 
+                    currentToken = await messaging.getToken({
                         vapidKey: VAPID_KEY, // 這裡僅作備案
-                        serviceWorkerRegistration: registration 
+                        serviceWorkerRegistration: registration
                     });
                 }
-                
+
                 if (currentToken) {
                     console.log("✅ Device Token 取得完畢");
                     const stored = JSON.parse(localStorage.getItem('user') || '{}');
                     const email = currentUser?.Email || currentUser?.email || stored.Email || stored.email;
-                    
+
                     if (email) {
                         showToast("⏳ 正在同步至伺服器...");
-                        const res = await callBackend('updateDeviceToken', { 
-                            email: email, 
-                            token: currentToken 
+                        const res = await callBackend('updateDeviceToken', {
+                            email: email,
+                            token: currentToken
                         });
                         if (res.success) {
                             showToast("🎉 推播裝置同步成功！");
@@ -678,7 +714,7 @@
             appId: "1:744052473577:web:ee5b767dfde9438af67a78",
             measurementId: "G-8CF9E1E98E"
         };
-        
+
         const vapidV37 = "BMWOLWSRgJ_zs-3_ZTFtigDmggvcXa_-QnDaGI3rQqEADBkszd-emdUmkh9iEO7e_8X_jc8pTEolmzkj_72mF9M";
 
         const appV37 = initializeApp(configV36);
@@ -741,8 +777,42 @@
             try {
                 currentUser = JSON.parse(storedUser);
                 console.log("Restored user from storage:", currentUser);
+                // v50: 確保 DOM 載入後執行自動登入
+                window.addEventListener('DOMContentLoaded', () => {
+                    handleAutoLogin();
+                });
             } catch (e) { localStorage.removeItem('user'); }
         }
+
+        function handleAutoLogin() {
+            if (!currentUser) return;
+            console.log("🚀 偵測到登入紀錄，正在自動進入系統...");
+            setupDashboard();
+            switchView('dashboard-view');
+            switchTab('home');
+            refreshSystemStatus();
+            loadAttendanceHistory();
+            setupUserPWA();
+        }
+
+        // v50: 恢復記住的帳密
+        function restoreRememberedCredentials() {
+            const remEmail = localStorage.getItem('remembered_email');
+            const remPwd = localStorage.getItem('remembered_password');
+            if (remEmail) {
+                const el = document.getElementById('login-email');
+                if (el) el.value = remEmail;
+            }
+            if (remPwd) {
+                const el = document.getElementById('login-password');
+                if (el) el.value = remPwd;
+            }
+            if (remEmail && remPwd) {
+                const el = document.getElementById('remember-me');
+                if (el) el.checked = true;
+            }
+        }
+        window.addEventListener('DOMContentLoaded', restoreRememberedCredentials);
 
         function formatDateTime(isoStr, onlyDate = false) {
             if (!isoStr) return "";
@@ -827,7 +897,7 @@
             ['home', 'history', 'monitor', 'broadcast', 'surveys'].forEach(s => { const el = document.getElementById(`${s}-section`); if (el) el.classList.toggle('hidden', s !== t); });
             if (t === 'home') { fetchAnnouncement(); fetchSurveyStatus(); }
             if (t === 'monitor') loadRealtimeStatus();
-            if (t === 'broadcast') loadEventList();
+            if (t === 'broadcast') { loadEventList(); loadStaffList(); }
             if (t === 'surveys') loadSurveyList();
             safeCreateIcons();
         }
@@ -842,6 +912,16 @@
                 // 修正：從 res.userData 讀取，並存入 localStorage
                 currentUser = res.userData;
                 localStorage.setItem('user', JSON.stringify(currentUser));
+
+                // v50: 處理「記住帳密」邏輯
+                const rememberMe = document.getElementById('remember-me');
+                if (rememberMe && rememberMe.checked) {
+                    localStorage.setItem('remembered_email', emailEl.value.trim());
+                    localStorage.setItem('remembered_password', pwdEl.value.trim());
+                } else {
+                    localStorage.removeItem('remembered_email');
+                    localStorage.removeItem('remembered_password');
+                }
 
                 setupDashboard();
                 switchView('dashboard-view');
@@ -873,10 +953,14 @@
             const isAdmin = ['Admin', 'Officer'].includes(currentUser.Role);
             const isActuallyAdmin = currentUser.Role === 'Admin';
             const isActuallyOfficer = currentUser.Role === 'Officer';
+            const isStaff = currentUser.Section === '行政組';
 
+            const btnHistory = document.getElementById('btn-history');
             const btnMonitor = document.getElementById('btn-monitor');
             const btnBroadcast = document.getElementById('btn-broadcast');
             const btnSurveys = document.getElementById('btn-surveys');
+            // 行政組隱藏簽到紀錄頁（不需出缺席追蹤）
+            if (btnHistory) btnHistory.classList.toggle('hidden', isStaff);
             if (btnMonitor) btnMonitor.classList.toggle('hidden', !isLeader && !isAdmin);
             if (btnBroadcast) btnBroadcast.classList.toggle('hidden', !isAdmin);
             if (btnSurveys) btnSurveys.classList.toggle('hidden', !isAdmin);
@@ -889,6 +973,10 @@
 
             const bypassConfig = document.getElementById('admin-bypass-config');
             if (bypassConfig) bypassConfig.classList.toggle('hidden', !isActuallyAdmin);
+
+            // 行政人員個資清單（僅 Admin/Officer 可見）
+            const staffPanel = document.getElementById('admin-staff-panel');
+            if (staffPanel) staffPanel.classList.toggle('hidden', !isAdmin);
 
             const monitorTitle = document.getElementById('monitor-title');
             if (monitorTitle) monitorTitle.innerText = isLeader ? `${currentUser.Section} 簽到狀態` : "全員簽到狀態";
@@ -925,7 +1013,11 @@
                 const phoneInput = document.getElementById('profile-phone');
                 const bdayInput = document.getElementById('profile-birthday');
                 const idInput = document.getElementById('profile-id-number');
-                if (phoneInput) phoneInput.value = currentUser.Phone || "";
+                if (phoneInput) {
+                    let ph = String(currentUser.Phone || "");
+                    if (ph && /^\d+$/.test(ph) && !ph.startsWith("0")) ph = "0" + ph;
+                    phoneInput.value = ph;
+                }
                 if (bdayInput) {
                     let d = currentUser.Birthday;
                     if (d) {
@@ -1002,7 +1094,7 @@
             const resultEl = document.getElementById('diag-push-result');
             setBtnLoading(btn, true, "診斷中...");
             resultEl.innerText = "⏳ 正在請求後端發送測試訊息...";
-            
+
             try {
                 const res = await callBackend('testPush', { email: currentUser.Email || currentUser.email });
                 if (res.success) {
@@ -1385,6 +1477,51 @@
             safeCreateIcons();
         }
 
+        async function loadStaffList() {
+            const listEl = document.getElementById('staff-list');
+            if (!listEl) return;
+            listEl.innerHTML = '<div class="py-10 flex flex-col items-center justify-center text-teal-400 gap-3"><div class="w-5 h-5 border-2 border-teal-400 border-t-transparent rounded-full animate-spin"></div><span class="text-xs font-bold">載入名單中...</span></div>';
+            try {
+                const res = await callBackend('getStaffList', {});
+                if (res?.success) {
+                    const staffs = res.data || [];
+                    if (staffs.length === 0) {
+                        listEl.innerHTML = '<div class="py-8 text-teal-300/60 font-bold text-center text-[10px]">目前無行政人員資料</div>';
+                    } else {
+                        listEl.innerHTML = staffs.map(s => {
+                            const consentHtml = s.PrivacyConsent.startsWith("YES") 
+                                ? `<span class="text-[8px] font-black text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1"><i data-lucide="check-circle" class="w-2.5 h-2.5"></i>已授權個資</span>`
+                                : `<span class="text-[8px] font-black text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded flex items-center gap-1"><i data-lucide="alert-circle" class="w-2.5 h-2.5"></i>未授權個資</span>`;
+                                
+                            return `
+                            <div class="bg-white/80 p-4 rounded-[20px] shadow-sm flex flex-col gap-2 relative overflow-hidden group">
+                                <div class="absolute right-0 top-0 w-10 h-full bg-gradient-to-l from-teal-50 to-transparent opacity-50"></div>
+                                <div class="flex justify-between items-start">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-black text-[10px] shrink-0 border-2 border-white shadow-sm">
+                                            ${s.Name.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <p class="font-black text-slate-700 text-sm flex items-center gap-1.5">${s.Name} <span class="text-[9px] font-bold text-teal-500 bg-teal-50 px-1.5 py-0.5 rounded-md border border-teal-100/50">${s.Instrument || '協助'}</span></p>
+                                            <p class="text-[10px] text-slate-400 font-bold mt-0.5 font-mono tracking-wider">${s.Phone || '無電話紀錄'}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-1.5">
+                                        ${consentHtml}
+                                        <span class="text-[9px] text-slate-300 font-bold uppercase">${s.ID_Number ? s.ID_Number.substring(0,4)+'***' : '無身分證'}</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                        }).join('');
+                    }
+                } else {
+                    listEl.innerHTML = `<div class="py-8 text-rose-400 font-bold text-center text-[10px]">載入失敗: ${res?.message || '未知錯誤'}</div>`;
+                }
+            } catch (e) {
+                listEl.innerHTML = '<div class="py-8 text-rose-400 font-bold text-center text-[10px]">連線錯誤</div>';
+            }
+            safeCreateIcons();
+        }
         async function activateEventFromList(id) {
             const res = await callBackend('activateEvent', { id });
             if (res?.success) { showToast("活動已開始廣播"); refreshSystemStatus(); loadEventList(); }
@@ -1537,12 +1674,18 @@
         }
 
         function switchSurveyAdminTab(tab) {
-            const sections = ['config', 'result'];
+            console.log("Switching survey admin tab to:", tab);
+            const sections = ['config', 'result', 'list'];
             sections.forEach(s => {
-                const el = document.getElementById(`sur-admin-${s}`); if (el) el.classList.toggle('hidden', s !== tab);
-                const btn = document.getElementById(`sur-tab-${s}`); if (btn) { if (s === tab) btn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm'); else btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm'); }
+                const el = document.getElementById(`sur-admin-${s}`);
+                if (el) el.classList.toggle('hidden', s !== tab);
+                const btn = document.getElementById(`sur-tab-${s}`);
+                if (btn) {
+                    if (s === tab) btn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                    else btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                }
             });
-            if (tab === 'result') loadSurveyResults();
+            if (tab === 'result' || tab === 'list') loadSurveyResults();
         }
 
         function renderAdminQuestions() {
@@ -1659,12 +1802,47 @@
 
         async function loadSurveyResults() {
             const res = await callBackend('getSurveyResults', { id: editingSurveyId });
-            const listEl = document.getElementById('sur-admin-result');
-            if (res?.success && listEl) {
-                const results = res.data || [];
-                if (results.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前尚無回覆資料</div>';
-                else listEl.innerHTML = results.map(r => `<div class="p-4 bg-slate-50 rounded-xl space-y-2"><p class="text-xs font-black text-slate-700">${r.label}</p><div class="space-y-1">${Object.entries(r.stats || {}).map(([k, v]) => `<div class="flex justify-between text-[10px] font-bold text-slate-500"><span>${k}</span><span>${v} 票</span></div>`).join('')}</div></div>`).join('');
+            console.log("Survey Results Backend Response:", res);
+            const resultEl = document.getElementById('sur-admin-result');
+            const listEl = document.getElementById('sur-admin-list');
+
+            if (res?.success) {
+                // 1. 渲染統計圖表 (原本功能)
+                if (resultEl) {
+                    const results = res.data || [];
+                    if (results.length === 0) resultEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前尚無回覆資料</div>';
+                    else resultEl.innerHTML = results.map(r => `<div class="p-4 bg-slate-50 rounded-xl space-y-2"><p class="text-xs font-black text-slate-700">${r.label}</p><div class="space-y-1">${Object.entries(r.stats || {}).map(([k, v]) => `<div class="flex justify-between text-[10px] font-bold text-slate-500"><span>${k}</span><span>${v} 票</span></div>`).join('')}</div></div>`).join('');
+                }
+
+                // 2. v51: 渲染回覆明細列表
+                if (listEl) {
+                    const rawData = res.rawData || [];
+                    if (rawData.length === 0) listEl.innerHTML = '<div class="py-10 text-slate-400 font-bold text-center">目前尚無回覆紀錄</div>';
+                    else listEl.innerHTML = rawData.map(r => `
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-white shadow-sm space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div class="text-left">
+                                    <p class="text-xs font-black text-slate-800">${r.name} <span class="text-[9px] font-bold text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded-full">${r.section || ''}</span></p>
+                                    <p class="text-[9px] text-slate-400 font-bold">${r.email}</p>
+                                </div>
+                                <span class="text-[9px] font-black text-indigo-400">${r.time}</span>
+                            </div>
+                            <div class="grid grid-cols-1 gap-2 border-t border-slate-200/50 pt-2">
+                                ${Object.entries(r.answers).map(([q, a]) => `
+                                    <div class="flex flex-col gap-0.5">
+                                        <p class="text-[9px] font-black text-slate-400 uppercase">${q}</p>
+                                        <p class="text-[10px] font-bold text-slate-600">${a || '(無填寫)'}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                if (resultEl) resultEl.innerHTML = '<div class="py-10 text-rose-400 font-bold text-center">載入統計失敗</div>';
+                if (listEl) listEl.innerHTML = '<div class="py-10 text-rose-400 font-bold text-center">載入列表失敗</div>';
             }
+            safeCreateIcons();
         }
 
         async function fetchSurveyStatus() {
@@ -1706,8 +1884,13 @@
                 const labelStr = String(q.label || "").toLowerCase();
                 if (labelStr.includes("姓名") || labelStr.includes("名字") || labelStr === "name") {
                     prevVal = currentUser.Name || "";
+                } else if (labelStr.includes("組別") || labelStr.includes("聲部") || labelStr.includes("section") || labelStr === "組") {
+                    prevVal = currentUser.Section || "";
                 } else if (labelStr.includes("手機") || labelStr.includes("電話") || labelStr.includes("連絡") || labelStr.includes("聯絡") || labelStr.includes("phone")) {
-                    prevVal = currentUser.Phone || "";
+                    // 強制轉字串，修正 Google Sheets 數字格式造成前導 0 遺失的問題
+                    let ph = String(currentUser.Phone || "");
+                    if (ph && /^\d+$/.test(ph) && !ph.startsWith("0")) ph = "0" + ph;
+                    prevVal = ph;
                 } else if (labelStr.includes("身分證") || labelStr.includes("身份證") || labelStr.includes("id")) {
                     prevVal = currentUser.ID_Number || "";
                 } else if (labelStr.includes("生日") || labelStr.includes("出生") || labelStr.includes("birthday")) {
@@ -1767,7 +1950,7 @@
             // 1. 從歷史資料與已填寫資料初始化 (用於跨分頁判斷)
             const idMap = {}; // label -> id
             adminQuestions.forEach(q => { if (q.id) idMap[q.label] = q.id; });
-            
+
             // 先從歷史/全域資料帶入
             Object.keys(userResponses).forEach(label => { if (idMap[label]) currentAnswers[idMap[label]] = userResponses[label]; });
             Object.keys(allSurveyResponses).forEach(label => { if (idMap[label]) currentAnswers[idMap[label]] = allSurveyResponses[label]; });
@@ -1886,18 +2069,18 @@
                 if (!q.branches) continue;
                 const ans = answers[q.label];
                 const target = q.branches[ans];
-                
+
                 if (target && target !== '__next__') {
                     if (target === '__end__') {
                         console.log('Branch Logic: Jumping to End (__end__)');
-                        handleSaveSurvey(); 
-                        return; 
+                        handleSaveSurvey();
+                        return;
                     }
                     const idx = surveySections.findIndex(s => String(s.id) === String(target));
                     if (idx !== -1) {
                         console.log(`Branch Logic: Jumping from current section to section idx ${idx} (Target ID: ${target})`);
-                        nextIdx = idx; 
-                        break; 
+                        nextIdx = idx;
+                        break;
                     } else {
                         console.warn(`Branch Logic: Target section ID "${target}" not found in current survey sections.`);
                     }
@@ -1920,11 +2103,11 @@
         function openSurveyModal() {
             const modal = document.getElementById('survey-modal');
             if (!modal) return;
-            
+
             // 優先開啟容器
             modal.classList.remove('hidden');
             modal.style.display = 'flex';
-            
+
             try {
                 const title = document.getElementById('survey-display-title')?.innerText || "";
                 const desc = document.getElementById('survey-display-desc')?.innerText || "";
@@ -1932,7 +2115,7 @@
                 const modalDesc = document.getElementById('survey-modal-desc');
                 if (modalTitle) modalTitle.innerText = title;
                 if (modalDesc) modalDesc.innerText = desc;
-                
+
                 const modalContent = document.getElementById('survey-modal-content');
                 if (currentEmbedURL && currentEmbedURL.trim() !== "") {
                     if (modalContent) modalContent.classList.replace('max-w-sm', 'max-w-3xl');
@@ -1981,7 +2164,7 @@
             });
             if (missing) return showToast(`「${missing.label}」為必填項目`, true);
             const btn = document.getElementById('save-survey-btn'); setBtnLoading(btn, true, "提交中...");
-            const res = await callBackend('submitSurveyResponse', { email: currentUser.Email, name: currentUser.Name, responsesJSON: JSON.stringify(allSurveyResponses) });
+            const res = await callBackend('submitSurveyResponse', { email: currentUser.Email, name: currentUser.Name, section: currentUser.Section || "", responsesJSON: JSON.stringify(allSurveyResponses) });
             setBtnLoading(btn, false, "提交回覆");
             if (res?.success) { showToast("回覆已提交"); closeSurveyModal(); fetchSurveyStatus(); }
         }
@@ -2033,15 +2216,15 @@
                 modal.style.display = 'none';
             }
         }
-        function addSurveyQuestion() { 
+        function addSurveyQuestion() {
             const newId = 'q' + Date.now() + Math.random().toString(36).substr(2, 5);
-            adminQuestions.push({ id: newId, label: "新題目", type: "text", options: "", required: false, condition: null, branches: {} }); 
-            renderAdminQuestions(); 
+            adminQuestions.push({ id: newId, label: "新題目", type: "text", options: "", required: false, condition: null, branches: {} });
+            renderAdminQuestions();
         }
-        function addSurveySection() { 
+        function addSurveySection() {
             const newId = 's' + Date.now() + Math.random().toString(36).substr(2, 5);
-            adminQuestions.push({ id: newId, label: "新區段", type: "section" }); 
-            renderAdminQuestions(); 
+            adminQuestions.push({ id: newId, label: "新區段", type: "section" });
+            renderAdminQuestions();
         }
         function moveAdminQuestion(i, dir) { const j = i + dir; if (j < 0 || j >= adminQuestions.length) return;[adminQuestions[i], adminQuestions[j]] = [adminQuestions[j], adminQuestions[i]]; renderAdminQuestions(); }
         function removeAdminQuestion(i) { adminQuestions.splice(i, 1); renderAdminQuestions(); }
@@ -2233,105 +2416,111 @@
         <div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 relative fade-up flex flex-col items-center max-h-[90vh]"
             style="z-index: 10106;">
             <div class="w-full flex-1 overflow-y-auto pr-2 custom-scrollbar flex flex-col items-center pb-2">
-            <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white"
-                id="profile-initial">-</div>
-            <div class="w-full space-y-2 mb-6 text-center">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">個人姓名
-                    (限本人修改)</label>
-                <input type="text" id="profile-name-input"
-                    class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 shadow-inner">
-            </div>
-            <!-- 新增：分頁切換器 -->
-            <div class="flex w-full bg-slate-100 p-1.5 rounded-[22px] mb-6 gap-1">
-                <button onclick="switchProfileTab('basic')" id="tab-btn-basic"
-                    class="flex-1 py-2.5 rounded-[18px] text-[10px] font-black transition-all bg-white text-indigo-600 shadow-sm">基本資料</button>
-                <button onclick="switchProfileTab('personal')" id="tab-btn-personal"
-                    class="flex-1 py-2.5 rounded-[18px] text-[10px] font-black transition-all text-slate-400">個資管理</button>
-            </div>
+                <div class="w-24 h-24 rounded-[32px] bg-slate-800 text-white flex items-center justify-center font-[900] text-3xl mb-4 shadow-xl border-4 border-white"
+                    id="profile-initial">-</div>
+                <div class="w-full space-y-2 mb-6 text-center">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">個人姓名
+                        (限本人修改)</label>
+                    <input type="text" id="profile-name-input"
+                        class="w-full px-4 py-3 rounded-2xl bg-slate-50 border-none outline-none font-[900] text-xl text-center text-slate-800 shadow-inner">
+                </div>
+                <!-- 新增：分頁切換器 -->
+                <div class="flex w-full bg-slate-100 p-1.5 rounded-[22px] mb-6 gap-1">
+                    <button onclick="switchProfileTab('basic')" id="tab-btn-basic"
+                        class="flex-1 py-2.5 rounded-[18px] text-[10px] font-black transition-all bg-white text-indigo-600 shadow-sm">基本資料</button>
+                    <button onclick="switchProfileTab('personal')" id="tab-btn-personal"
+                        class="flex-1 py-2.5 rounded-[18px] text-[10px] font-black transition-all text-slate-400">個資管理</button>
+                </div>
 
-            <div id="profile-tab-basic" class="w-full space-y-4">
-                <div class="space-y-1"><label
-                        class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">角色/權限</label>
-                    <div id="profile-role"
-                        class="w-full px-4 py-3.5 bg-slate-50 rounded-2xl text-sm font-bold text-center text-indigo-600">
-                        Member</div>
-                </div>
-                <div class="space-y-1"><label
-                        class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">主要樂器</label><select
-                        id="profile-instrument-input"
-                        class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none shadow-sm"></select>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center"><span
-                        class="text-[10px] font-black text-slate-500 uppercase text-center">組別</span><span
-                        class="text-sm font-bold text-slate-700 text-center" id="profile-section-display">-</span></div>
-                <div class="p-4 bg-indigo-50/50 rounded-[20px] text-left space-y-2">
-                    <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">系統診斷 v15</p>
-                    <div class="flex justify-between text-[10px] font-bold"><span class="text-slate-400">PWA
-                            模式</span><span id="diag-pwa" class="text-slate-600">-</span></div>
-                    <div class="flex justify-between text-[10px] font-bold"><span
-                            class="text-slate-400">通知支援</span><span id="diag-support" class="text-slate-600">-</span>
-                    </div>
-                    <div class="flex justify-between text-[10px] font-bold"><span
-                            class="text-slate-400">權限狀態</span><span id="diag-permission" class="text-slate-600">-</span>
-                    </div>
-                </div>
-                <div id="profile-notif-row" class="space-y-1 hidden">
-                    <button onclick="requestNotificationPermission(true)"
-                        class="w-full py-4 bg-white text-indigo-600 rounded-[18px] font-black text-xs flex items-center justify-center gap-2 border border-slate-100 shadow-sm"><i
-                            data-lucide="bell" class="w-4 h-4"></i>開啟通知功能</button>
-                </div>
-                <div class="space-y-1"><label
-                        class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">變更密碼</label><input
-                        type="password" id="profile-new-password"
-                        class="w-full px-4 py-3.5 rounded-2xl bg-slate-100 outline-none border-none text-xs font-bold text-center"
-                        placeholder="不變請留空"></div>
-            </div>
-
-            <!-- 個資管理分頁 -->
-            <div id="profile-tab-personal" class="hidden w-full space-y-4">
-                <div class="p-5 bg-amber-50 rounded-[28px] border border-amber-100 mb-2">
-                    <p class="text-[10px] font-bold text-amber-700 leading-relaxed text-left">
-                        <i data-lucide="info" class="w-3 h-3 inline-block mr-1"></i> 填寫下列個資主要用於演出保險投保，系統將進行加密傳輸與保護。
-                    </p>
-                </div>
-                <!-- 新增：個資管理欄位 -->
-                <div class="space-y-4 p-5 bg-slate-50/50 rounded-[30px] border border-slate-100">
+                <div id="profile-tab-basic" class="w-full space-y-4">
                     <div class="space-y-1"><label
-                            class="text-[10px] font-black text-slate-400 uppercase px-1">連絡電話</label><input type="tel"
-                            id="profile-phone"
-                            class="w-full px-4 py-4 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm"
-                            placeholder="未填寫"></div>
-                    <div class="space-y-1"><label
-                            class="text-[10px] font-black text-slate-400 uppercase px-1">出生日期</label><input type="date"
-                            id="profile-birthday"
-                            class="w-full px-4 py-4 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm">
+                            class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">角色/權限</label>
+                        <div id="profile-role"
+                            class="w-full px-4 py-3.5 bg-slate-50 rounded-2xl text-sm font-bold text-center text-indigo-600">
+                            Member</div>
                     </div>
                     <div class="space-y-1"><label
-                            class="text-[10px] font-black text-slate-400 uppercase px-1">身分證字號</label><input type="text"
-                            id="profile-id-number"
-                            class="w-full px-4 py-4 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm"
-                            placeholder="A123456789"></div>
-                </div>
-                <button onclick="openPrivacyModal()" class="w-full py-4 mt-2 bg-white text-indigo-600 rounded-[18px] font-black text-xs flex items-center justify-center gap-2 border border-slate-100 shadow-sm">
-                    <i data-lucide="file-text" class="w-4 h-4"></i> 查看個資同意書
-                </button>
-
-                <!-- v42: 推播診斷專區 -->
-                <div id="diag-push-panel" class="mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <h5 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                        <i data-lucide="activity" class="w-3.5 h-3.5"></i> 系統通訊診斷 (v42)
-                    </h5>
-                    <div class="flex flex-col gap-3">
-                        <div class="bg-white p-3 rounded-xl border border-slate-100 text-[9px] font-mono whitespace-pre-wrap break-all text-slate-500" id="diag-push-result">
-                            尚未發起診斷
+                            class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">主要樂器</label><select
+                            id="profile-instrument-input"
+                            class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none outline-none font-bold text-center appearance-none shadow-sm"></select>
+                    </div>
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-[20px] text-center"><span
+                            class="text-[10px] font-black text-slate-500 uppercase text-center">組別</span><span
+                            class="text-sm font-bold text-slate-700 text-center" id="profile-section-display">-</span>
+                    </div>
+                    <div class="p-4 bg-indigo-50/50 rounded-[20px] text-left space-y-2">
+                        <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">系統診斷 v15</p>
+                        <div class="flex justify-between text-[10px] font-bold"><span class="text-slate-400">PWA
+                                模式</span><span id="diag-pwa" class="text-slate-600">-</span></div>
+                        <div class="flex justify-between text-[10px] font-bold"><span
+                                class="text-slate-400">通知支援</span><span id="diag-support"
+                                class="text-slate-600">-</span>
                         </div>
-                        <button id="diag-push-btn" onclick="triggerPushDiagnostic()" 
-                            class="w-full py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black border border-indigo-100 active:scale-95 transition-all">
-                            測試背景推播通道
-                        </button>
+                        <div class="flex justify-between text-[10px] font-bold"><span
+                                class="text-slate-400">權限狀態</span><span id="diag-permission"
+                                class="text-slate-600">-</span>
+                        </div>
                     </div>
+                    <div id="profile-notif-row" class="space-y-1 hidden">
+                        <button onclick="requestNotificationPermission(true)"
+                            class="w-full py-4 bg-white text-indigo-600 rounded-[18px] font-black text-xs flex items-center justify-center gap-2 border border-slate-100 shadow-sm"><i
+                                data-lucide="bell" class="w-4 h-4"></i>開啟通知功能</button>
+                    </div>
+                    <div class="space-y-1"><label
+                            class="text-[10px] font-black text-slate-400 uppercase px-1 text-center">變更密碼</label><input
+                            type="password" id="profile-new-password"
+                            class="w-full px-4 py-3.5 rounded-2xl bg-slate-100 outline-none border-none text-xs font-bold text-center"
+                            placeholder="不變請留空"></div>
                 </div>
-            </div> <!-- Close tab-personal -->
+
+                <!-- 個資管理分頁 -->
+                <div id="profile-tab-personal" class="hidden w-full space-y-4">
+                    <div class="p-5 bg-amber-50 rounded-[28px] border border-amber-100 mb-2">
+                        <p class="text-[10px] font-bold text-amber-700 leading-relaxed text-left">
+                            <i data-lucide="info" class="w-3 h-3 inline-block mr-1"></i> 填寫下列個資主要用於演出保險投保，系統將進行加密傳輸與保護。
+                        </p>
+                    </div>
+                    <!-- 新增：個資管理欄位 -->
+                    <div class="space-y-4 p-5 bg-slate-50/50 rounded-[30px] border border-slate-100">
+                        <div class="space-y-1"><label
+                                class="text-[10px] font-black text-slate-400 uppercase px-1">連絡電話</label><input
+                                type="tel" id="profile-phone"
+                                class="w-full px-4 py-4 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm"
+                                placeholder="未填寫"></div>
+                        <div class="space-y-1"><label
+                                class="text-[10px] font-black text-slate-400 uppercase px-1">出生日期</label><input
+                                type="date" id="profile-birthday"
+                                class="w-full px-4 py-4 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm">
+                        </div>
+                        <div class="space-y-1"><label
+                                class="text-[10px] font-black text-slate-400 uppercase px-1">身分證字號</label><input
+                                type="text" id="profile-id-number"
+                                class="w-full px-4 py-4 rounded-2xl bg-white border-none outline-none font-bold text-sm shadow-sm"
+                                placeholder="A123456789"></div>
+                    </div>
+                    <button onclick="openPrivacyModal()"
+                        class="w-full py-4 mt-2 bg-white text-indigo-600 rounded-[18px] font-black text-xs flex items-center justify-center gap-2 border border-slate-100 shadow-sm">
+                        <i data-lucide="file-text" class="w-4 h-4"></i> 查看個資同意書
+                    </button>
+
+                    <!-- v42: 推播診斷專區 -->
+                    <div id="diag-push-panel" class="mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <h5
+                            class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i data-lucide="activity" class="w-3.5 h-3.5"></i> 系統通訊診斷 (v42)
+                        </h5>
+                        <div class="flex flex-col gap-3">
+                            <div class="bg-white p-3 rounded-xl border border-slate-100 text-[9px] font-mono whitespace-pre-wrap break-all text-slate-500"
+                                id="diag-push-result">
+                                尚未發起診斷
+                            </div>
+                            <button id="diag-push-btn" onclick="triggerPushDiagnostic()"
+                                class="w-full py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black border border-indigo-100 active:scale-95 transition-all">
+                                測試背景推播通道
+                            </button>
+                        </div>
+                    </div>
+                </div> <!-- Close tab-personal -->
             </div> <!-- Close scrollable container from line 2235 -->
 
             <div class="pt-6 w-full flex gap-3 bg-white mt-auto">
@@ -2397,7 +2586,8 @@
 
     <div id="announcement-modal" class="hidden fixed inset-0 z-[10102] flex items-center justify-center p-6">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeAnnouncementModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up flex flex-col max-h-[90vh]" style="z-index: 10106;">
+        <div class="bg-white w-full max-w-sm rounded-[36px] shadow-2xl p-8 relative fade-up flex flex-col max-h-[90vh]"
+            style="z-index: 10106;">
             <h3 class="text-xl font-[900] text-slate-800 mb-6 tracking-tight flex items-center justify-center gap-2"><i
                     data-lucide="megaphone" class="w-6 h-6 text-amber-500"></i>發布全員公告</h3>
             <textarea id="announcement-edit-input"
@@ -2426,6 +2616,8 @@
                     class="flex-1 py-3 rounded-[16px] text-xs font-black transition-all bg-white text-indigo-600 shadow-sm">問卷設定</button>
                 <button id="sur-tab-result" onclick="switchSurveyAdminTab('result')"
                     class="flex-1 py-3 rounded-[16px] text-xs font-black transition-all text-slate-500">回覆統計</button>
+                <button id="sur-tab-list" onclick="switchSurveyAdminTab('list')"
+                    class="flex-1 py-3 rounded-[16px] text-xs font-black transition-all text-slate-500">回覆管理</button>
             </div>
 
             <!-- 設定頁面 -->
@@ -2479,6 +2671,13 @@
                 </div>
             </div>
 
+            <!-- v51: 回覆管理清單頁面 -->
+            <div id="sur-admin-list" class="hidden flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
+                <div class="text-center py-10">
+                    <p class="text-sm font-bold text-slate-400">正在讀取回覆明細...</p>
+                </div>
+            </div>
+
             <button onclick="closeSurveyAdminModal()"
                 class="mt-6 text-slate-400 text-[10px] font-black uppercase self-center hover:text-slate-600 transition-colors">返回問卷列表</button>
         </div>
@@ -2502,7 +2701,8 @@
                 <div id="survey-dynamic-fields" class="space-y-5"></div>
                 <div id="survey-iframe-container"
                     class="hidden w-full h-[65vh] rounded-2xl overflow-hidden border border-slate-100 shadow-inner mt-4">
-                    <iframe id="survey-external-frame" src="" class="w-full h-full border-none"></iframe></div>
+                    <iframe id="survey-external-frame" src="" class="w-full h-full border-none"></iframe>
+                </div>
             </div>
             <div class="p-6 pt-4 flex gap-3 bg-slate-50/50 border-t border-slate-100">
                 <button onclick="closeSurveyModal()"
@@ -2598,7 +2798,8 @@
 
 
     <!-- Toast 通知 -->
-    <div id="toast" class="hidden fixed top-12 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[10200] transition-all transform duration-500 border-white text-center">
+    <div id="toast"
+        class="hidden fixed top-12 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-4 rounded-[22px] glass-panel shadow-2xl z-[10200] transition-all transform duration-500 border-white text-center">
         <div class="p-2 rounded-xl bg-white shadow-sm">
             <i id="toast-icon" class="w-5 h-5"></i>
         </div>
@@ -2608,14 +2809,14 @@
     <script>
         // v40: 確保 Service Worker 獲正確註冊
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
+            window.addEventListener('load', function () {
                 // v40: 註冊 Firebase 標準命名的 SW 檔案
                 navigator.serviceWorker.register('firebase-messaging-sw.js')
-                .then(function(registration) {
-                    console.log('✅ firebase-messaging-sw.js 註冊成功 (v40)', registration.scope);
-                }).catch(function(err) {
-                    console.error('❌ Service Worker 註冊失敗:', err);
-                });
+                    .then(function (registration) {
+                        console.log('✅ firebase-messaging-sw.js 註冊成功 (v40)', registration.scope);
+                    }).catch(function (err) {
+                        console.error('❌ Service Worker 註冊失敗:', err);
+                    });
             });
         }
     </script>
