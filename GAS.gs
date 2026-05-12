@@ -33,6 +33,7 @@ function doPost(e) {
             case 'deactivateEvent': result = deactivateEvent(); break;
             case 'updateDeviceToken': result = updateDeviceToken(data); break;
             case 'testPush': result = testPush(data); break;
+            case 'getStaffList': result = getStaffList(); break;
             default: result = { success: false, message: "未知指令" };
         }
     } catch (err) {
@@ -166,18 +167,23 @@ function getSurveyStatus(data) {
         let responded = false;
         let lastResponse = {};
 
-        // 加上保護：只有當有信箱，而且有回覆紀錄表時才去撈歷史
-        const respSheet = SS.getSheetByName("SurveyResponses");
-        if (respSheet && respSheet.getLastRow() > 1 && data && data.email) {
-            const resps = respSheet.getDataRange().getValues();
+        // v51: 優先從專屬分頁 SRV_ 讀取回覆狀態與歷史
+        const surveySheet = SS.getSheetByName("SRV_" + activeId);
+        if (surveySheet && surveySheet.getLastRow() > 1 && data && data.email) {
+            const resps = surveySheet.getDataRange().getValues();
+            const headers = resps[0];
             const email = String(data.email).toLowerCase().trim();
 
-            // 使用先反轉後尋找，確保找到最後一筆
-            const lastResp = [...resps].reverse().find(r => r[1] && String(r[1]).toLowerCase().trim() === email && String(r[3]) === String(activeId));
+            // 尋找該 Email 的最後一筆 (反轉搜尋)
+            const userRow = [...resps].reverse().find(r => r[1] && String(r[1]).toLowerCase().trim() === email);
 
-            if (lastResp) {
+            if (userRow) {
                 responded = true;
-                try { lastResponse = JSON.parse(lastResp[4] || "{}"); } catch (e) { }
+                // 從各欄位重建 lastResponse JSON（從第 5 欄開始，跳過組別）
+                lastResponse = {};
+                for (let i = 4; i < headers.length; i++) {
+                    lastResponse[headers[i]] = userRow[i];
+                }
             }
         }
         return {
@@ -212,6 +218,7 @@ function submitSurveyResponse(data) {
         // 3. 準備資料列
         const userEmail = data.email.toLowerCase();
         const userName = data.name || "";
+        const userSection = data.section || "";
         const responses = JSON.parse(data.responsesJSON || "{}");
         const headers = surveySheet.getRange(1, 1, 1, surveySheet.getLastColumn()).getValues()[0];
         const rowData = new Array(headers.length).fill("");
@@ -219,9 +226,10 @@ function submitSurveyResponse(data) {
         rowData[0] = new Date(); // 時間
         rowData[1] = userEmail;
         rowData[2] = userName;
+        rowData[3] = userSection; // 組別
 
-        // 根據題目標籤填入欄位
-        for (let i = 3; i < headers.length; i++) {
+        // 根據題目標籤填入欄位（從第 5 欄開始）
+        for (let i = 4; i < headers.length; i++) {
             const label = headers[i];
             if (responses.hasOwnProperty(label)) rowData[i] = responses[label];
         }
@@ -247,8 +255,8 @@ function getOrCreateSurveySheet(surveyId, title, questions) {
     let sheet = SS.getSheetByName(sheetName);
     if (!sheet) sheet = SS.insertSheet(sheetName);
 
-    // 動態產生表頭：時間 | Email | 姓名 | [所有題目標籤...]
-    const expectedHeaders = ["填寫時間", "Email", "姓名"].concat(questions.map(q => q.label));
+    // 動態產生表頭：時間 | Email | 姓名 | 組別 | [所有題目標籤...]
+    const expectedHeaders = ["填寫時間", "Email", "姓名", "組別"].concat(questions.map(q => q.label));
     const currentHeaders = sheet.getLastColumn() > 0 ? sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0] : [];
 
     if (JSON.stringify(currentHeaders) !== JSON.stringify(expectedHeaders)) {
@@ -262,24 +270,55 @@ function getOrCreateSurveySheet(surveyId, title, questions) {
 
 function getSurveyResults(data) {
     try {
-        const template = SS.getSheetByName("SurveyTemplates").getDataRange().getValues().find(r => String(r[0]) === String(data.id));
-        if (!template) return { success: false, message: "找不到問卷" };
-        const questions = JSON.parse(template[3] || "[]");
-        const responses = SS.getSheetByName("SurveyResponses").getDataRange().getValues();
-        const results = questions.map(q => {
+        const surveyId = data.id;
+        const sheet = SS.getSheetByName("SRV_" + surveyId);
+        if (!sheet || sheet.getLastRow() <= 1) return { success: true, data: [], rawData: [] };
+
+        const vals = sheet.getDataRange().getValues();
+        const headers = vals[0];
+        const rows = vals.slice(1);
+
+        // 1. 統計各題結果 (跳過 填寫時間, Email, 姓名, 組別)
+        const results = [];
+        for (let col = 4; col < headers.length; col++) {
+            const label = headers[col];
             const stats = {};
-            responses.forEach(r => {
-                if (String(r[3]) === String(data.id)) {
-                    try {
-                        const userResp = JSON.parse(r[4] || "{}");
-                        const val = userResp[q.label];
-                        if (val) stats[val] = (stats[val] || 0) + 1;
-                    } catch (e) { }
+            rows.forEach(r => {
+                const val = String(r[col] || "").trim();
+                if (val) {
+                    // 如果是多選 (逗號分隔)，拆開計次
+                    if (val.includes(',')) {
+                        val.split(',').forEach(v => {
+                            const subV = v.trim();
+                            if (subV) stats[subV] = (stats[subV] || 0) + 1;
+                        });
+                    } else {
+                        stats[val] = (stats[val] || 0) + 1;
+                    }
                 }
             });
-            return { label: q.label, stats: stats };
+            results.push({ label: label, stats: stats });
+        }
+
+        // 2. 獲取原始回覆表格 (用於回覆管理清單)
+        const rawData = rows.map(r => {
+            let timeStr = "";
+            try {
+                if (r[0] instanceof Date) {
+                    timeStr = Utilities.formatDate(r[0], "GMT+8", "MM/dd HH:mm");
+                } else {
+                    timeStr = String(r[0] || "");
+                }
+            } catch (e) { timeStr = String(r[0] || ""); }
+
+            const item = { time: timeStr, email: r[1], name: r[2], section: r[3] || "", answers: {} };
+            for (let i = 4; i < headers.length; i++) {
+                item.answers[headers[i]] = r[i];
+            }
+            return item;
         });
-        return { success: true, data: results };
+
+        return { success: true, data: results, rawData: rawData.reverse() };
     } catch (e) { return { success: false, message: e.toString() }; }
 }
 
@@ -328,7 +367,11 @@ function getRealtimeStatus(userData) {
 
         // 計算樂團總共辦了幾場活動
         const totalEventsCount = Object.keys(uniqueEvents).length;
-        const data = members.slice(1).map(m => {
+        
+        // 過濾掉「行政組」，不讓他們出現在出缺席監控中
+        const filteredMembers = members.slice(1).filter(m => String(m[2] || "").trim() !== "行政組");
+        
+        const data = filteredMembers.map(m => {
             const email = String(m[3] || "").toLowerCase().trim();
             const stats = userStats[email] || { presentCount: 0, today: false };
 
@@ -365,6 +408,30 @@ function getRealtimeStatus(userData) {
         const stats = { present: data.filter(d => d.status === "已簽到").length, absent: data.filter(d => d.status !== "已簽到").length };
         return { success: true, data, stats, totalEvents: totalEventsCount };
     } catch (e) { return { success: false, message: e.toString() }; }
+}
+
+function getStaffList() {
+    try {
+        const memS = SS.getSheetByName("Members");
+        if (memS.getLastColumn() < 13) memS.insertColumnsAfter(memS.getLastColumn(), 13 - memS.getLastColumn());
+        const members = memS.getDataRange().getValues();
+        
+        // 只抓取行政組
+        const staffs = members.slice(1).filter(m => String(m[2] || "").trim() === "行政組").map(m => ({
+            Name: m[1],
+            Section: m[2],
+            Instrument: m[6], // 職能
+            Email: String(m[3] || "").toLowerCase().trim(),
+            Phone: m[9] || "",
+            Birthday: m[10] || "",
+            ID_Number: m[11] || "",
+            PrivacyConsent: m[12] || "NO"
+        }));
+        
+        return { success: true, data: staffs };
+    } catch (e) { 
+        return { success: false, message: e.toString() }; 
+    }
 }
 
 // --- 核心：自動補齊欄位工具 ---
@@ -453,7 +520,8 @@ function loginUser(data) {
             success: true,
             userData: {
                 ID: row[0], Name: row[1], Section: row[2], Email: row[3], Role: row[5], Instrument: row[6],
-                Phone: row[9] || "", Birthday: row[10] || "", ID_Number: row[11] || "", PrivacyConsent: row[12] || "NO"
+                Phone: (function(v){ var s=String(v||""); return (s&&/^\d+$/.test(s)&&!s.startsWith("0"))?"0"+s:s; })(row[9]),
+                Birthday: row[10] || "", ID_Number: row[11] || "", PrivacyConsent: row[12] || "NO"
             }
         };
     } catch (e) { return { success: false, message: e.toString() }; }
@@ -684,7 +752,11 @@ function saveMember(data) {
         if (data.instrument) sheet.getRange(rowNum, 7).setValue(data.instrument);
         if (data.password && data.password.trim() !== "") sheet.getRange(rowNum, 5).setValue(data.password.trim());
 
-        if (data.phone !== undefined) sheet.getRange(rowNum, 10).setValue(data.phone);
+        if (data.phone !== undefined) {
+            const phoneCell = sheet.getRange(rowNum, 10);
+            phoneCell.setNumberFormat('@');  // 強制純文字，保留前導 0
+            phoneCell.setValue(String(data.phone));
+        }
         if (data.birthday !== undefined) sheet.getRange(rowNum, 11).setValue(data.birthday);
         if (data.idNumber !== undefined) sheet.getRange(rowNum, 12).setValue(data.idNumber);
         if (data.privacyConsent !== undefined) {
