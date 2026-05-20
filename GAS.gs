@@ -34,6 +34,8 @@ function doPost(e) {
             case 'updateDeviceToken': result = updateDeviceToken(data); break;
             case 'testPush': result = testPush(data); break;
             case 'getStaffList': result = getStaffList(); break;
+            case 'getUpcomingEvents': result = getUpcomingEvents(); break;
+            case 'submitLeave': result = submitLeave(data); break;
             default: result = { success: false, message: "未知指令" };
         }
     } catch (err) {
@@ -58,6 +60,29 @@ function getEventList() {
             RestStart: formatTimeValue(r[8]), RestEnd: formatTimeValue(r[9])
         }));
         return { success: true, data: list.reverse(), activeEventId: activeEventId };
+    } catch (e) { return { success: false, message: e.toString() }; }
+}
+
+function getUpcomingEvents() {
+    try {
+        const sheet = SS.getSheetByName("Events");
+        if (sheet.getLastRow() < 2) return { success: true, data: [] };
+        const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 10).getValues();
+        const todayStr = Utilities.formatDate(new Date(), "GMT+8", "yyyy-MM-dd");
+        
+        const list = [];
+        data.forEach(r => {
+            if (!r[3]) return;
+            // 統一格式化成 yyyy-MM-dd 再比較字串，避免時區或物件問題
+            const eventDateStr = r[3] instanceof Date ? Utilities.formatDate(r[3], "GMT+8", "yyyy-MM-dd") : String(r[3]);
+            if (eventDateStr >= todayStr) {
+                list.push({
+                    ID: r[0], Name: r[1], Type: r[2], Date: eventDateStr,
+                    StartTime: formatTimeValue(r[4]), EndTime: formatTimeValue(r[5])
+                });
+            }
+        });
+        return { success: true, data: list };
     } catch (e) { return { success: false, message: e.toString() }; }
 }
 
@@ -241,8 +266,14 @@ function submitSurveyResponse(data) {
             if (String(sheetVals[i][1]).toLowerCase() === userEmail) { rowIdx = i + 1; break; }
         }
 
-        if (rowIdx !== -1) surveySheet.getRange(rowIdx, 1, 1, rowData.length).setValues([rowData]);
-        else surveySheet.appendRow(rowData);
+        if (rowIdx !== -1) {
+            surveySheet.getRange(rowIdx, 1, 1, rowData.length).setNumberFormat('@').setValues([rowData.map(v => v instanceof Date ? Utilities.formatDate(v, "GMT+8", "yyyy-MM-dd HH:mm:ss") : String(v))]);
+        } else {
+            const newRow = surveySheet.getLastRow() + 1;
+            const range = surveySheet.getRange(newRow, 1, 1, rowData.length);
+            range.setNumberFormat('@'); // 強制純文字，保留前導 0
+            range.setValues([rowData.map(v => v instanceof Date ? Utilities.formatDate(v, "GMT+8", "yyyy-MM-dd HH:mm:ss") : String(v))]);
+        }
 
         // 備份到總表 (選填)
         const master = SS.getSheetByName("SurveyResponses");
@@ -276,7 +307,12 @@ function getSurveyResults(data) {
 
         const vals = sheet.getDataRange().getValues();
         const headers = vals[0];
-        const rows = vals.slice(1);
+        let rows = vals.slice(1);
+
+        // 如果是 Leader 且有指定組別，則過濾
+        if (data.role === 'Leader' && data.section) {
+            rows = rows.filter(r => String(r[3] || "").trim() === data.section);
+        }
 
         // 1. 統計各題結果 (跳過 填寫時間, Email, 姓名, 組別)
         const results = [];
@@ -318,7 +354,24 @@ function getSurveyResults(data) {
             return item;
         });
 
-        return { success: true, data: results, rawData: rawData.reverse() };
+        // 3. 若為 Leader，回傳該組全員名單（含填寫狀態）
+        let memberList = [];
+        if (data.role === 'Leader' && data.section) {
+            const memS = SS.getSheetByName("Members");
+            const allMembers = memS.getDataRange().getValues().slice(1);
+            const sectionMembers = allMembers.filter(m => String(m[2] || "").trim() === data.section);
+            // 已填寫的 email 清單
+            const filledEmails = rows.map(r => String(r[1] || "").toLowerCase().trim());
+            memberList = sectionMembers.map(m => ({
+                name: m[1],
+                instrument: m[6] || "",
+                filled: filledEmails.includes(String(m[3] || "").toLowerCase().trim())
+            }));
+            // 已填寫排後面，未填寫排前面
+            memberList.sort((a, b) => a.filled === b.filled ? 0 : a.filled ? 1 : -1);
+        }
+
+        return { success: true, data: results, rawData: rawData.reverse(), memberList: memberList };
     } catch (e) { return { success: false, message: e.toString() }; }
 }
 
@@ -356,12 +409,21 @@ function getRealtimeStatus(userData) {
 
             // 紀錄活動總場次 (利用 日期+活動名 當作唯一值)
             if (attDate && attEvent) uniqueEvents[attDate + "_" + attEvent] = true;
-            if (!userStats[email]) userStats[email] = { presentCount: 0, today: false };
-            userStats[email].presentCount++; // 這個人總計出席過幾次
-
-            // 檢查今天是否已簽到
-            if (attDate === currentEventDate && attEvent === currentEventName) {
-                userStats[email].today = true;
+            if (!userStats[email]) userStats[email] = { presentCount: 0, leaveCount: 0, today: false, todayStatus: "尚未簽到" };
+            
+            const attStatus = String(attendance[i][6] || ""); // 判斷是出席還是請假
+            if (attStatus === "請假") {
+                userStats[email].leaveCount++;
+                if (attDate === currentEventDate && attEvent === currentEventName) {
+                    userStats[email].today = true;
+                    userStats[email].todayStatus = "請假";
+                }
+            } else {
+                userStats[email].presentCount++;
+                if (attDate === currentEventDate && attEvent === currentEventName) {
+                    userStats[email].today = true;
+                    userStats[email].todayStatus = "已簽到";
+                }
             }
         }
 
@@ -373,11 +435,11 @@ function getRealtimeStatus(userData) {
         
         const data = filteredMembers.map(m => {
             const email = String(m[3] || "").toLowerCase().trim();
-            const stats = userStats[email] || { presentCount: 0, today: false };
+            const stats = userStats[email] || { presentCount: 0, leaveCount: 0, today: false, todayStatus: "尚未簽到" };
 
             let statusText = "尚未簽到";
             if (stats.today) {
-                statusText = "已簽到";
+                statusText = stats.todayStatus;
             } else if (isSystemOn) {
                 let endH = 0, endM = 0;
                 if (currentEventEndTime.includes('時')) {
@@ -395,8 +457,8 @@ function getRealtimeStatus(userData) {
                 // 系統已經關閉，但這個人沒簽到
                 statusText = "缺席";
             }
-            // 【真實缺席數】 = 樂團總共辦了幾場活動 - 該團員的出席總次數
-            let absenceCount = totalEventsCount - stats.presentCount;
+            // 【真實缺席數】 = 樂團總共辦了幾場活動 - 出席總次數 - 請假總次數
+            let absenceCount = totalEventsCount - stats.presentCount - stats.leaveCount;
             if (absenceCount < 0) absenceCount = 0;
             return {
                 Name: m[1], Section: m[2], Instrument: m[6], Email: email,
@@ -458,20 +520,25 @@ function getSystemStatus(data) {
         const eventId = String(config[8] || "");
         const bypassCode = String(config[12] || "");
         let hasCheckedIn = false;
+        let hasLeaved = false;
         if (data && data.email && isSystemOn) {
             const attSheet = SS.getSheetByName("Attendance");
             if (attSheet && attSheet.getLastRow() > 1) {
                 const attData = attSheet.getDataRange().getValues();
                 const email = String(data.email).toLowerCase().trim();
-                // 精準位置：Email(索引3), 活動名稱(索引4), Date(索引5)
+                // 精準位置：Email(索引3), 活動名稱(索引4), Date(索引5), 類別(索引6)
                 for (let i = attData.length - 1; i >= 1; i--) {
                     const attEmail = String(attData[i][3] || "").toLowerCase().trim();
                     const attEvent = String(attData[i][4] || ""); // 正確的 EventName 在這裡！
                     const attDateRaw = attData[i][5];
                     const attDate = attDateRaw instanceof Date ? Utilities.formatDate(attDateRaw, "GMT+8", "yyyy-MM-dd") : String(attDateRaw || "");
+                    const attType = String(attData[i][6] || "");
 
                     if (attEmail === email && attDate === eventDate && attEvent === eventName) {
                         hasCheckedIn = true;
+                        if (attType === "請假") {
+                            hasLeaved = true;
+                        }
                         break;
                     }
                 }
@@ -480,7 +547,7 @@ function getSystemStatus(data) {
         return {
             success: true, enabled: isSystemOn, eventName: eventName, type: type,
             eventStart: startTimeStr, eventEnd: endTimeStr, eventDate: eventDate,
-            id: eventId, bypassCode: bypassCode, hasCheckedIn: hasCheckedIn
+            id: eventId, bypassCode: bypassCode, hasCheckedIn: hasCheckedIn, hasLeaved: hasLeaved
         };
     } catch (e) { return { success: false, message: e.toString() }; }
 }
@@ -549,6 +616,25 @@ function submitCheckin(data) {
     } catch (err) { return { success: false, message: err.toString() }; }
 }
 
+function submitLeave(data) {
+    try {
+        SS.getSheetByName("Attendance").appendRow([
+            new Date(), 
+            data.name, 
+            data.section, 
+            String(data.email).toLowerCase(), 
+            data.eventName, 
+            data.date, 
+            "請假", 
+            "系統請假", 
+            "請假"
+        ]);
+        return { success: true };
+    } catch (err) { 
+        return { success: false, message: err.toString() }; 
+    }
+}
+
 function getAttendanceHistory(data) {
     try {
         const attSheet = SS.getSheetByName("Attendance");
@@ -558,7 +644,7 @@ function getAttendanceHistory(data) {
         const email = String(data.email).toLowerCase().trim();
         const list = [];
 
-        // 精準位置：Email(3), 活動名稱(4), Date(5), Duration即時數(8)
+        // 精準位置：Email(3), 活動名稱(4), Date(5), 類別(6), Duration即時數(8)
         for (let i = attData.length - 1; i >= 1; i--) {
             const rowEmail = String(attData[i][3] || "").toLowerCase().trim();
 
@@ -566,9 +652,14 @@ function getAttendanceHistory(data) {
                 const eventName = String(attData[i][4] || "一般團練"); // 抓取真正的活動名
                 const dateRaw = attData[i][5];
                 const dateStr = dateRaw instanceof Date ? Utilities.formatDate(dateRaw, "GMT+8", "yyyy-MM-dd") : String(dateRaw || "");
+                const eventType = String(attData[i][6] || "");
 
                 let duration = String(attData[i][8] || "");
-                if (!duration) duration = "2時30分";
+                if (eventType === "請假") {
+                    duration = "請假";
+                } else if (!duration) {
+                    duration = "2時30分";
+                }
                 list.push({
                     status: eventName,
                     date: dateStr,
@@ -753,9 +844,12 @@ function saveMember(data) {
         if (data.password && data.password.trim() !== "") sheet.getRange(rowNum, 5).setValue(data.password.trim());
 
         if (data.phone !== undefined) {
+            let p = String(data.phone).trim();
+            // 如果是全數字且沒有 0 開頭，強制補 0
+            if (p && /^\d+$/.test(p) && !p.startsWith("0")) p = "0" + p;
             const phoneCell = sheet.getRange(rowNum, 10);
-            phoneCell.setNumberFormat('@');  // 強制純文字，保留前導 0
-            phoneCell.setValue(String(data.phone));
+            phoneCell.setNumberFormat('@');  // 強制純文字
+            phoneCell.setValue(p); // 寫入字串
         }
         if (data.birthday !== undefined) sheet.getRange(rowNum, 11).setValue(data.birthday);
         if (data.idNumber !== undefined) sheet.getRange(rowNum, 12).setValue(data.idNumber);
