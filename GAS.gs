@@ -464,6 +464,7 @@ function getRealtimeStatus(userData) {
                 Name: m[1], Section: m[2], Instrument: m[6], Email: email,
                 status: statusText,
                 absenceCount: absenceCount,
+                leaveCount: stats.leaveCount,
                 Phone: m[9] || "", Birthday: m[10] || "", ID_Number: m[11] || "", PrivacyConsent: m[12] || "NO"
             };
         });
@@ -627,7 +628,8 @@ function submitLeave(data) {
             data.date, 
             "請假", 
             "系統請假", 
-            "請假"
+            "請假",
+            data.reason || ""
         ]);
         return { success: true };
     } catch (err) { 
