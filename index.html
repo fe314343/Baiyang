@@ -263,7 +263,7 @@
                 <button id="login-submit-btn" onclick="handleLogin()"
                     class="relative w-full btn-premium text-white font-black py-4 rounded-[20px] text-lg tracking-wide shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">立即登入
                     <i data-lucide="arrow-right" class="w-5 h-5"></i></button>
-                    <div class="text-center pt-1"><button onclick="switchAuthMode('register')"
+                <div class="text-center pt-1"><button onclick="switchAuthMode('register')"
                         class="text-slate-400 text-xs font-bold hover:text-indigo-600 underline decoration-indigo-200 underline-offset-4">註冊新成員</button>
                 </div>
             </div>
@@ -427,7 +427,8 @@
                                     class="text-lg tracking-tight">簽到</span></button>
                             <div id="btn-pulse" class="absolute inset-0 rounded-full"></div>
                         </div>
-                        <button onclick="openLeaveModal()" class="mt-6 text-sm font-black text-amber-500 bg-amber-50 px-6 py-2.5 rounded-full border border-amber-100 hover:bg-amber-100 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2">
+                        <button onclick="openLeaveModal()"
+                            class="mt-6 text-sm font-black text-amber-500 bg-amber-50 px-6 py-2.5 rounded-full border border-amber-100 hover:bg-amber-100 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2">
                             <i data-lucide="calendar-off" class="w-4 h-4"></i> 請假申請
                         </button>
                     </div>
@@ -1241,7 +1242,7 @@
             const btn = document.getElementById('checkin-btn'), pulse = document.getElementById('btn-pulse');
             if (!btn || !pulse) return;
             if (hasCheckedIn) {
-                btn.disabled = true; 
+                btn.disabled = true;
                 if (hasLeaved) {
                     btn.className = "relative z-10 w-36 h-36 bg-amber-500 rounded-full text-white font-black shadow-xl border-[10px] border-white flex flex-col items-center justify-center transition-all duration-700";
                     btn.innerHTML = '<i data-lucide="calendar-check" class="w-12 h-12 mb-1"></i><span class="text-[10px] font-black uppercase">已請假</span>';
@@ -1337,16 +1338,18 @@
                 } else {
                     select.innerHTML = '<option value="">目前無近期活動可選</option>';
                 }
-            } catch(e) {
+            } catch (e) {
                 select.innerHTML = '<option value="">載入失敗</option>';
             }
         }
 
         async function submitLeaveApp() {
             const select = document.getElementById('leave-event-select');
+            const reasonInput = document.getElementById('leave-reason');
             if (!select || !select.value) return showToast("請選擇請假活動", true);
-            
+
             const [eventName, eventDate] = select.value.split('|');
+            const reason = reasonInput ? reasonInput.value.trim() : "";
             const btn = document.getElementById('leave-submit-btn');
             setBtnLoading(btn, true, "送出中...");
             try {
@@ -1355,16 +1358,18 @@
                     name: currentUser.Name,
                     section: currentUser.Section,
                     eventName: eventName,
-                    date: eventDate
+                    date: eventDate,
+                    reason: reason
                 });
                 if (res?.success) {
                     showToast("請假送出成功！");
+                    if (reasonInput) reasonInput.value = "";
                     closeLeaveModal();
                     setTimeout(() => { refreshSystemStatus(); loadAttendanceHistory(); }, 1000);
                 } else {
                     showToast(res?.message || "請假失敗", true);
                 }
-            } catch(e) {
+            } catch (e) {
                 showToast("連線異常", true);
             } finally {
                 setBtnLoading(btn, false, "送出請假");
@@ -1564,10 +1569,10 @@
                         listEl.innerHTML = '<div class="py-8 text-teal-300/60 font-bold text-center text-[10px]">目前無行政人員資料</div>';
                     } else {
                         listEl.innerHTML = staffs.map(s => {
-                            const consentHtml = s.PrivacyConsent.startsWith("YES") 
+                            const consentHtml = s.PrivacyConsent.startsWith("YES")
                                 ? `<span class="text-[8px] font-black text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1"><i data-lucide="check-circle" class="w-2.5 h-2.5"></i>已授權個資</span>`
                                 : `<span class="text-[8px] font-black text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded flex items-center gap-1"><i data-lucide="alert-circle" class="w-2.5 h-2.5"></i>未授權個資</span>`;
-                                
+
                             return `
                             <div class="bg-white/80 p-4 rounded-[20px] shadow-sm flex flex-col gap-2 relative overflow-hidden group">
                                 <div class="absolute right-0 top-0 w-10 h-full bg-gradient-to-l from-teal-50 to-transparent opacity-50"></div>
@@ -1583,7 +1588,7 @@
                                     </div>
                                     <div class="flex flex-col items-end gap-1.5">
                                         ${consentHtml}
-                                        <span class="text-[9px] text-slate-300 font-bold uppercase">${s.ID_Number ? s.ID_Number.substring(0,4)+'***' : '無身分證'}</span>
+                                        <span class="text-[9px] text-slate-300 font-bold uppercase">${s.ID_Number ? s.ID_Number.substring(0, 4) + '***' : '無身分證'}</span>
                                     </div>
                                 </div>
                             </div>`;
@@ -1699,10 +1704,11 @@
 
             if (listEl) listEl.innerHTML = list.map(m => {
                 const abs = m.absenceCount || 0;
+                const lv = m.leaveCount || 0;
                 let statusColor = 'text-rose-400';
                 if (m.status === '已簽到') statusColor = 'text-emerald-500';
                 else if (m.status === '請假') statusColor = 'text-amber-500';
-                return `<div class="bg-white/70 p-4 rounded-2xl flex justify-between items-center text-left"><div class="flex flex-col gap-1"><p class="font-black text-slate-800 text-xs">${m.Name} <span class="text-[9px] text-slate-400">(${m.Instrument})</span></p><p class="text-[10px] font-black ${getAbsenceColorClass(abs)}">缺 ${abs}</p></div><div class="text-right"><span class="text-xs font-black ${statusColor}">${m.status}</span></div></div>`
+                return `<div class="bg-white/70 p-4 rounded-2xl flex justify-between items-center text-left"><div class="flex flex-col gap-1"><p class="font-black text-slate-800 text-xs">${m.Name} <span class="text-[9px] text-slate-400">(${m.Instrument})</span></p><div class="flex gap-2"><p class="text-[10px] font-black ${getAbsenceColorClass(abs)}">缺 ${abs}</p><p class="text-[10px] font-black text-amber-400">假 ${lv}</p></div></div><div class="text-right"><span class="text-xs font-black ${statusColor}">${m.status}</span></div></div>`
             }).join('');
             safeCreateIcons();
         }
@@ -1925,9 +1931,9 @@
                                             <p class="text-sm font-black text-slate-800">${m.name} <span class="text-[9px] font-bold text-slate-400">(${m.instrument})</span></p>
                                         </div>
                                         ${m.filled
-                                            ? '<span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> 已填寫</span>'
-                                            : '<span class="text-[10px] font-black text-rose-400 bg-rose-50 px-2.5 py-1 rounded-lg flex items-center gap-1"><i data-lucide="circle-x" class="w-3.5 h-3.5"></i> 未填寫</span>'
-                                        }
+                                    ? '<span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> 已填寫</span>'
+                                    : '<span class="text-[10px] font-black text-rose-400 bg-rose-50 px-2.5 py-1 rounded-lg flex items-center gap-1"><i data-lucide="circle-x" class="w-3.5 h-3.5"></i> 未填寫</span>'
+                                }
                                     </div>
                                 </div>
                             `).join('');
@@ -2907,26 +2913,39 @@
     </div>
 
     <!-- 請假申請 Modal -->
-    <div id="leave-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[10100] items-center justify-center p-4">
+    <div id="leave-modal"
+        class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[10100] items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-[32px] p-6 shadow-2xl border-white/60 text-center animate-in">
-            <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-500 shadow-inner">
+            <div
+                class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-500 shadow-inner">
                 <i data-lucide="calendar-off" class="w-8 h-8"></i>
             </div>
             <h3 class="text-xl font-[900] text-slate-800 tracking-tight mb-2">請假申請</h3>
             <p class="text-xs font-bold text-slate-500 mb-6">請選擇您要請假的活動，送出後不列入缺席紀錄。</p>
-            
+
             <div class="space-y-4 mb-6 text-left">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">選擇請假活動</label>
-                    <select id="leave-event-select" class="w-full px-4 py-3 bg-slate-100 border-none rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-amber-500/50">
+                    <label
+                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">選擇請假活動</label>
+                    <select id="leave-event-select"
+                        class="w-full px-4 py-3 bg-slate-100 border-none rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-amber-500/50">
                         <option value="">載入中...</option>
                     </select>
                 </div>
+                <div>
+                    <label
+                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">請假原因</label>
+                    <textarea id="leave-reason"
+                        class="w-full px-4 py-3 bg-slate-100 border-none rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-amber-500/50 resize-none h-24"
+                        placeholder="請輸入請假原因(選填)..."></textarea>
+                </div>
             </div>
-            
+
             <div class="flex gap-4">
-                <button onclick="closeLeaveModal()" class="flex-1 py-3.5 bg-slate-100 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-200 active:scale-95 transition-all">取消</button>
-                <button id="leave-submit-btn" onclick="submitLeaveApp()" class="flex-1 py-3.5 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-amber-500/30 active:scale-95 transition-all">送出請假</button>
+                <button onclick="closeLeaveModal()"
+                    class="flex-1 py-3.5 bg-slate-100 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-200 active:scale-95 transition-all">取消</button>
+                <button id="leave-submit-btn" onclick="submitLeaveApp()"
+                    class="flex-1 py-3.5 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-amber-500/30 active:scale-95 transition-all">送出請假</button>
             </div>
         </div>
     </div>
