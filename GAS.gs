@@ -409,7 +409,7 @@ function getRealtimeStatus(userData) {
 
             // 紀錄活動總場次 (利用 日期+活動名 當作唯一值)
             if (attDate && attEvent) uniqueEvents[attDate + "_" + attEvent] = true;
-            if (!userStats[email]) userStats[email] = { presentCount: 0, leaveCount: 0, today: false, todayStatus: "尚未簽到" };
+            if (!userStats[email]) userStats[email] = { presentCount: 0, leaveCount: 0, today: false, todayStatus: "尚未簽到", todayReason: "" };
             
             const attStatus = String(attendance[i][6] || ""); // 判斷是出席還是請假
             if (attStatus === "請假") {
@@ -417,6 +417,7 @@ function getRealtimeStatus(userData) {
                 if (attDate === currentEventDate && attEvent === currentEventName) {
                     userStats[email].today = true;
                     userStats[email].todayStatus = "請假";
+                    userStats[email].todayReason = String(attendance[i][9] || ""); // 抓取第 10 欄的原因
                 }
             } else {
                 userStats[email].presentCount++;
@@ -465,11 +466,17 @@ function getRealtimeStatus(userData) {
                 status: statusText,
                 absenceCount: absenceCount,
                 leaveCount: stats.leaveCount,
+                todayReason: stats.todayReason || "",
                 Phone: m[9] || "", Birthday: m[10] || "", ID_Number: m[11] || "", PrivacyConsent: m[12] || "NO"
             };
         });
-        const stats = { present: data.filter(d => d.status === "已簽到").length, absent: data.filter(d => d.status !== "已簽到").length };
-        return { success: true, data, stats, totalEvents: totalEventsCount };
+        const stats = { present: data.filter(d => d.status === "已簽到").length, absent: data.filter(d => d.status === "缺席").length, leave: data.filter(d => d.status === "請假").length };
+        return { 
+            success: true, data, stats, totalEvents: totalEventsCount,
+            eventStart: formatTimeValue(config[3]), 
+            eventEnd: formatTimeValue(config[4]), 
+            eventDate: currentEventDate
+        };
     } catch (e) { return { success: false, message: e.toString() }; }
 }
 
@@ -908,5 +915,15 @@ function checkAndInitSheets() {
     if (sysS.getLastRow() === 0) {
         sysS.appendRow(["狀態", "活動名", "類型", "開始", "結束", "_", "_", "日期", "ID", "休始", "休止", "SurveyID"]);
         sysS.appendRow(["off", "", "", "", "", "", "", "", "", "", "", ""]);
+    }
+}
+
+function sendSummaryNotification(data) {
+    try {
+        const title = `崇正國樂團：${data.type}名單彙整`;
+        const body = data.content;
+        return sendBroadcastNotification(title, body);
+    } catch (e) {
+        return { success: false, message: e.toString() };
     }
 }
