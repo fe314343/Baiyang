@@ -471,6 +471,7 @@
                             <p class="text-3xl font-[900] text-rose-700" id="stat-absent">0</p>
                         </div>
                     </div>
+                    <div id="monitor-summary-container" class="mb-6 space-y-3 hidden"></div>
                     <div id="realtime-status-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scroll"></div>
                 </div>
             </div>
@@ -1642,13 +1643,16 @@
             if (res?.success) { showToast("活動已儲存"); closeEditModal(); loadEventList(); }
         }
 
+        let currentEventMeta = null;
         async function loadRealtimeStatus() {
             const listEl = document.getElementById('realtime-status-list'); if (!listEl) return;
+            const summaryEl = document.getElementById('monitor-summary-container');
             listEl.innerHTML = '<div class="py-10 text-[10px] font-black uppercase text-center">資料同步中...</div>';
             try {
                 const res = await callBackend('getRealtimeStatus', { section: currentUser.Section, role: currentUser.Role });
                 if (res && res.success) {
                     cachedMemberList = res.data || [];
+                    currentEventMeta = { start: res.eventStart, end: res.eventEnd, date: res.eventDate };
                     const presentEl = document.getElementById('stat-present'), absentEl = document.getElementById('stat-absent');
                     if (presentEl) presentEl.innerText = res.stats?.present || 0;
                     if (absentEl) absentEl.innerText = res.stats?.absent || 0;
@@ -1710,7 +1714,123 @@
                 else if (m.status === '請假') statusColor = 'text-amber-500';
                 return `<div class="bg-white/70 p-4 rounded-2xl flex justify-between items-center text-left"><div class="flex flex-col gap-1"><p class="font-black text-slate-800 text-xs">${m.Name} <span class="text-[9px] text-slate-400">(${m.Instrument})</span></p><div class="flex gap-2"><p class="text-[10px] font-black ${getAbsenceColorClass(abs)}">缺 ${abs}</p><p class="text-[10px] font-black text-amber-400">假 ${lv}</p></div></div><div class="text-right"><span class="text-xs font-black ${statusColor}">${m.status}</span></div></div>`
             }).join('');
+
+            renderMonitorSummary(list);
             safeCreateIcons();
+        }
+
+        function renderMonitorSummary(list) {
+            const container = document.getElementById('monitor-summary-container');
+            if (!container || !currentEventMeta || !currentEventMeta.start) {
+                if (container) container.classList.add('hidden');
+                return;
+            }
+
+            const now = new Date();
+            const startStr = String(currentEventMeta.start);
+            const endStr = String(currentEventMeta.end);
+
+            const parseTime = (str) => {
+                let h = 0, m = 0;
+                if (str.includes('時')) {
+                    const p = str.split('時'); h = parseInt(p[0]); m = parseInt(p[1] || 0);
+                } else if (str.includes(':')) {
+                    const p = str.split(':'); h = parseInt(p[0]); m = parseInt(p[1] || 0);
+                }
+                const d = new Date(currentEventMeta.date);
+                d.setHours(h, m, 0, 0);
+                return d;
+            };
+
+            const startTime = parseTime(startStr);
+            const endTime = parseTime(endStr);
+            const tenMinAfterStart = new Date(startTime.getTime() + 10 * 60 * 1000);
+
+            // 調試用：console.log("Now:", now, "Start+10:", tenMinAfterStart, "End:", endTime);
+
+            let summaryHtml = "";
+            const leaveList = list.filter(m => m.status === '請假');
+            const absentList = list.filter(m => m.status === '缺席');
+
+            // 1. 活動進行中 (不論是否過 10 分鐘，只要有請假就顯示，但 10 分鐘後標題變更)
+            if (now < endTime) {
+                if (leaveList.length > 0) {
+                    const isTenMinPassed = now > tenMinAfterStart;
+                    summaryHtml = `
+                        <div class="bg-amber-500/5 p-5 rounded-[28px] border border-amber-100/50">
+                            <div class="flex justify-between items-center mb-4">
+                                <h5 class="text-[10px] font-black text-amber-600 uppercase tracking-widest">${isTenMinPassed ? '今日請假名單彙整' : '預約請假名單'}</h5>
+                                <div class="flex gap-2">
+                                    <button onclick="copySummaryText('請假')" class="w-8 h-8 bg-white border border-amber-100 rounded-lg flex items-center justify-center text-amber-500 active:scale-95 transition-all"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                    <button onclick="pushSummaryToMobile('請假')" class="w-8 h-8 bg-amber-500 text-white rounded-lg flex items-center justify-center active:scale-95 shadow-sm shadow-amber-200 transition-all"><i data-lucide="send" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                ${leaveList.map(m => `<div class="bg-white/60 p-3 rounded-xl"><p class="text-[11px] font-black text-slate-700">${m.Name} <span class="text-[9px] text-slate-400 font-bold ml-1">${m.todayReason ? '理由：' + m.todayReason : '(未填原因)'}</span></p></div>`).join('')}
+                            </div>
+                            ${!isTenMinPassed ? '<p class="text-[8px] text-slate-400 font-bold mt-3 text-center">* 活動開始 10 分鐘後將彙整最終名單</p>' : ''}
+                        </div>`;
+                }
+            }
+            // 2. 活動結束後 -> 顯示缺席名單
+            else {
+                if (absentList.length > 0 || leaveList.length > 0) {
+                    summaryHtml = `
+                        <div class="bg-indigo-500/5 p-5 rounded-[28px] border border-indigo-100/50">
+                            <div class="flex justify-between items-center mb-4">
+                                <h5 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">今日考勤最終彙整</h5>
+                                <div class="flex gap-2">
+                                    <button onclick="copySummaryText('缺席')" class="w-8 h-8 bg-white border border-indigo-100 rounded-lg flex items-center justify-center text-indigo-500 active:scale-95 transition-all"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                    <button onclick="pushSummaryToMobile('缺席')" class="w-8 h-8 bg-indigo-500 text-white rounded-lg flex items-center justify-center active:scale-95 shadow-sm shadow-indigo-200 transition-all"><i data-lucide="send" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                ${absentList.length > 0 ? `<div><p class="text-[9px] font-black text-rose-500 mb-1">● 缺席人員 (${absentList.length}人)</p><p class="text-[11px] font-bold text-slate-600 leading-relaxed">${absentList.map(m => m.Name).join('、')}</p></div>` : ''}
+                                ${leaveList.length > 0 ? `<div><p class="text-[9px] font-black text-amber-500 mb-1">● 請假人員 (${leaveList.length}人)</p><p class="text-[11px] font-bold text-slate-600 leading-relaxed">${leaveList.map(m => m.Name).join('、')}</p></div>` : ''}
+                            </div>
+                        </div>`;
+                }
+            }
+
+            if (summaryHtml) {
+                container.innerHTML = summaryHtml;
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+            safeCreateIcons();
+            // v52: 增加二次觸發以確保動態元素已被捕獲
+            setTimeout(safeCreateIcons, 50);
+            setTimeout(safeCreateIcons, 500);
+        }
+
+        async function pushSummaryToMobile(type) {
+            const listEl = document.getElementById('realtime-status-list');
+            if (!cachedMemberList) return;
+            const leaveList = cachedMemberList.filter(m => m.status === '請假');
+            const absentList = cachedMemberList.filter(m => m.status === '缺席');
+            let content = "";
+            if (type === '請假') {
+                content = `【今日請假名單】\n` + leaveList.map(m => `${m.Name}: ${m.todayReason || '未填原因'}`).join('\n');
+            } else {
+                content = `【今日未到名單】\n缺席: ${absentList.map(m => m.Name).join('、') || '無'}\n請假: ${leaveList.map(m => m.Name).join('、') || '無'}`;
+            }
+            const res = await callBackend('sendSummaryNotification', { type, content });
+            if (res?.success) showToast("摘要已發送至手機");
+            else showToast("發送失敗", true);
+        }
+
+        function copySummaryText(type) {
+            if (!cachedMemberList) return;
+            const leaveList = cachedMemberList.filter(m => m.status === '請假');
+            const absentList = cachedMemberList.filter(m => m.status === '缺席');
+            let content = "";
+            if (type === '請假') {
+                content = `今日請假名單：\n` + leaveList.map(m => `・${m.Name} (${m.todayReason || '未填原因'})`).join('\n');
+            } else {
+                content = `今日未到名單：\n缺席：${absentList.map(m => m.Name).join('、') || '無'}\n請假：${leaveList.map(m => m.Name).join('、') || '無'}`;
+            }
+            navigator.clipboard.writeText(content).then(() => showToast("已複製到剪貼簿"));
         }
 
         async function loadSurveyList() {
