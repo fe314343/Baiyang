@@ -1634,6 +1634,7 @@
             }
 
             const reason = document.getElementById('proxy-reason')?.value.trim() || '';
+            const proxyLabel = ['Admin', 'Officer'].includes(currentUser.Role) ? '行政代請假' : '組長代請假';
             const btn = document.getElementById('leave-submit-btn');
             setBtnLoading(btn, true, '送出中...');
             try {
@@ -1643,7 +1644,7 @@
                     section: memberSection,
                     eventName: eventName,
                     date: eventDate,
-                    reason: reason ? `[組長代請假] ${reason}` : '[組長代請假]'
+                    reason: reason ? `[${proxyLabel}] ${reason}` : `[${proxyLabel}]`
                 });
                 if (res?.success) {
                     showToast(`已代 ${memberName} 送出請假`);
