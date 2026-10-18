@@ -28,6 +28,8 @@ function doPost(e) {
             case 'saveSurveyConfig': result = saveSurveyConfig(data); break;
             case 'getSurveyStatus': result = getSurveyStatus(data); break;
             case 'submitSurveyResponse': result = submitSurveyResponse(data); break;
+            case 'submitSurveyResponseBatch': result = submitSurveyResponseBatch(data); break;
+            case 'getMemberListForDelegation': result = getMemberListForDelegation(); break;
             case 'getSurveyResults': result = getSurveyResults(data); break;
             case 'saveSystemSetting': result = saveSystemSetting(data); break;
             case 'deactivateEvent': result = deactivateEvent(); break;
@@ -35,7 +37,13 @@ function doPost(e) {
             case 'testPush': result = testPush(data); break;
             case 'getStaffList': result = getStaffList(); break;
             case 'getUpcomingEvents': result = getUpcomingEvents(); break;
+            case 'saveEventConfig': result = saveEventConfig(data); break;
+            case 'getEventConfig': result = getEventConfig(); break;
             case 'submitLeave': result = submitLeave(data); break;
+            case 'submitPerformance': result = submitPerformance(data); break;
+            case 'getPerformances': result = getPerformances(data); break;
+            case 'submitStaffReport': result = submitStaffReport(data); break;
+            case 'getStaffReports': result = getStaffReports(data); break;
             default: result = { success: false, message: "未知指令" };
         }
     } catch (err) {
@@ -214,6 +222,7 @@ function getSurveyStatus(data) {
         return {
             success: true,
             active: true,
+            surveyId: String(activeId),
             title: template[1],
             description: template[2],
             questions: JSON.parse(template[3] || "[]"),
@@ -248,10 +257,37 @@ function submitSurveyResponse(data) {
         const headers = surveySheet.getRange(1, 1, 1, surveySheet.getLastColumn()).getValues()[0];
         const rowData = new Array(headers.length).fill("");
 
+        // 優先從問卷答案中解析填寫對象的「姓名」與「組別/聲部」
+        let targetName = userName;
+        for (const key of Object.keys(responses)) {
+            const lowerKey = String(key).toLowerCase();
+            if (lowerKey.includes("姓名") || lowerKey.includes("名字") || lowerKey === "name") {
+                if (responses[key] && String(responses[key]).trim() !== "") {
+                    targetName = String(responses[key]).trim();
+                    break;
+                }
+            }
+        }
+
+        let targetSection = userSection;
+        for (const key of Object.keys(responses)) {
+            const lowerKey = String(key).toLowerCase();
+            if (lowerKey.includes("組別") || lowerKey.includes("聲部") || lowerKey.includes("section") || lowerKey === "組") {
+                const val = String(responses[key] || "").trim();
+                if (val !== "") {
+                    // 若回答中包含樂團已知組別名稱，則僅提取組別（防範如「拉弦組(大提琴)」造成樂器也一起寫入的情況）
+                    const sections = ["吹管組", "拉弦組", "彈撥組", "揚打組", "低音組", "行政組"];
+                    const matchedSec = sections.find(s => val.includes(s));
+                    targetSection = matchedSec || val;
+                    break;
+                }
+            }
+        }
+
         rowData[0] = new Date(); // 時間
         rowData[1] = userEmail;
-        rowData[2] = userName;
-        rowData[3] = userSection; // 組別
+        rowData[2] = targetName;   // 寫入實際填寫對象的姓名，而非僅登入者名字
+        rowData[3] = targetSection;// 寫入實際填寫對象的組別
 
         // 根據題目標籤填入欄位（從第 5 欄開始）
         for (let i = 4; i < headers.length; i++) {
@@ -259,11 +295,16 @@ function submitSurveyResponse(data) {
             if (responses.hasOwnProperty(label)) rowData[i] = responses[label];
         }
 
-        // 4. 重複填寫檢查 (Email 為主)
+        // 4. 重複填寫檢查 (以 Email ＋ 填寫對象姓名 為主，實現一帳號幫多人填寫)
         const sheetVals = surveySheet.getDataRange().getValues();
         let rowIdx = -1;
         for (let i = 1; i < sheetVals.length; i++) {
-            if (String(sheetVals[i][1]).toLowerCase() === userEmail) { rowIdx = i + 1; break; }
+            const rowEmail = String(sheetVals[i][1]).toLowerCase();
+            const rowName = String(sheetVals[i][2]).trim();
+            if (rowEmail === userEmail && rowName === targetName) { 
+                rowIdx = i + 1; 
+                break; 
+            }
         }
 
         if (rowIdx !== -1) {
@@ -280,6 +321,88 @@ function submitSurveyResponse(data) {
         if (master) master.appendRow([new Date(), userEmail, userName, activeSurId, data.responsesJSON]);
         return { success: true };
     } catch (e) { return { success: false, message: e.toString() }; }
+}
+
+function submitSurveyResponseBatch(data) {
+    try {
+        const callerRole = String(data.role || "");
+        const callerSection = String(data.section || "").trim();
+        const isAdmin = callerRole === 'Admin' || callerRole === 'Officer';
+        const isLeader = callerRole === 'Leader';
+
+        if (!isAdmin && !isLeader) {
+            return { success: false, message: "無權限執行批次劃記" };
+        }
+
+        const activeSurId = data.surveyId || SS.getSheetByName("SystemConfig").getRange(2, 12).getValue();
+        if (!activeSurId) return { success: false, message: "無指定或啟動中問卷" };
+
+        const templates = SS.getSheetByName("SurveyTemplates").getDataRange().getValues();
+        const templateRow = templates.find(r => String(r[0]) === String(activeSurId));
+        if (!templateRow) return { success: false, message: "找不到問卷定義" };
+        const questions = JSON.parse(templateRow[3] || "[]");
+
+        const surveySheet = getOrCreateSurveySheet(activeSurId, templateRow[1], questions);
+        const headers = surveySheet.getRange(1, 1, 1, surveySheet.getLastColumn()).getValues()[0];
+
+        const batchList = data.batchData || [];
+        if (batchList.length === 0) return { success: false, message: "請選擇要劃記的成員" };
+
+        let successCount = 0;
+        const master = SS.getSheetByName("SurveyResponses");
+
+        batchList.forEach(item => {
+            const memberSection = String(item.section || "").trim();
+            // 權限隔離校驗：Leader 只能劃記自己 Section 的人員
+            if (isLeader && memberSection !== callerSection) {
+                return; // 跳過非本組成員
+            }
+
+            const targetName = String(item.name || "").trim();
+            const memberEmail = String(item.email || "").toLowerCase().trim();
+            const responses = typeof item.responses === 'object' ? item.responses : JSON.parse(item.responsesJSON || "{}");
+
+            const rowData = new Array(headers.length).fill("");
+            rowData[0] = new Date();
+            rowData[1] = memberEmail || `${targetName}@delegated.local`;
+            rowData[2] = targetName;
+            rowData[3] = memberSection || callerSection;
+
+            for (let i = 4; i < headers.length; i++) {
+                const label = headers[i];
+                if (responses.hasOwnProperty(label)) rowData[i] = responses[label];
+            }
+
+            // 尋找是否已有該成員的寫入紀錄（以 Name + Section 為 Key）
+            const sheetVals = surveySheet.getDataRange().getValues();
+            let rowIdx = -1;
+            for (let i = 1; i < sheetVals.length; i++) {
+                const rowName = String(sheetVals[i][2]).trim();
+                const rowSec = String(sheetVals[i][3]).trim();
+                if (rowName === targetName && (rowSec === memberSection || !memberSection)) {
+                    rowIdx = i + 1;
+                    break;
+                }
+            }
+
+            const formattedRow = rowData.map(v => v instanceof Date ? Utilities.formatDate(v, "GMT+8", "yyyy-MM-dd HH:mm:ss") : String(v));
+            if (rowIdx !== -1) {
+                surveySheet.getRange(rowIdx, 1, 1, rowData.length).setNumberFormat('@').setValues([formattedRow]);
+            } else {
+                const newRow = surveySheet.getLastRow() + 1;
+                const range = surveySheet.getRange(newRow, 1, 1, rowData.length);
+                range.setNumberFormat('@');
+                range.setValues([formattedRow]);
+            }
+
+            if (master) master.appendRow([new Date(), memberEmail, targetName, activeSurId, JSON.stringify(responses)]);
+            successCount++;
+        });
+
+        return { success: true, count: successCount };
+    } catch (e) {
+        return { success: false, message: e.toString() };
+    }
 }
 function getOrCreateSurveySheet(surveyId, title, questions) {
     const sheetName = "SRV_" + surveyId;
@@ -354,21 +477,34 @@ function getSurveyResults(data) {
             return item;
         });
 
-        // 3. 若為 Leader，回傳該組全員名單（含填寫狀態）
+        // 3. 回傳成員名單（含填寫狀態），用於回覆管理與未填過濾
         let memberList = [];
-        if (data.role === 'Leader' && data.section) {
+        const isLeader = data.role === 'Leader' && data.section;
+        const isAdminOrOfficer = (data.role === 'Admin' || data.role === 'Officer');
+        if (isLeader || isAdminOrOfficer) {
             const memS = SS.getSheetByName("Members");
-            const allMembers = memS.getDataRange().getValues().slice(1);
-            const sectionMembers = allMembers.filter(m => String(m[2] || "").trim() === data.section);
-            // 已填寫的 email 清單
-            const filledEmails = rows.map(r => String(r[1] || "").toLowerCase().trim());
-            memberList = sectionMembers.map(m => ({
-                name: m[1],
-                instrument: m[6] || "",
-                filled: filledEmails.includes(String(m[3] || "").toLowerCase().trim())
-            }));
-            // 已填寫排後面，未填寫排前面
-            memberList.sort((a, b) => a.filled === b.filled ? 0 : a.filled ? 1 : -1);
+            if (memS) {
+                const allMembers = memS.getDataRange().getValues().slice(1);
+                const filteredMembers = isLeader
+                    ? allMembers.filter(m => String(m[2] || "").trim() === data.section)
+                    : allMembers;
+                // 收集已填寫的 email 與 姓名 清單 (相容自己填寫與他人代填)
+                const filledEmails = rows.map(r => String(r[1] || "").toLowerCase().trim());
+                const filledNames = rows.map(r => String(r[2] || "").trim());
+                memberList = filteredMembers.map(m => {
+                    const memName = String(m[1] || "").trim();
+                    const memEmail = String(m[3] || "").toLowerCase().trim();
+                    const sectionStr = String(m[2] || "").trim();
+                    return {
+                        name: memName,
+                        section: sectionStr,
+                        instrument: String(m[6] || "").trim(),
+                        filled: filledEmails.includes(memEmail) || filledNames.includes(memName)
+                    };
+                }).filter(m => m.name); // 排除空欄位
+                // 已填寫排後面，未填寫排前面
+                memberList.sort((a, b) => a.filled === b.filled ? 0 : a.filled ? 1 : -1);
+            }
         }
 
         return { success: true, data: results, rawData: rawData.reverse(), memberList: memberList };
@@ -407,8 +543,12 @@ function getRealtimeStatus(userData) {
             const attDateRaw = attendance[i][5];
             const attDate = attDateRaw instanceof Date ? Utilities.formatDate(attDateRaw, "GMT+8", "yyyy-MM-dd") : String(attDateRaw || "");
 
-            // 紀錄活動總場次 (利用 日期+活動名 當作唯一值)
-            if (attDate && attEvent) uniqueEvents[attDate + "_" + attEvent] = true;
+            // 紀錄活動總場次與日期 (利用 日期+活動名 當作唯一值，並儲存日期做後續比對)
+            if (attDate && attEvent) {
+                if (!uniqueEvents[attDate + "_" + attEvent]) {
+                    uniqueEvents[attDate + "_" + attEvent] = attDate;
+                }
+            }
             if (!userStats[email]) userStats[email] = { presentCount: 0, leaveCount: 0, today: false, todayStatus: "尚未簽到", todayReason: "" };
             
             const attStatus = String(attendance[i][6] || ""); // 判斷是出席還是請假
@@ -428,38 +568,78 @@ function getRealtimeStatus(userData) {
             }
         }
 
-        // 計算樂團總共辦了幾場活動
+        // ---------------------------------
+        // 計算系統時間與活動截止
+        // ---------------------------------
+        let endH = 0, endM = 0;
+        if (currentEventEndTime.includes('時')) {
+            const parts = currentEventEndTime.split('時');
+            endH = parseInt(parts[0]); endM = parseInt(parts[1]);
+        } else if (currentEventEndTime.includes(':')) {
+            const parts = currentEventEndTime.split(':');
+            endH = parseInt(parts[0]); endM = parseInt(parts[1]);
+        }
+        const endDateTime = new Date(currentEventDate);
+        endDateTime.setHours(endH, endM, 0);
+
+        const currentEventConcluded = isSystemOn && (now > endDateTime);
+        const todayStr = Utilities.formatDate(now, "GMT+8", "yyyy-MM-dd");
+
+        // 重新加上被誤刪的活動總數計算
         const totalEventsCount = Object.keys(uniqueEvents).length;
-        
-        // 過濾掉「行政組」，不讓他們出現在出缺席監控中
-        const filteredMembers = members.slice(1).filter(m => String(m[2] || "").trim() !== "行政組");
+
+        // 過濾掉「行政組」，不讓他們出現在出缺席監控中 (除非指定 includeStaff 為 true)
+        const includeStaff = userData && (userData.includeStaff === true || userData.includeStaff === "true");
+        const filteredMembers = includeStaff
+            ? members.slice(1)
+            : members.slice(1).filter(m => String(m[2] || "").trim() !== "行政組");
         
         const data = filteredMembers.map(m => {
             const email = String(m[3] || "").toLowerCase().trim();
+            const joinDateRaw = m[7]; // 成員入團日期
+            let joinDateStr = "";
+            if (joinDateRaw) {
+                joinDateStr = joinDateRaw instanceof Date ? Utilities.formatDate(joinDateRaw, "GMT+8", "yyyy-MM-dd") : String(joinDateRaw).substring(0, 10);
+            }
+
+            let memberTotalEventsCount = 0;
+            // 逐個檢查 uniqueEvents，只計算已經「過期/結束」的活動
+            for (let key in uniqueEvents) {
+                const evtDate = uniqueEvents[key];
+                const evtName = key.split('_')[1];
+
+                let isConcluded = false;
+                if (evtDate < todayStr) {
+                    isConcluded = true;
+                } else if (evtDate === todayStr) {
+                    if (isSystemOn && evtDate === currentEventDate && evtName === currentEventName) {
+                        isConcluded = currentEventConcluded;
+                    } else {
+                        isConcluded = true;
+                    }
+                } // 若 > todayStr (未來活動)，則為 false (完全不採計)
+
+                if (isConcluded) {
+                    if (!joinDateStr || evtDate >= joinDateStr) {
+                        memberTotalEventsCount++;
+                    }
+                }
+            }
+
             const stats = userStats[email] || { presentCount: 0, leaveCount: 0, today: false, todayStatus: "尚未簽到" };
 
             let statusText = "尚未簽到";
             if (stats.today) {
                 statusText = stats.todayStatus;
             } else if (isSystemOn) {
-                let endH = 0, endM = 0;
-                if (currentEventEndTime.includes('時')) {
-                    const parts = currentEventEndTime.split('時');
-                    endH = parseInt(parts[0]); endM = parseInt(parts[1]);
-                } else if (currentEventEndTime.includes(':')) {
-                    const parts = currentEventEndTime.split(':');
-                    endH = parseInt(parts[0]); endM = parseInt(parts[1]);
-                }
-                const endDateTime = new Date(currentEventDate);
-                endDateTime.setHours(endH, endM, 0);
                 // 如果系統開啟中但已經打鐘了
-                if (now > endDateTime) statusText = "缺席";
+                if (currentEventConcluded) statusText = "缺席";
             } else {
                 // 系統已經關閉，但這個人沒簽到
                 statusText = "缺席";
             }
-            // 【真實缺席數】 = 樂團總共辦了幾場活動 - 出席總次數 - 請假總次數
-            let absenceCount = totalEventsCount - stats.presentCount - stats.leaveCount;
+            // 【真實缺席數】 = 該成員加入後且「已結束」的活動總數 - 出席總次數 - 請假總次數
+            let absenceCount = memberTotalEventsCount - stats.presentCount - stats.leaveCount;
             if (absenceCount < 0) absenceCount = 0;
             return {
                 Name: m[1], Section: m[2], Instrument: m[6], Email: email,
@@ -475,7 +655,8 @@ function getRealtimeStatus(userData) {
             success: true, data, stats, totalEvents: totalEventsCount,
             eventStart: formatTimeValue(config[3]), 
             eventEnd: formatTimeValue(config[4]), 
-            eventDate: currentEventDate
+            eventDate: currentEventDate,
+            eventName: currentEventName
         };
     } catch (e) { return { success: false, message: e.toString() }; }
 }
@@ -501,6 +682,27 @@ function getStaffList() {
         return { success: true, data: staffs };
     } catch (e) { 
         return { success: false, message: e.toString() }; 
+    }
+}
+
+function getMemberListForDelegation() {
+    try {
+        const memS = SS.getSheetByName("Members");
+        if (!memS) return { success: false, message: "找不到 Members 工作表" };
+        const members = memS.getDataRange().getValues();
+        if (members.length <= 1) return { success: true, data: [] };
+        
+        const list = members.slice(1).map(m => ({
+            Name: String(m[1] || "").trim(),
+            Section: String(m[2] || "").trim(),
+            Email: String(m[3] || "").toLowerCase().trim(),
+            Role: String(m[5] || "").trim(),
+            Instrument: String(m[6] || "").trim()
+        })).filter(m => m.Name !== "");
+        
+        return { success: true, data: list };
+    } catch (e) {
+        return { success: false, message: e.toString() };
     }
 }
 
@@ -567,11 +769,39 @@ function saveSystemSetting(data) {
         const value = String(data.value);
 
         if (key === 'bypassCode') {
-            // 將授權碼保存在 M 欄 (第 13 欄)
             sysS.getRange(2, 13).setValue(value);
             return { success: true };
         }
         return { success: false, message: "無效的設定鍵值" };
+    } catch (e) {
+        return { success: false, message: e.toString() };
+    }
+}
+
+function saveEventConfig(data) {
+    try {
+        const sysS = SS.getSheetByName("SystemConfig");
+        if (sysS.getLastColumn() < 15) sysS.insertColumnsAfter(sysS.getLastColumn(), 15 - sysS.getLastColumn());
+        sysS.getRange(2, 14).setValue(String(data.eventName || ''));
+        sysS.getRange(2, 15).setValue(String(data.eventDate || ''));
+        return { success: true };
+    } catch (e) {
+        return { success: false, message: e.toString() };
+    }
+}
+
+function getEventConfig() {
+    try {
+        const sysS = SS.getSheetByName("SystemConfig");
+        if (sysS.getLastColumn() < 15) return { success: true, eventName: '', eventDate: '' };
+        const row = sysS.getRange(2, 14, 1, 2).getValues()[0];
+        let dateVal = row[1];
+        if (dateVal instanceof Date) {
+            dateVal = Utilities.formatDate(dateVal, "GMT+8", "yyyy-MM-dd");
+        } else {
+            dateVal = String(dateVal || '');
+        }
+        return { success: true, eventName: String(row[0] || ''), eventDate: dateVal };
     } catch (e) {
         return { success: false, message: e.toString() };
     }
@@ -626,6 +856,20 @@ function submitCheckin(data) {
 
 function submitLeave(data) {
     try {
+        if (!data.date) return { success: false, message: "未指定活動日期" };
+
+        const now = new Date();
+        const todayStr = Utilities.formatDate(now, "GMT+8", "yyyy-MM-dd");
+        const currentHM = Number(Utilities.formatDate(now, "GMT+8", "HHmm"));
+        const eventDateStr = String(data.date).trim();
+
+        if (eventDateStr < todayStr) {
+            return { success: false, message: "該場次活動日期已過，無法辦理線上請假" };
+        }
+        if (eventDateStr === todayStr && currentHM >= 1430) {
+            return { success: false, message: "活動當天 14:30 後已截止請假申請" };
+        }
+
         SS.getSheetByName("Attendance").appendRow([
             new Date(), 
             data.name, 
@@ -909,7 +1153,7 @@ function formatTimeValue(v) {
 }
 
 function checkAndInitSheets() {
-    const sheets = ["Members", "Attendance", "Events", "SystemConfig", "Announcements", "SurveyTemplates", "SurveyResponses"];
+    const sheets = ["Members", "Attendance", "Events", "SystemConfig", "Announcements", "SurveyTemplates", "SurveyResponses", "PerformanceRecords"];
     sheets.forEach(n => { if (!SS.getSheetByName(n)) SS.insertSheet(n); });
     const sysS = SS.getSheetByName("SystemConfig");
     if (sysS.getLastRow() === 0) {
@@ -923,6 +1167,195 @@ function sendSummaryNotification(data) {
         const title = `崇正國樂團：${data.type}名單彙整`;
         const body = data.content;
         return sendBroadcastNotification(title, body);
+    } catch (e) {
+        return { success: false, message: e.toString() };
+    }
+}
+
+// ==========================================
+// D. 表演時數功能 (Performance Records)
+// ==========================================
+
+function submitPerformance(data) {
+    try {
+        const sheet = SS.getSheetByName("PerformanceRecords");
+        if (!sheet) return { success: false, message: "找不到 PerformanceRecords 工作表" };
+
+        const eventName = String(data.eventName || "").trim();
+        const eventDate = String(data.eventDate || "").trim();
+        const durationMinutes = parseInt(data.durationMinutes) || 0;
+        const members = data.members || []; // [{ name, email }]
+
+        if (!eventName || !eventDate || !durationMinutes || members.length === 0) {
+            return { success: false, message: "請填寫完整的表演資訊與參與人員" };
+        }
+
+        const timestamp = new Date();
+        members.forEach(m => {
+            sheet.appendRow([timestamp, eventName, eventDate, durationMinutes, String(m.email).toLowerCase().trim(), m.name]);
+        });
+
+        return { success: true, count: members.length };
+    } catch (e) {
+        return { success: false, message: e.toString() };
+    }
+}
+
+function getPerformances(data) {
+    try {
+        const sheet = SS.getSheetByName("PerformanceRecords");
+        if (!sheet || sheet.getLastRow() < 2) return { success: true, data: [], totalMinutes: 0 };
+
+        const rows = sheet.getDataRange().getValues().slice(1);
+        const requestEmail = String(data.email || "").toLowerCase().trim();
+        const role = String(data.role || "");
+        const isAdmin = role === 'Admin' || role === 'Officer';
+
+        // 一律依 Date+EventName 聚合，避免同一場表演的多筆資料各自顯示
+        const eventMap = {};
+        rows.forEach(r => {
+            const rowEmail = String(r[4] || "").toLowerCase().trim();
+            if (!isAdmin && rowEmail !== requestEmail) return; // 非管理員只看自己的
+            const dateRaw = r[2];
+            const dateStr = dateRaw instanceof Date ? Utilities.formatDate(dateRaw, "GMT+8", "yyyy-MM-dd") : String(dateRaw || "");
+            const key = dateStr + "_" + String(r[1]);
+            if (!eventMap[key]) {
+                eventMap[key] = { eventName: r[1], eventDate: dateStr, durationMinutes: parseInt(r[3]) || 0, members: [] };
+            }
+            if (isAdmin) eventMap[key].members.push({ name: r[5], email: r[4] });
+        });
+
+        const results = Object.values(eventMap).sort((a, b) => b.eventDate.localeCompare(a.eventDate));
+
+        // 計算個人總時數
+        let personalMinutes = 0;
+        rows.forEach(r => {
+            if (String(r[4] || "").toLowerCase().trim() === requestEmail) {
+                personalMinutes += parseInt(r[3]) || 0;
+            }
+        });
+
+        return { success: true, data: results, totalMinutes: personalMinutes };
+    } catch (e) {
+        return { success: false, message: e.toString() };
+    }
+}
+
+// ==========================================
+// E. 行政協助人員專屬報表 (Staff Reports -> Transport & Meal Survey)
+// ==========================================
+
+function submitStaffReport(data) {
+    try {
+        let sheet = SS.getSheetByName("StaffSurveys");
+        if (!sheet) {
+            sheet = SS.insertSheet("StaffSurveys");
+            sheet.appendRow(["時間戳記", "對應日期", "活動名稱", "填寫人Email", "填寫人姓名", "協助人員Email", "協助人員姓名", "組別", "協助職能", "聯絡電話", "身分證字號", "出生年月日", "交通方式", "是否需要停車位", "膳食需求", "備註"]);
+            sheet.getRange(1, 1, 1, 16).setFontWeight("bold").setBackground("#f3f4f6").setHorizontalAlignment("center");
+            sheet.setFrozenRows(1);
+            for (let i = 1; i <= 16; i++) sheet.autoResizeColumn(i);
+        }
+        
+        const replies = data.replies || [];
+        const date = data.date;
+        const eventName = data.eventName;
+        const fillerEmail = String(data.email).toLowerCase().trim();
+        const fillerName = data.name;
+        
+        // 載入團員基本資料庫，比對個資 (以 Email 為主，自動拉取個資)
+        const memS = SS.getSheetByName("Members");
+        const members = memS.getDataRange().getValues().slice(1);
+        const memberMap = {};
+        members.forEach(m => {
+            const email = String(m[3] || "").toLowerCase().trim();
+            memberMap[email] = {
+                section: String(m[2] || ""),
+                instrument: String(m[6] || ""),
+                phone: String(m[9] || ""),
+                birthday: m[10] instanceof Date ? Utilities.formatDate(m[10], "GMT+8", "yyyy-MM-dd") : String(m[10] || ""),
+                idNumber: String(m[11] || "")
+            };
+        });
+
+        const rowsToAppend = [];
+        replies.forEach(r => {
+            const email = String(r.email).toLowerCase().trim();
+            const details = memberMap[email] || { section: "行政組", instrument: "行政", phone: "", birthday: "", idNumber: "" };
+            
+            rowsToAppend.push([
+                new Date(),
+                date,
+                eventName,
+                fillerEmail,
+                fillerName,
+                email,
+                r.name,
+                details.section,
+                details.instrument,
+                r.phone || details.phone || "",
+                r.idNumber || details.idNumber || "",
+                r.birthday || details.birthday || "",
+                r.transit || "",
+                r.parking || "",
+                r.meal || "",
+                r.notes || ""
+            ]);
+        });
+        
+        if (rowsToAppend.length > 0) {
+            const startRow = sheet.getLastRow() + 1;
+            sheet.getRange(startRow, 1, rowsToAppend.length, 16).setValues(rowsToAppend);
+        }
+        
+        return { success: true, count: rowsToAppend.length };
+    } catch (e) {
+        return { success: false, message: e.toString() };
+    }
+}
+
+function getStaffReports(data) {
+    try {
+        const sheet = SS.getSheetByName("StaffSurveys");
+        if (!sheet || sheet.getLastRow() < 2) return { success: true, data: [] };
+
+        const vals = sheet.getDataRange().getValues();
+        const rows = vals.slice(1);
+        const roleType = data.roleType; // 音控 / 錄影 / 場務 / all
+
+        let filtered = rows;
+        if (roleType && roleType !== 'all') {
+            filtered = filtered.filter(r => String(r[8]).trim() === roleType.trim());
+        }
+
+        const dataList = filtered.map(r => {
+            let timeStr = "";
+            try {
+                if (r[0] instanceof Date) {
+                    timeStr = Utilities.formatDate(r[0], "GMT+8", "MM/dd HH:mm");
+                } else {
+                    timeStr = String(r[0] || "");
+                }
+            } catch (e) { timeStr = String(r[0] || ""); }
+
+            return {
+                timestamp: timeStr,
+                date: r[1],
+                eventName: r[2],
+                fillerName: r[4],
+                email: r[5],
+                name: r[6],
+                roleType: r[8],
+                phone: r[9],
+                idNumber: r[10],
+                birthday: r[11],
+                transit: r[12],
+                parking: r[13],
+                meal: r[14],
+                notes: r[15]
+            };
+        });
+
+        return { success: true, data: dataList.reverse() }; // Latest first
     } catch (e) {
         return { success: false, message: e.toString() };
     }
